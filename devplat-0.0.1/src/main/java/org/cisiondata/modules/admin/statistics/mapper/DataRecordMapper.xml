@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.admin.statistics.dao.DataRecordDAO">
+
+	<resultMap type="DataRecord" id="dataRecordResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="name" column="NAME"/>
+        <result property="dataNum" column="DATA_NUM"/>  
+        <result property="docNum" column="DOC_NUM"/> 
+        <result property="insertDate" column="INSERT_DATE"/> 
+        <result property="insertTime" column="INSERT_TIME"/> 
+    </resultMap>
+    
+    <sql id="columnClause">NAME, DATA_NUM, DOC_NUM, INSERT_DATE, INSERT_TIME</sql>
+    
+    <sql id="whereClause">
+    	<where>
+    		<if test="condition.name != null and condition.name != ''">
+    			AND NAME = #{condition.name}
+    		</if>
+    		<if test="condition.dataNum != null">
+    			AND DATA_NUM = #{condition.dataNum}
+    		</if>
+    		<if test="condition.docNum != null">
+    			AND DOC_NUM = #{condition.docNum}
+    		</if>
+    		<if test="condition.insertDate != null and condition.insertDate != ''">
+    			AND INSERT_DATE = #{condition.insertDate}
+    		</if>
+    	</where>
+    </sql>
+    
+     <insert id="insert" parameterType="DataRecord">
+            INSERT INTO T_USER_DATA_RECORD(NAME, DATA_NUM, DOC_NUM, INSERT_DATE, INSERT_TIME) 
+            VALUES(#{name},#{dataNum},#{docNum},#{insertDate},#{insertTime})  
+    </insert>
+    
+    <select id="readDataByPK" resultType="DataRecord" resultMap="dataRecordResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_USER_DATA_RECORD WHERE ID = #{pk}
+    </select>
+    
+    <select id="readDataByCondition" resultType="DataRecord" resultMap="dataRecordResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_USER_DATA_RECORD 
+            <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataListByCondition" resultType="DataRecord" resultMap="dataRecordResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_USER_DATA_RECORD 
+            <include refid="whereClause"/>
+            ORDER BY INSERT_TIME DESC limit 0,30
+    </select>
+    
+    <select id="readDataPaginationByCondition" resultType="DataRecord" resultMap="dataRecordResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_USER_DATA_RECORD
+        ]]>   
+    </select>
+    
+     <select id="readDataByInsertDate" parameterType="string" resultType="DataRecord">  
+            SELECT NAME name, DATA_NUM dataNum,DOC_NUM docNum FROM T_USER_DATA_RECORD WHERE INSERT_DATE = #{time} order by NAME
+    </select>
+    
+    <select id="readDataByTimeSeven" parameterType="string" resultType="DataRecord">  
+    	select NAME name, SUM(t.DATA_NUM) dataNum, SUM(t.DOC_NUM)  docNum from 
+			(select NAME, DATA_NUM, DOC_NUM from T_USER_DATA_RECORD  where INSERT_DATE >=  #{time7} ) t
+		 group by NAME order by NAME
+    </select>
+     
+     <select id="readDataByTimeThirty" parameterType="string" resultType="DataRecord">  
+    	select NAME name, SUM(t.DATA_NUM) dataNum, SUM(t.DOC_NUM)  docNum from 
+			(select NAME, DATA_NUM, DOC_NUM from T_USER_DATA_RECORD  where INSERT_DATE >=  #{time30} ) t
+		 group by NAME order by NAME
+    </select>
+</mapper>

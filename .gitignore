@@ -1,0 +1,16 @@
+.svn
+.metadata
+.recommenders
+RemoteSystemsTempFiles
+Servers
+target
+classes
+WEB-INF/classes/
+bin
+lib
+*.bat
+*.dat
+*.class
+*/org.eclipse.wst.common.component
+esclient
+esentity

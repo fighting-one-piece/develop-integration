@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.authentication.dao.ResourceDAO">
+
+	<resultMap type="Resource" id="resourceResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="name" column="NAME"/>
+        <result property="type" column="TYPE"/>  
+        <result property="identity" column="IDENTITY"/> 
+        <result property="url" column="URL"/> 
+        <result property="icon" column="ICON"/> 
+        <result property="priority" column="PRIORITY"/> 
+        <result property="deleteFlag" column="DELETE_FLAG"/> 
+    </resultMap>
+    
+    <sql id="columnClause">ID, NAME, TYPE, IDENTITY, URL, ICON, PRIORITY, DELETE_FLAG</sql>
+    
+    <sql id="whereClause">
+    	<where>
+    		<if test="condition.name != null and condition.name != ''">
+    			AND NAME = #{condition.name}
+    		</if>
+    		<if test="condition.identity != null and condition.identity != ''">
+    			AND IDENTITY = #{condition.identity}
+    		</if>
+    		<if test="condition.type != null">
+    			AND TYPE = #{condition.type}
+    		</if>
+    		<if test="condition.url != null and condition.url != ''">
+    			AND URL = #{condition.url}
+    		</if>
+    		<if test="condition.deleteFlag != null">
+    			AND DELETE_FLAG = #{condition.deleteFlag}
+    		</if>
+    	</where>
+    </sql>
+    
+     <insert id="insert" parameterType="Resource">
+            INSERT INTO T_RESOURCE(NAME, TYPE, IDENTITY, URL, ICON, PRIORITY, DELETE_FLAG) 
+            VALUES(#{name},#{type},#{identity},#{url},#{icon},#{priority},#{DELETE_FLAG})  
+    </insert>
+    
+    <select id="readDataByPK" resultMap="resourceResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_RESOURCE WHERE ID = #{id}
+    </select>
+    
+    <select id="readDataByCondition" resultMap="resourceResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_RESOURCE
+            <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataListByCondition" resultMap="resourceResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_RESOURCE
+            <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataPaginationByCondition" resultMap="resourceResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_RESOURCE
+        ]]>   
+    </select>
+    
+</mapper>

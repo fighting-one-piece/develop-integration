@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.admin.auth.dao.AGroupDAO">
+
+	<resultMap type="AGroup" id="groupResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="name" column="NAME"/>
+        <result property="identity" column="IDENTITY"/> 
+        <result property="desc" column="DESCRIPTION"/> 
+        <result property="createTime" column="CREATE_TIME" javaType="java.util.Date"/> 
+        <result property="deleteFlag" column="DELETE_FLAG" /> 
+        <result property="account" column="ACCOUNT" />
+    </resultMap>
+    <!-- 查询全部 -->
+    <select id="selAll" resultMap="groupResultMap">
+    	SELECT ID,NAME,IDENTITY,DESCRIPTION,CREATE_TIME,DELETE_FLAG FROM T_GROUP
+    </select>
+    <!-- 根据id获取 -->
+    <select id="getIdGroup" resultMap="groupResultMap">
+    	SELECT ID,NAME,IDENTITY,DESCRIPTION,CREATE_TIME,DELETE_FLAG FROM T_GROUP WHERE ID =#{id}
+    </select>
+    <!-- 查询是否存在该名称 -->
+    <select id="selGroup" parameterType="String" resultType="int">
+    	SELECT COUNT(*) FROM T_GROUP WHERE NAME = #{0}
+    </select>
+   	<!-- 增加群组 -->
+    <insert id="addGroup" parameterType="AGroup">
+    	INSERT INTO T_GROUP(NAME,IDENTITY,DESCRIPTION,CREATE_TIME,DELETE_FLAG) VALUES(#{name},#{identity},#{desc},#{createTime},#{deleteFlag})
+    </insert>
+    <!-- 修改群组信息 -->
+    <update id="updateGroup" parameterType="AGroup">
+    	UPDATE T_GROUP SET NAME=#{name},IDENTITY=#{identity},DESCRIPTION=#{desc},DELETE_FLAG=#{deleteFlag} where ID=#{id}
+    </update>
+    <!-- 删除群组与用户相关联信息 -->
+    <delete id="delGUser" > 
+    	DELETE FROM T_USER_GROUP WHERE GROUP_ID = #{0}
+    </delete>
+    <!-- 删除群组与角色相关信息 -->
+    <delete id="delGRole">
+    	DELETE FROM T_GROUP_ROLE WHERE GROUP_ID = #{0}
+    </delete>
+    <!-- 根据ID删除群组 -->
+    <delete id="delGroup">
+    	DELETE FROM T_GROUP WHERE ID = #{0}
+    </delete>
+    <!-- 根据群ID获取用户名称 -->
+    <select id="getByIdUser"  resultMap="groupResultMap">
+    	SELECT ACCOUNT FROM T_USER WHERE ID IN (SELECT USER_ID FROM T_USER_GROUP WHERE GROUP_ID =#{0});
+    </select>
+    <!-- 获取不属于当前群组的用户名称 -->
+    <select id="getByIdNotUser" resultMap="groupResultMap">
+    	SELECT ACCOUNT FROM T_USER WHERE ID NOT IN (SELECT USER_ID FROM T_USER_GROUP WHERE GROUP_ID =#{0});
+    </select>
+</mapper>

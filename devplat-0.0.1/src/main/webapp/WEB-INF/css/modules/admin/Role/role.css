@@ -1,0 +1,50 @@
+#a{
+	 width:200px;
+	 height:10px;
+	 text-align: center;
+}
+#whole{
+	margin:0 auto;   
+    width:1000px;   
+    height:600px;   
+}
+
+#role{
+	text-align: center;
+}
+#butn{
+	padding: 3px 5px;
+    background: #13ACF8;  
+    width:120px;
+    color: #fff;
+    border: 3px solid #6CD6FF;
+    font-weight: bold;
+    font-family: "微软雅黑", "Microsoft Yahei", "黑体", sans-serif;
+	
+}
+.result{
+	width:200px;
+	 height:10px;
+	 text-align: center;
+	
+}
+.role_result_updata{
+	display: none;
+	position: absolute;
+	top: 15%;
+	left: 26%;
+	width: 48%;
+	height: 40%;
+	padding: 16px;
+	border: 5px solid orange;
+	border-radius: 10px;
+	background-color: white;
+	z-index: 1002;
+	overflow-y: auto; 
+}
+#centers{
+	margin:0 auto;   
+    width:400px;   
+}
+
+

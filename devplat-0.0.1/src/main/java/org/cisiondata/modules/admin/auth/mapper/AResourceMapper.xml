@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.admin.auth.dao.AResourceDao">
+
+	<resultMap type="org.cisiondata.modules.admin.auth.entity.AResource" id="AResourceModelMap">
+		<id property="id" column="ID"/>
+		<result column="NAME" property="name"/>
+		<result column="TYPE" property="type" javaType="int"/>
+		<result column="IDENTITY" property="identity"/>
+		<result column="URL" property="url"/>
+		<result column="ICON" property="icon"/>
+		<result column="PRIORITY" property="priority"/>
+		<result column="PARENT_ID" property="parentId"/>
+		<result column="PARENT_NAME" property="parentName"/>
+		<result column="DELETE_FLAG" property="deleteFlag" javaType="int"/>
+	</resultMap>
+	<!-- 增加 -->
+	<insert id="addAResource" parameterType="org.cisiondata.modules.admin.auth.entity.AResource">
+		insert into T_RESOURCE(NAME,TYPE,IDENTITY,URL,ICON,PRIORITY,PARENT_ID,DELETE_FLAG) 
+		value (#{name},#{type},#{identity},#{url},#{icon},#{priority},#{parentId},0)
+	</insert>
+	<!-- 查询全部 -->
+	<select id="findAllAResource" resultMap="AResourceModelMap">
+		select ID,NAME,TYPE,IDENTITY,URL,ICON,PRIORITY,PARENT_ID,DELETE_FLAG from T_RESOURCE WHERE DELETE_FLAG=0
+	</select>
+	<!-- 根据状态查询 -->
+	<select id="findByDeleteFlag" resultMap="AResourceModelMap">
+		select ID,NAME,TYPE,IDENTITY,URL,ICON,PRIORITY,PARENT_ID,DELETE_FLAG from T_RESOURCE WHERE DELETE_FLAG=1
+	</select>
+	<!-- 根据ID修改deleteFlag -->
+	<update id="updateDeleteFlagById" parameterType="long">
+		update T_RESOURCE set DELETE_FLAG=1 where ID=#{id}
+	</update>
+	<!-- 根据parentId修改parentId -->
+	<update id="updateParentIdByParentId" parameterType="long">
+		update T_RESOURCE set PARENT_ID='' where PARENT_ID=#{parentId}
+	</update>
+	<!-- 根据资源类型查询 -->
+	<select id="findByType" parameterType="int" resultMap="AResourceModelMap">
+		select ID,NAME,TYPE,IDENTITY,URL,ICON,PRIORITY,PARENT_ID,DELETE_FLAG from T_RESOURCE WHERE TYPE=#{type} AND DELETE_FLAG=0 ORDER BY PRIORITY
+	</select>
+	<!-- 根据资源类型分页查询 -->
+	<select id="findByPage" resultMap="AResourceModelMap">
+		select T1.ID ID,T1.NAME NAME,T1.TYPE TYPE,T1.IDENTITY IDENTITY,T1.URL URL,T1.ICON ICON,T1.PRIORITY PRIORITY,T1.PARENT_ID PARENT_ID,T2.NAME PARENT_NAME,T1.DELETE_FLAG DELETE_FLAG from T_RESOURCE T1 LEFT JOIN T_RESOURCE T2 ON T2.ID=T1.PARENT_ID WHERE T1.DELETE_FLAG=0 ORDER BY TYPE LIMIT #{0},#{1}
+	</select>
+	<!-- 查询总数 -->
+	<select id="findCount" resultType="int">
+		select COUNT(ID) from T_RESOURCE WHERE DELETE_FLAG=0
+	</select>
+	<!-- 根据id查询 -->
+	<select id="findById" parameterType="long" resultMap="AResourceModelMap">
+		select ID,NAME,TYPE,IDENTITY,URL,ICON,PRIORITY,PARENT_ID,DELETE_FLAG from T_RESOURCE WHERE ID=#{id} AND DELETE_FLAG=0
+	</select>
+	<!-- 根据type和parentId查询 -->
+	<select id="findByTypeAndParentId" parameterType="org.cisiondata.modules.admin.auth.entity.AResource" resultMap="AResourceModelMap">
+		select ID,NAME,TYPE,IDENTITY,URL,ICON,PRIORITY,PARENT_ID from T_RESOURCE WHERE TYPE=#{type} AND PARENT_ID=#{parentId} AND DELETE_FLAG=0 ORDER BY PRIORITY
+	</select>
+	<!-- 根据parentId查询 -->
+	<select id="findByParentId" parameterType="string" resultMap="AResourceModelMap">
+		select ID,NAME,TYPE,IDENTITY,URL,ICON,PRIORITY,PARENT_ID from T_RESOURCE WHERE PARENT_ID=#{parentId} AND DELETE_FLAG=0 ORDER BY PARENT_ID
+	</select>
+	<!-- 修改 -->
+	<update id="updateAResource" parameterType="org.cisiondata.modules.admin.auth.entity.AResource">
+		update T_RESOURCE set NAME=#{name},TYPE=#{type},IDENTITY=#{identity},URL=#{url},PRIORITY=#{priority},PARENT_ID=#{parentId},ICON=#{icon} where ID=#{id}
+	</update>
+	
+</mapper>

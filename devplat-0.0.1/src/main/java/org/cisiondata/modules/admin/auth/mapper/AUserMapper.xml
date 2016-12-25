@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.admin.auth.dao.AUserDao">
+
+	<resultMap type="org.cisiondata.modules.admin.auth.entity.AUser" id="AUserModelMap">
+		<id property="id" column="ID"/>
+		<result column="ACCOUNT" property="account"/>
+		<result column="PASSWORD" property="password"/>
+		<result column="IDENTITY" property="identity"/>
+		<result column="NICK_NAME" property="nickname"/>
+		<result column="EMAIL" property="email"/>
+		<result column="STATUS" property="status"/>
+		<result column="CREATE_TIME" property="createTime"/>
+		<result column="EXPIRE_TIME" property="expireTime"/>
+		<result column="DELETE_FLAG" property="deleteFlag"/>
+	</resultMap>
+	
+	<!-- 增加 -->
+	<insert id="addAUser" parameterType="org.cisiondata.modules.admin.auth.entity.AUser">
+		insert into T_USER(ACCOUNT,PASSWORD,IDENTITY,NICK_NAME,EMAIL,STATUS,CREATE_TIME,EXPIRE_TIME,DELETE_FLAG) 
+		value (#{account},#{password},#{identity},#{nickname},#{email},#{status},#{createTime},#{expireTime},#{deleteFlag})
+	</insert>
+	
+	<!-- 查询全部 -->
+	<select id="findAllAUser" resultMap="AUserModelMap">
+		select ID,ACCOUNT,IDENTITY,NICK_NAME,EMAIL,STATUS,CREATE_TIME,EXPIRE_TIME,DELETE_FLAG  from T_USER ORDER BY ID
+	</select>
+	<!-- 根据账号查询 -->
+	<select id="findAuser" resultMap="AUserModelMap">
+		select ID,ACCOUNT,IDENTITY,NICK_NAME,EMAIL,STATUS,CREATE_TIME,EXPIRE_TIME,DELETE_FLAG  from T_USER WHERE ACCOUNT = #{account}
+	</select> 
+	<!-- 根据id更改DELETE_FLAG状态 -->
+	<update id="deleteAUser" parameterType="long">
+		update  T_USER SET DELETE_FLAG = "1" where ID=#{id}
+	</update>
+	<!-- 根据ID更新-->
+	<update id="updateAUser" parameterType="org.cisiondata.modules.admin.auth.entity.AUser"> 
+		update  T_USER SET ACCOUNT=#{account},PASSWORD=#{password} WHERE ID=#{id}
+	</update> 
+	<!-- 根据id查询
+	<select id="findById" parameterType="long" resultMap="AUserModelMap">
+		select ID,NAME,TYPE,IDENTITY,URL,ICON,PRIORITY,PARENT_ID,DELETE_FLAG from T_RESOURCE WHERE ID=#{id}
+	</select> -->
+	
+	<!--<resultMap type="org.cisiondata.modules.admin.auth.entity.AUserARole" id="AUserARoleModelMap">
+		<id property="id" column="ID"/>
+		<result column="USER_ID" property="auser"/>
+		<result column="ROLE_ID" property="arole"/>
+		<result column="PRIORITY" property="priority"/>
+	</resultMap>
+	
+		 查询全部 
+	<select id="findAllAUserArole" resultMap="AUserAroleModelMap">
+		select ID,ROLE_ID,USER_ID,PRIORITY from T_USER_ROLE ORDER BY ID
+	</select>-->
+	<insert id="insertgroup" parameterType="org.cisiondata.modules.admin.auth.entity.AUserAGroup">
+		insert into  T_USER_GROUP(USER_ID,GROUP_ID,PRIORITY) value (#{auser},#{agroup},"3") 
+	</insert>
+	<insert id="insertrole" parameterType="org.cisiondata.modules.admin.auth.entity.AUserARole">
+		insert into  T_USER_ROLE(USER_ID,Role_ID,PRIORITY) value (#{auser},#{arole},"3") 
+	</insert>
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.log.dao.LogMapper">
+
+	<resultMap type="LogModel" id="LogModelMap">
+		<result column="id" property="id" jdbcType="INTEGER"/>
+		<result column="session_id" property="sessionId"/>
+		<result column="ip" property="ip"/>
+		<result column="access_time" property="accessTime" javaType="java.util.Date"/>
+		<result column="keyword" property="keyword"/>
+		<result column="c" property="count"/>
+	</resultMap>
+	<!-- 增加 -->
+	<insert id="addLog" parameterType="LogModel">
+		insert into T_LOG(id,session_id,ip,access_time,keyword) value (#{id},#{sessionId},#{ip},#{accessTime},#{keyword})
+	</insert>
+	<!-- 查询全部 -->
+	<select id="findAll" resultMap="LogModelMap">
+		select id,session_id,ip,access_time,keyword from T_LOG
+	</select>
+	<!-- 分页SQL语句 -->
+	<select id="selectByPage" resultMap="LogModelMap">
+		SELECT c.* FROM T_LOG c LEFT JOIN (SELECT a.*, count(1) as kn FROM T_LOG a GROUP BY a.keyword ORDER BY kn DESC) b ON c.keyword = b.keyword ORDER BY b.kn DESC limit #{0},#{1}
+	</select>
+	<!-- 删除 -->
+	<delete id="delLog" parameterType="string">
+		delete from T_LOG where keyword = #{keyword}
+	</delete>
+	<!-- 统计关键字 -->
+	<select id="count" resultMap="LogModelMap">
+		SELECT keyword,COUNT(keyword) AS C FROM T_LOG GROUP BY keyword
+	</select>
+	<!-- 统计关键字分页 -->
+	<select id="countPage" resultMap="LogModelMap">
+		SELECT keyword,COUNT(keyword) AS C FROM T_LOG GROUP BY keyword ORDER BY C DESC LIMIT #{0},#{1}
+	</select>
+	<!-- 查询某个关键字 -->
+	<select id="selectByKey" resultMap="LogModelMap">
+		SELECT id,session_id,ip,access_time,keyword FROM T_LOG WHERE keyword = #{0}
+	</select>
+	<!-- 查询到某个关键字进行分页 -->
+	<select id="keyByPage" resultMap="LogModelMap">
+		SELECT id,session_id,ip,access_time,keyword FROM T_LOG WHERE keyword = #{0} LIMIT #{1},#{2}
+	</select>
+	<!-- 分页SQL语句 -->
+	<select id="selectByorderTime" resultMap="LogModelMap">
+		SELECT * FROM T_LOG  ORDER BY access_time DESC limit #{0},#{1}
+	</select>
+</mapper>

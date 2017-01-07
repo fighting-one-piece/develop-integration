@@ -106,8 +106,7 @@ public class DatadaServiceImpl implements IDatadaService {
 			String json = HttpUtils.sendPost(URL, sb.toString());
 			DatadaResponse datadaResponse = gson.fromJson(json, DatadaResponse.class);
 			QueryResult<Map<String, Object>> qr = new QueryResult<Map<String, Object>>();
-			if (null == datadaResponse)
-				return qr;
+			if (null == datadaResponse) return qr;
 			DataResponse dataResponse = datadaResponse.getData();
 			qr.setScrollId(dataResponse.getSearchToken());
 			qr.setTotalRowNum(Long.parseLong(dateline));

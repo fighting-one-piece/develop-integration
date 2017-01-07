@@ -3,7 +3,9 @@ package org.cisiondata.utils.excel;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -31,7 +33,15 @@ public class PoiExcelUtils {
 		}
 		return result.toString();
 	}
-
+	//将字符串以逗号分隔后存入List
+	public static List<String> stringToList(String str){
+		List<String> list = new ArrayList<String>();
+		StringTokenizer st = new StringTokenizer(str, ",");
+		while (st.hasMoreTokens()) {
+			list.add(st.nextToken());
+		}
+		return list;
+	}
 	// 判断文件格式
 	public static Workbook ReadExcelUtils(MultipartFile filepath, String file) {
 		if (filepath == null) {

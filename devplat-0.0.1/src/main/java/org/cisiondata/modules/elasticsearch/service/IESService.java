@@ -18,6 +18,16 @@ public interface IESService {
 	public List<Map<String, Object>> readDataListByCondition(QueryBuilder query) throws BusinessException;
 	
 	/**
+	 * 根据条件全索引读取数据
+	 * @param query
+	 * @param size 返回结果集条数
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<Map<String, Object>> readDataListByCondition(QueryBuilder query, int size) 
+			throws BusinessException;
+	
+	/**
 	 * 根据条件指定索引读取数据
 	 * @param index
 	 * @param type

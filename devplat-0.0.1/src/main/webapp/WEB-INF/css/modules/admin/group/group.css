@@ -92,7 +92,7 @@ i {
 	top: 10%;
 	left: 40%;
 	width: 500px;
-	height: 500px;
+	height: 400px;
 	padding: 16px;
 	border: 5px solid #EAEAEA;
 	border-radius: 10px;
@@ -104,6 +104,12 @@ i {
 select {
 	min-width: 80px;
 }
-.add_del_GU table{
+.add_del_GU .table-bordered{
 	font-size: 12px;
+}
+#Colseone{
+	float: right;
+}
+.td_button button{
+	margin: 5px;
 }

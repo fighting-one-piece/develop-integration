@@ -15,9 +15,6 @@
 <script type="text/javascript" src="<%=basePath %>/js/sweetalert2.min.js"></script>
 <link rel="stylesheet" href="<%=basePath%>/css/modules/admin/resourceTree.css" />
 <script type="text/javascript" src="<%=basePath%>/js/modules/admin/resourceTree.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/i18n/defaults-*.min.js"></script>
 </head>
 <body>
 	<div class="styleWhite">
@@ -78,17 +75,10 @@
 						<!--multiple="multiple" 能同时选择多个   size="10"  确定下拉选的长度-->
 
 						<select  name="first" multiple="multiple" size=10 class="td3" id="first" >
-							<option value="1">admin</option>
-							<option value="2">test</option>
-							<option value="3">cisiondata</option>
-							<option value="4">bb</option>
-							<option value="5">fb</option>
-							<option value="6">yes</option>
-							<option value="7">ww</option>
-							<option value="8">xx</option>
+							
 						</select>
 					</td>
-					<td width="69" valign="middle">
+					<td width="69" valign="middle" class="td_button">
 						<button style="width: 86px" name="add" id="addU" class="btn btn-sm btn-success">添加<i class="glyphicon glyphicon-chevron-right"></i></button><br/>
 						<button style="width: 86px" name="add_all" id="add_all" class="btn btn-sm btn-success">全部添加<i class="glyphicon glyphicon-forward"></i></button><br/>
 						<button style="width: 86px" name="remove" id="remove" class="btn btn-sm btn-success">移除<i class="glyphicon glyphicon-chevron-left"></i></button><br/>
@@ -96,12 +86,12 @@
 					</td>
 					<td width="127" align="left" id="getByIdUser">
 						<select name="second" size="10" multiple="multiple" class="td3" id="second">
-							<option value="9">hah</option>
+							
 						</select>
 					</td>
 				</tr>
 			</table>
-			<button id="add_GUser" class="btn btn-sm btn-success">添加</button>
+			<button id="add_GUser" class="btn btn-sm btn-success">确定</button>
 	</div>
 </body>
 </html>

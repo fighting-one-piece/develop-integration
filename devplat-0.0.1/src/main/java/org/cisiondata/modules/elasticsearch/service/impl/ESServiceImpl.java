@@ -8,13 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.elasticsearch.client.ESClient;
 import org.cisiondata.modules.elasticsearch.service.IESService;
@@ -49,13 +47,12 @@ public class ESServiceImpl implements IESService {
 	
 	protected Logger LOG = LoggerFactory.getLogger(getClass());
 
-	protected static final int ES_10 = 1;
-	protected static final int ES_105 = 2;
+	/** ES INDEX */
+	protected static Set<String> indices = null;
+	/** ES TYPE */
+	protected static Set<String> types = null;
 	
-	protected static Set<String> indices_10 = null;
-	protected static Set<String> indices_105 = null;
-	protected static Set<String> types_10 = null;
-	protected static Set<String> types_105 = null;
+	/** ES 搜索属性字段*/
 	protected static Set<String> name_attributes = null;
 	protected static Set<String> phone_attributes = null;
 	protected static Set<String> idcard_attributes = null;
@@ -63,14 +60,18 @@ public class ESServiceImpl implements IESService {
 	protected static Set<String> identity_attributes = null;
 	protected static Set<String> location_attributes = null;
 	protected static Set<String> all_attributes = null;
+	
+	/** ES INDEX TYPE 映射关系*/
 	protected static Map<String, List<String>> index_types_map = null;
+	
+	/** 属性字段过滤*/
+	protected static Set<String> filter_attributes = null;
 	
 	@PostConstruct
 	public void postConstruct() {
 		initAttributeCache();
 		initESIndicesTypesCache();
 		initES10IndicesTypesCache();
-		initES105IndicesTypesCache();
 	}
 	
 	private void initAttributeCache() {
@@ -82,6 +83,10 @@ public class ESServiceImpl implements IESService {
 		identity_attributes = new HashSet<String>();
 		location_attributes = new HashSet<String>();
 		index_types_map = new HashMap<String, List<String>>();
+		filter_attributes = new HashSet<String>();
+		filter_attributes.add("insertTime");
+		filter_attributes.add("updateTime");
+		filter_attributes.add("sourceFile");
 	}
 	
 	private void filterAttributeCache(String attribute) {
@@ -121,21 +126,46 @@ public class ESServiceImpl implements IESService {
 		all_attributes.addAll(location_attributes);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void initES10IndicesTypesCache() {
-		indices_10 = new HashSet<String>();
-		types_10 = new HashSet<String>();
-		initESIndicesTypesCache(ES_10, indices_10, types_10);
-	}
-	
-	private void initES105IndicesTypesCache() {
-		indices_105 = new HashSet<String>();
-		types_105 = new HashSet<String>();
-		initESIndicesTypesCache(ES_105, indices_105, types_105);
+		indices = new HashSet<String>();
+		types = new HashSet<String>();
+		try {
+			IndicesAdminClient indicesAdminClient = ESClient.getInstance().getClient().admin().indices();
+			GetMappingsResponse getMappingsResponse = indicesAdminClient.getMappings(new GetMappingsRequest()).get();
+			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = 
+					getMappingsResponse.getMappings();
+			Iterator<ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>> 
+			mappingIterator = mappings.iterator();
+			while (mappingIterator.hasNext()) {
+				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>
+				objectObjectCursor = mappingIterator.next();
+				if (objectObjectCursor.key.startsWith(".marvel-es")) continue;
+				indices.add(objectObjectCursor.key);
+				ImmutableOpenMap<String, MappingMetaData> immutableOpenMap = objectObjectCursor.value;
+				ObjectLookupContainer<String> keys = immutableOpenMap.keys();
+				Iterator<ObjectCursor<String>> keysIterator = keys.iterator();
+				while(keysIterator.hasNext()) {
+					String type = keysIterator.next().value;
+					types.add(type);
+					MappingMetaData mappingMetaData = immutableOpenMap.get(type);
+					Map<String, Object> mapping = mappingMetaData.getSourceAsMap();
+					if (mapping.containsKey("properties")) {
+						Map<String, Object> properties = (Map<String, Object>) mapping.get("properties");
+						for (String attribute : properties.keySet()) {
+							filterAttributeCache(attribute);
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		} 
 	}
 	
 	private void initESIndicesTypesCache() {
 		try {
-			IndicesAdminClient indicesAdminClient = buildClient(ES_10).admin().indices();
+			IndicesAdminClient indicesAdminClient = ESClient.getInstance().getClient().admin().indices();
 			GetMappingsResponse getMappingsResponse = indicesAdminClient.getMappings(new GetMappingsRequest()).get();
 			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = 
 					getMappingsResponse.getMappings();
@@ -162,134 +192,45 @@ public class ESServiceImpl implements IESService {
 		} 
 	}
 	
-	@SuppressWarnings("unchecked")
-	private void initESIndicesTypesCache(int es, Set<String> indexs_cache, Set<String> types_cache) {
-		try {
-			IndicesAdminClient indicesAdminClient = buildClient(es).admin().indices();
-			GetMappingsResponse getMappingsResponse = indicesAdminClient.getMappings(new GetMappingsRequest()).get();
-			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = 
-					getMappingsResponse.getMappings();
-			Iterator<ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>> 
-			mappingIterator = mappings.iterator();
-			while (mappingIterator.hasNext()) {
-				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>
-				objectObjectCursor = mappingIterator.next();
-				indexs_cache.add(objectObjectCursor.key);
-				ImmutableOpenMap<String, MappingMetaData> immutableOpenMap = objectObjectCursor.value;
-				ObjectLookupContainer<String> keys = immutableOpenMap.keys();
-				Iterator<ObjectCursor<String>> keysIterator = keys.iterator();
-				while(keysIterator.hasNext()) {
-					String type = keysIterator.next().value;
-					types_cache.add(type);
-					MappingMetaData mappingMetaData = immutableOpenMap.get(type);
-					Map<String, Object> mapping = mappingMetaData.getSourceAsMap();
-					if (mapping.containsKey("properties")) {
-						Map<String, Object> properties = (Map<String, Object>) mapping.get("properties");
-						for (String attribute : properties.keySet()) {
-							filterAttributeCache(attribute);
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		} 
-	}
-	
-	private ExecutorService executorService = Executors.newCachedThreadPool();
-	
 	@Override
 	public List<Map<String, Object>> readDataListByCondition(QueryBuilder query) throws BusinessException {
 		return readDataListByCondition(null, new String[0], query);
 	}
+	
+	@Override
+	public List<Map<String, Object>> readDataListByCondition(QueryBuilder query, int size) 
+			throws BusinessException {
+		return readDataListByCondition(null, new String[0], query, size);
+	}
 
 	@Override
-	public List<Map<String, Object>> readDataListByCondition(final String index, final String type, 
-			final QueryBuilder query) throws BusinessException {
-		return readDataListByCondition(null, new String[]{type}, query);
+	public List<Map<String, Object>> readDataListByCondition(String index, String type, 
+			QueryBuilder query) throws BusinessException {
+		return readDataListByCondition(index, new String[]{type}, query);
 	}
 	
 	@Override
-	public List<Map<String, Object>> readDataListByCondition(final String index, final String[] types, 
-			final QueryBuilder query) throws BusinessException {
-		List<Future<List<Map<String, Object>>>> fs = new ArrayList<Future<List<Map<String, Object>>>>();
-		for (int i = ES_10; i <= ES_105; i++) {
-			fs.add(executorService.submit(new ReadDataListTask(i, index, types, query)));
-		}
-		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-		try {
-			for (int i = 0, len = fs.size(); i < len; i++) {
-				Future<List<Map<String, Object>>> f = fs.get(i);
-				while (!f.isDone()) {}
-				resultList.addAll(f.get());
-			}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-		return resultList;
+	public List<Map<String, Object>> readDataListByCondition(String index, String[] types, 
+			QueryBuilder query) throws BusinessException {
+		return readDataListByCondition(index, types, query, 200);
 	}
 	
 	@Override
-	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(final QueryBuilder query, 
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(QueryBuilder query, 
 			String scrollId, int size) throws BusinessException {
 		return readPaginationDataListByCondition(null, new String[0], query, scrollId, size);
 	}
 	
 	@Override
-	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(final String index, final String type, 
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
 			QueryBuilder query, String scrollId, int size) throws BusinessException {
-		return readPaginationDataListByCondition(null, new String[]{type}, query, scrollId, size);
+		return readPaginationDataListByCondition(index, new String[]{type}, query, scrollId, size);
 	}
 	
 	@Override
-	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(final String index, final String[] types, 
-			final QueryBuilder query, String scrollId, int size) throws BusinessException {
-		List<Future<QueryResult<Map<String, Object>>>> fs = new ArrayList<Future<QueryResult<Map<String, Object>>>>();
-		for (int i = ES_10; i <= ES_105; i++) {
-			fs.add(executorService.submit(new ReadPaginationDataListTask(i, index, types, query, null, 50)));
-		}
-		
-		long totalRowNum = 0;
-		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-		try {
-			for (int i = 0, len = fs.size(); i < len; i++) {
-				Future<QueryResult<Map<String, Object>>> f = fs.get(i);
-				while (!f.isDone()){}
-				QueryResult<Map<String, Object>> qr = f.get();
-				totalRowNum = totalRowNum + qr.getTotalRowNum();
-				resultList.addAll(qr.getResultList());
-			}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-		
-		QueryResult<Map<String, Object>> qr = new QueryResult<Map<String,Object>>();
-		qr.setTotalRowNum(totalRowNum);
-		int from = StringUtils.isBlank(scrollId) ? 1 : Integer.parseInt(scrollId);
-		qr.setScrollId(String.valueOf(from + 1));
-		int fromIndex = (from - 1) * size;
-		int targetRowNum = totalRowNum > resultList.size() ? resultList.size() : (int) totalRowNum;
-		int toIndex = (fromIndex + size) > targetRowNum ? (int) targetRowNum : (fromIndex + size);
-		LOG.info("totalRowNum:{} fromIndex:{} toIndex:{} targetRowNum:{}", totalRowNum, fromIndex, toIndex, targetRowNum);
-		if (fromIndex <= toIndex) {
-			qr.setResultList(resultList.subList(fromIndex, toIndex));
-		}
-		return qr;
-	}
-	
-	private Client buildClient(int es) {
-		Client client = null;
-		switch (es) {
-			case ES_10:
-				client = ESClient.getInstance().getClient10();
-				break;
-			case ES_105:	
-				client = ESClient.getInstance().getClient105();
-				break;
-			default:
-				break;
-		}
-		return client;
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String[] types, 
+			QueryBuilder query, String scrollId, int size) throws BusinessException {
+		return readIndexsTypesPaginationDatas(index, types, query, scrollId, size);
 	}
 	
 	private String[] buildIndices(Set<String> defaultIndices, String index) {
@@ -300,24 +241,10 @@ public class ESServiceImpl implements IESService {
 		return (null == types || types.length == 0) ? defaultTypes.toArray(new String[0]) : types;
 	}
 	
-	private SearchRequestBuilder buildSearchRequestBuilder(int es, String index, String[] types) {
-		Client targetClient = null;
-		String[] targetIndices = null;
-		String[] targetTypes = null;
-		switch (es) {
-			case ES_10:
-				targetClient = ESClient.getInstance().getClient10();
-				targetIndices = buildIndices(indices_10, index);
-				targetTypes = buildTypes(types_10, types);
-				break;
-			case ES_105:	
-				targetClient = ESClient.getInstance().getClient105();
-				targetIndices = buildIndices(indices_105, index);
-				targetTypes = buildTypes(types_105, types);
-				break;
-			default:
-				break;
-		}
+	private SearchRequestBuilder buildSearchRequestBuilder(String index, String[] ctypes) {
+		Client targetClient = ESClient.getInstance().getClient();
+		String[] targetIndices = buildIndices(indices, index);
+		String[] targetTypes = buildTypes(types, ctypes);
 		return targetClient.prepareSearch(targetIndices).setTypes(targetTypes);
 	}
 	
@@ -331,38 +258,38 @@ public class ESServiceImpl implements IESService {
         }
 	}
 	
-	private boolean indicesExists(int es, String index) {
+	private boolean indicesExists(String index) {
 		if (StringUtils.isBlank(index)) return true;
 		IndicesExistsRequest indicesExistsRequest = new IndicesExistsRequest(index);
-		IndicesExistsResponse indicesExistsResponse = buildClient(es).admin().indices()
-				.exists(indicesExistsRequest).actionGet();
+		IndicesExistsResponse indicesExistsResponse = ESClient.getInstance().getClient()
+				.admin().indices().exists(indicesExistsRequest).actionGet();
 		return indicesExistsResponse.isExists();
 	}
 	
-	private List<Map<String, Object>> readIndexsTypesDatas(int es, String index, 
-			String[] types, QueryBuilder query) throws BusinessException {
-		if (!indicesExists(es, index)) return new ArrayList<Map<String,Object>>();
-		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(es, index, types);
+	private List<Map<String, Object>> readDataListByCondition(String index, String[] types, 
+			QueryBuilder query, int size) throws BusinessException {
+		if (!indicesExists(index)) return new ArrayList<Map<String,Object>>();
+		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(index, types);
 		searchRequestBuilder.setQuery(query);
 		wrapperSearchRequestBuilder(searchRequestBuilder);
-		searchRequestBuilder.setSize(100);
+		searchRequestBuilder.setSize(size);
 		SearchResponse response = searchRequestBuilder.execute().actionGet();
 		SearchHit[] hitArray = response.getHits().getHits();
 		return buildResultList(hitArray, false);
 	}
 	
-	private QueryResult<Map<String, Object>> readIndexsTypesDatas(int es, String index, String[] types,
+	private QueryResult<Map<String, Object>> readIndexsTypesPaginationDatas(String index, String[] types,
 			QueryBuilder query, String scrollId, int size) throws BusinessException {
-		if (!indicesExists(es, index)) return new QueryResult<Map<String,Object>>();
-		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(es, index, types);
+		if (!indicesExists(index)) return new QueryResult<Map<String,Object>>();
+		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(index, types);
 		searchRequestBuilder.setQuery(query);
 		wrapperSearchRequestBuilder(searchRequestBuilder);
         searchRequestBuilder.setScroll(TimeValue.timeValueMinutes(3));
         searchRequestBuilder.setSize(size);
 		SearchResponse response = searchRequestBuilder.execute().actionGet();
 		if (StringUtils.isNotBlank(scrollId)) {
-			response = buildClient(es).prepareSearchScroll(scrollId).setScroll(
-					TimeValue.timeValueMinutes(3)).execute().actionGet();
+			response = ESClient.getInstance().getClient().prepareSearchScroll(scrollId)
+					.setScroll(TimeValue.timeValueMinutes(3)).execute().actionGet();
 		}
 		SearchHit[] hitArray = response.getHits().getHits();
 		QueryResult<Map<String, Object>> qr = new QueryResult<Map<String,Object>>();
@@ -375,11 +302,8 @@ public class ESServiceImpl implements IESService {
 	private List<Map<String, Object>> buildResultList(SearchHit[] hitArray, boolean isPagination) {
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		SearchHit hit = null;
-		StringBuilder prefix = null;
-		StringBuilder en = null;
 		String key = null;
 		Object value = null;
-		HighlightField highLightField = null;
 		Map<String, Object> source = null;
 		Map<String, Object> replaceSource = null;
 		Map<String, HighlightField> highLightFields = null;
@@ -388,29 +312,29 @@ public class ESServiceImpl implements IESService {
 			highLightFields = hit.getHighlightFields();
 			source = hit.getSource();
 			replaceSource = new HashMap<String, Object>();
-			prefix = new StringBuilder();
-			prefix.append(hit.getIndex());
-			prefix.append(".").append(hit.getType());
+			String prefix = hit.getIndex() + "." + hit.getType();
 			for (Map.Entry<String, Object> entry : source.entrySet()) {
 				key = entry.getKey();
+				if (filter_attributes.contains(key)) continue;
 				value = entry.getValue();
-				highLightField = highLightFields.get(key);
-				if (null != highLightField) {
-					Text[] texts = highLightField.getFragments();
-					StringBuilder content = new StringBuilder();
+				if (highLightFields.containsKey(key)) {
+					Text[] texts = highLightFields.get(key).getFragments();
+					StringBuilder highLightText = new StringBuilder();
 					for (int t = 0, tlen = texts.length; t < tlen; t++) {
-						content.append(texts[t]);
+						highLightText.append(texts[t]);
 					}
-					if (content.length() > 0) value = content.toString();
+					if (highLightText.length() > 0) value = highLightText.toString();
 				}
-				en = new StringBuilder(prefix.toString()).append(".").append(key);
-				String ch = MessageUtils.getInstance().getMessage(en.toString());
-				replaceSource.put(StringUtils.isBlank(ch) ? key : ch, value);
+				String account = (String) SecurityUtils.getSubject().getPrincipal();
+				value = key.toLowerCase().indexOf("password") != -1 
+						&& !"liqien".equals(account) ? "********" : value;
+				String chValue = MessageUtils.getInstance().getMessage(prefix + "." + key);
+				replaceSource.put(StringUtils.isBlank(chValue) ? key : chValue, value);
 			}
 			if (isPagination) {
 				Map<String, Object> result = new HashMap<String, Object>();
-				result.put("index", MessageUtils.getInstance().getMessage(prefix.toString()));
-				result.put("type", MessageUtils.getInstance().getMessage(prefix.toString()));
+				result.put("index", MessageUtils.getInstance().getMessage(prefix));
+				result.put("type", MessageUtils.getInstance().getMessage(prefix));
 				result.put("data", replaceSource);
 				resultList.add(result);
 			} else {
@@ -424,16 +348,13 @@ public class ESServiceImpl implements IESService {
 	
 	class ReadDataListTask implements Callable<List<Map<String, Object>>> {
 		
-		private int es = 0;
-		
 		private String index = null;
 		
 		private String[] types = null;
 		
 		private QueryBuilder query = null;
 		
-		public ReadDataListTask(int es, String index, String[] types, QueryBuilder query) {
-			this.es = es;
+		public ReadDataListTask(String index, String[] types, QueryBuilder query) {
 			this.index = index;
 			this.types = types;
 			this.query = query;
@@ -441,14 +362,12 @@ public class ESServiceImpl implements IESService {
 		
 		@Override
 		public List<Map<String, Object>> call() throws Exception {
-			return readIndexsTypesDatas(es, index, types, query);
+			return readDataListByCondition(index, types, query);
 		}
 		
 	}
 	
 	class ReadPaginationDataListTask implements Callable<QueryResult<Map<String, Object>>> {
-		
-		private int es = 0;
 		
 		private String index = null;
 		
@@ -460,9 +379,8 @@ public class ESServiceImpl implements IESService {
 		
 		private int size = 50;
 		
-		public ReadPaginationDataListTask(int es, String index, String[] types, 
+		public ReadPaginationDataListTask(String index, String[] types, 
 				QueryBuilder query, String scrollId, int size) {
-			this.es = es;
 			this.index = index;
 			this.types = types;
 			this.query = query;
@@ -472,7 +390,7 @@ public class ESServiceImpl implements IESService {
 		
 		@Override
 		public QueryResult<Map<String, Object>> call() throws Exception {
-			return readIndexsTypesDatas(es, index, types, query, scrollId, size);
+			return readIndexsTypesPaginationDatas(index, types, query, scrollId, size);
 		}
 		
 	}

@@ -7,12 +7,8 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.cisiondata.modules.abstr.entity.QueryResult;
-import org.cisiondata.modules.elasticsearch.client.ESClient;
 import org.cisiondata.modules.elasticsearch.service.IESService;
 import org.cisiondata.modules.identity.service.IQQService;
-import org.elasticsearch.action.admin.indices.analyze.AnalyzeAction;
-import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequestBuilder;
-import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse.AnalyzeToken;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
@@ -73,21 +69,13 @@ public class QQServiceImpl implements IQQService {
 	@Override
 	// 根据QQ号得到基本信息
 	public List<Map<String, Object>> readQQData(String qq) {
-		return esService.readDataListByCondition("qq", "qqdata", QueryBuilders.termQuery("qq", qq));
+		return esService.readDataListByCondition("qq", "qqdata", QueryBuilders.termQuery("qqNum", qq));
 	}
 
 	//通过QQ昵称查询
 	@Override
-	public QueryResult<Map<String, Object>> readQQNickData(String qqnick, String scrollId, int rowNumPerPage) {
-		AnalyzeRequestBuilder request = new AnalyzeRequestBuilder(
-		ESClient.getInstance().getClient(), AnalyzeAction.INSTANCE, "qq", qqnick);
-		request.setTokenizer("ik_smart");
-		List<AnalyzeToken> analyzeTokens = request.execute().actionGet().getTokens();
-		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-		for (int i = 0, len = analyzeTokens.size(); i < len; i++) {
-			AnalyzeToken analyzeToken = analyzeTokens.get(i);
-			boolQueryBuilder.must(QueryBuilders.termQuery("nick", analyzeToken.getTerm()));
-		}
-		return esService.readPaginationDataListByCondition("qq", "qqqunrelation", boolQueryBuilder, scrollId, rowNumPerPage);
+	public QueryResult<Map<String, Object>> readQQNickData(String nick, String scrollId, int rowNumPerPage) {
+		return esService.readPaginationDataListByCondition("qq", "qqqunrelation", 
+				QueryBuilders.matchPhraseQuery("nick", nick), scrollId, rowNumPerPage);
 	}
 }

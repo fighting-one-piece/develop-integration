@@ -1,7 +1,9 @@
 package org.cisiondata.modules.identity.service;
 
+import java.util.List;
 import java.util.Map;
 
+import org.cisiondata.modules.identity.entity.MobileAttributionModel;
 import org.cisiondata.utils.exception.BusinessException;
 
 public interface IMobileService {
@@ -21,5 +23,11 @@ public interface IMobileService {
 	 * @throws BusinessException
 	 */
 	public Map<String, Object> readMobileDynamicInfo(String mobile) throws BusinessException;
+	/**
+	 * 手机归属地
+	 * @param phone
+	 * @return
+	 */
+	public List<MobileAttributionModel> selByDnseg(String phone);
 	
 }

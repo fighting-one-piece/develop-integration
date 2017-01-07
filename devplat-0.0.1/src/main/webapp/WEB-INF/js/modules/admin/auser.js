@@ -8,25 +8,26 @@ $(document).ready(function () {
 		$("#turnPage").hide();
 	};
 	
-	loadingAuser();
+	loadingAuser(1);
 	//点击查看加载首页
 	$("#showselectallauser").click(function(){
 		hideAll();
 		$("#showAUserResult").empty();
-		loadingAuser();
+		loadingAuser(1);
 	});
-	function loadingAuser(){
+	function loadingAuser(index){
 		hideAll();
 		$("#showAUserResult").empty();
 	$.ajax({
 		url:"page",
 		type:"get",
+		data:{"index":index},
 		dataType:"json",
 		success:function(result){
+			$("#endpage").val(result.data.pageCount);
 			if (result.code == 1) {
 				var data = result.data;
-				var num = data.length;
-				var html = "<table style='width:80%;margin-top: 3%;' id='selecttable'><tr align='center'>";
+				var html = "<table style='width:100%;margin-top: 3%;' id='selecttable'><tr align='center'>";
 					html += 	"<td style='background: #EEE8AA;'>ID</td>";
 				 	html += 	"<td style='background: #EEE8AA;'>账号</td>";
 				 	html += 	"<td style='background: #EEE8AA;'>标识</td>";
@@ -39,17 +40,32 @@ $(document).ready(function () {
 				 	html += 	"<td style='background: #EEE8AA;'>修改/删除</td>";
 				 	html += 	"<td style='background: #EEE8AA;'>添加功能</td>";
 				 	html += "</tr>";
-				for (var i = 0; i < data.length; i++) {
+				for (var i = 0; i < data.aUser.length; i++) {
+					if (data.aUser[i].identity == undefined) {
+						data.aUser[i].identity = "";
+					}
+					if (data.aUser[i].nickname == undefined) {
+						data.aUser[i].nickname = "";
+					}
+					if (data.aUser[i].email == undefined) {
+						data.aUser[i].email = "";
+					}
+					if (data.aUser[i].status == undefined) {
+						data.aUser[i].status = "";
+					}
+					if (data.aUser[i].expireTime == undefined) {
+						data.aUser[i].expireTime = "";
+					}
 					html += "<tr align='center'>";
-					html += 	"<td>"+data[i].id+"</td>";
-					html += 	"<td>"+data[i].account+"</td>";
-					html += 	"<td>"+data[i].identity+"</td>";
-					html += 	"<td>"+data[i].nickname+"</td>";
-					html += 	"<td>"+data[i].email+"</td>";
-					html += 	"<td>"+data[i].status+"</td>";
-					html += 	"<td>"+data[i].createTime+"</td>";
-					html += 	"<td>"+data[i].expireTime+"</td>";
-					html += 	"<td>"+data[i].deleteFlag+"</td>";
+					html += 	"<td>"+data.aUser[i].id+"</td>";
+					html += 	"<td>"+data.aUser[i].account+"</td>";
+					html += 	"<td>"+data.aUser[i].identity+"</td>";
+					html += 	"<td>"+data.aUser[i].nickname+"</td>";
+					html += 	"<td>"+data.aUser[i].email+"</td>";
+					html += 	"<td>"+data.aUser[i].status+"</td>";
+					html += 	"<td>"+FormatDate(new Date(data.aUser[i].createTime))+"</td>";
+					html += 	"<td>"+FormatDate(new Date(data.aUser[i].expireTime))+"</td>";
+					html += 	"<td id='deleteFlag'>"+data.aUser[i].deleteFlag+"</td>";
 					html += 	"<td><button id='updateauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>修改</button>";
 					html +=		"<button id='deleteauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>删除</button></td>";
 					html += 	"<td><button id='addgroup' class='btn btn-sm btn-info' style='margin-right: 1%;'>组</button>";
@@ -59,6 +75,9 @@ $(document).ready(function () {
 				}
 					html += "</table>";
 				$("#showAUserResult").append(html);
+				if (result.data.pageCount > 10) {
+					$("#turnPage").show();
+				}
 			}else {
 				$("#showAUserResult").append("请刷新页面！");
 			}
@@ -88,6 +107,12 @@ $(document).ready(function () {
 				dataType:"json",
 				success:function(result){
 					if (result.code == 1) {
+						if (result.data.nickname == undefined) {
+							result.data.nickname = "";
+						}
+						if (result.data.email == undefined) {
+							result.data.email = "";
+						}
 					var html = "<table style='width:80%;margin-top: 3%;'><tr align='center'>";
 					html += 	"<td style='background: #EEE8AA;'>ID</td>";
 					html += 	"<td style='background: #EEE8AA;'>账号</td>";
@@ -132,10 +157,17 @@ $(document).ready(function () {
 	$("#showaddauser").click(function(){
 		hideAll();
 		$("#addwarning").empty();
+		$("#setaccount").val("");
+		$("#setpassword").val("");
+		$("#confirmpassword").val("");
+		$("#nickname").val("");
+		$("#email").val("");
+		$("#expireTime").val("");
 		$("#showaddauserpage").show();
 		$("#showAUserResult").empty();
-		 $("#addwarning").append("*为必填内容！");
+		 $("#addwarning").append("请保证填写的正确性！");
 	});
+	
 	//点击增加页面确定	
 	$("#addauser").click(function(){
 		var account = $("#setaccount").val().trim();
@@ -145,14 +177,28 @@ $(document).ready(function () {
 		var email = $("#email").val().trim();
 		var identity = $("#identity").val().trim();
 		var status = $("#status").val().trim();	
-		var expireTime = $("#expireTime").val().trim();
+		var  expireTime = new Date( $("#expireTime").val().trim());
+		if (status == "是" ) {
+			status = "0";
+		}else {
+			status = "1";
+		}
+		if (nickname == null || nickname == "") {
+			nickname = null;
+		}
+		if (expireTime == null || expireTime == "" || expireTime == "Invalid Date") {
+			expireTime = new Date();
+		}
+		if (identity == null || identity == "") {
+			identity = null;
+		}
 		if (account == null || account == "") {
 			$("#addwarning").empty();
 			 $("#addwarning").append("账号不能为空！");
 		}else if (password == null || password == "" ) {
 			$("#addwarning").empty();
 			$("#addwarning").append("请输入密码！");
-		}else if( password.match(new RegExp("^[a-zA-Z][a-zA-Z0-9_]{5，15}")) || password.length < 6 || password.length > 16){
+		}else if(password.match(new RegExp("^[a-zA-Z][a-zA-Z0-9_]{5，15}")) || password.length < 6 || password.length > 16){
 			$("#addwarning").empty();
 			 $("#addwarning").append("密码为6至16位的字母及数字组成！");
 		}else if (confirmpassword == null || confirmpassword == "" ) {
@@ -161,21 +207,41 @@ $(document).ready(function () {
 		}else if (password != confirmpassword) {
 			$("#addwarning").empty();
 			 $("#addwarning").append("两次输入的密码不相同！");
-		}else {
+		}else if (email.match(new RegExp("/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/"))) {
 			$("#addwarning").empty();
-			 $("#addwarning").append("正在全速处理中····");
+			$("#addwarning").append("邮箱 不正确！");
+		}else{
+			$("#addwarning").empty();
+			$("#addwarning").append("正在全速处理中····");
 			 $.ajax({
-					url:"addauser",
-					type:"post",
+				 url:"selectauser",
+					type:"get",
 					dataType:"json",
-					data:{"account":account,"password":password},
+					data:{"account":account},
 					success:function(result){
 						if (result.code == 1) {
 							$("#addwarning").empty();
-							 $("#addwarning").append(result.data);
-						}else {
-							$("#addwarning").empty();
 							$("#addwarning").append("账号已存在！");
+						}else {
+							 $.ajax({
+								url:"addauser",
+								type:"post",
+								dataType:"json",
+								data:{"account":account,"password":password,"nickname":nickname,"email":email,"identity":identity,"status":status,"expireTime":expireTime},
+								success:function(result){
+									if (result.code == 1) {
+										$("#addwarning").empty();
+										 $("#addwarning").append(result.data);
+									}else {
+										$("#addwarning").empty();
+										$("#addwarning").append("添加失败！");
+									}
+								},
+								error:function(){
+									$("#addwarning").empty();
+									$("#addwarning").append("添加失败！");
+								}
+							 });
 						}
 				}
 			});
@@ -328,6 +394,7 @@ $(document).ready(function () {
 			success:function(result){
 				if (result.code == 1) {
 					alert(result.data);
+					loadingAuser(1);
 				}else {
 					alert("请刷新页面重试！");
 				}
@@ -370,10 +437,10 @@ $(document).ready(function () {
 			$("#status").val(status);
 		}
 		if (createTime != "undefined") {
-			$("#createTime").val(createTime);
+			$("#createTime").val(new Date(createTime).toString());
 		}
 		if (expireTime != "undefined") {
-			$("#expireTime").val(expireTime);
+			$("#expireTime").val(new Date(expireTime).toString());
 		}
 		if (deleteFlag != "undefined") {
 			$("#deleteFlag").val(deleteFlag);
@@ -389,7 +456,21 @@ $(document).ready(function () {
 		var email = $("#email").val().trim();
 		var identity = $("#identity").val().trim();
 		var status = $("#status").val().trim();	
-		var expireTime = $("#expireTime").val().trim();
+		var expireTime =new Date($("#expireTime").val().trim());
+		if (status == "是" ) {
+			status = "0";
+		}else {
+			status = "1";
+		}
+		if (nickname == null || nickname == "") {
+			nickname = null;
+		}
+		if (expireTime == null || expireTime == "" || expireTime == "Invalid Date") {
+			expireTime = new Date();
+		}
+		if (identity == null || identity == "") {
+			identity = null;
+		}
 		if (account == null || account == "") {
 			$("#addwarning").empty();
 			 $("#addwarning").append("账号不能为空！");
@@ -402,45 +483,71 @@ $(document).ready(function () {
 		}else if (confirmpassword == null || confirmpassword == "" ) {
 			$("#addwarning").empty();
 			$("#addwarning").append("请输入确认密码！");
-		}else if (password != confirmpassword) {
+		}else if(password != confirmpassword) {
 			$("#addwarning").empty();
 			 $("#addwarning").append("两次输入的密码不相同！");
-		}else {
+		}else if(email.match(new RegExp("/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/"))) {
+			$("#addwarning").empty();
+			 $("#addwarning").append("邮箱不正确！");
+		}else{
 			$("#addwarning").empty();
 			 $("#addwarning").append("正在全速处理中····");
 			 $.ajax({
 					url:"updateauser",
 					type:"post",
 					dataType:"json",
-					data:{"account":account,"password":password,"id":id},
+					data:{"account":account,"password":password,"id":id,"nickname":nickname,"email":email,"identity":identity,"status":status,"expireTime":expireTime},
 					success:function(result){
+						console.log(result);
 						if (result.code == 1) {
 							$("#addwarning").empty();
 							 $("#addwarning").append(result.data);
+							 alert("修改成功！");
+							 loadingAuser(1);
 						}else {
 							$("#addwarning").empty();
-							$("#addwarning").append("更新失败！");
+							$("#addwarning").append("修改失败！");
 						}
 				}
 			});
 		}
 	});
 	
-	$("#addgroup").click(function(){
-		hideAll();
-		$("#showAUserResult").empty();
-		$.ajax({
-			url:"addgroup",
-			type:"get",
-			dataType:"json",
-			success:function(result){
-				
-			}
-		});
+	//首页
+	$("#homepage").click(function(){
+		var index =1;
+		$("#homepage").val(index);
+		loadingAuser(index);
 	});
 	
-	//点击下一页	
+	
+	
+	//上一页
+	$("#lastpage").click(function(){
+			var index = parseInt($("#homepage").val())-1;
+			if(index<=1){
+				index=1;
+			}
+			$("#homepage").val(index);
+			loadingAuser(index);
+	});
+	
+	
+	//下一页
 	$("#nextpage").click(function(){
+			var index = parseInt($("#homepage").val())+1;
+			if(index >= $("#endpage").val()){
+				index = $("#endpage").val();
+			}
+			$("#homepage").val(index);
+			loadingAuser(index);
+	});
+	
+	//末页
+	$("#endpage").click(function(){
+		var index = $("#endpage").val();
+		$("#homepage").val(index);
+		loadingAuser(index);
 	});
 	
 	$("body").on("click",".addpermissions",function(){
@@ -451,6 +558,15 @@ $(document).ready(function () {
 })
 
 });
+
+function FormatDate (strTime) {
+	var paddNum = function(num){
+        num += "";
+        return num.replace(/^(\d)$/,"0$1");
+     }
+    var date = new Date(strTime);
+    return date.getFullYear()+"-"+paddNum(date.getMonth() + 1)+"-"+paddNum(date.getDate())+" "+paddNum(date.getHours())+":"+paddNum(date.getMinutes())+":"+paddNum(date.getSeconds());
+}
 
 //enter 控件
 function EnterPressEnsure(){ //传入 event 

@@ -78,7 +78,7 @@ body{min-height:100%;position: relative}
 .Hui-tabNav{height: 40px; padding-right:75px;background: #a2bed5 url(/devplat/images/admin/acrossTab-bg.png) repeat-x 0 bottom;overflow:hidden; position:relative}
 .Hui-tabNav-wp{position:relative; height:40px;overflow:hidden;}
 .Hui-tabNav .acrossTab{ position:absolute; top:10px; left:0px}
-.loading {background:url(/devplat/images/admin/loading_072.gif) no-repeat center; height:100px}
+.loading {background:no-repeat center; height:100px}
 .show_iframe iframe {position: absolute;bottom: 0;height: 100%;width: 100%}
 .Hui-tabNav-more {position: absolute;right:0px;width:70px;top:8px;display: none;}
 

@@ -155,39 +155,63 @@ $(function(){
 			}
 		})
 	});
+	var group_id;
 	//点击群组为群组添加用户
 	$(".group").live("click",function(){
 		//获取tr的id
 		var id = $(this).parent().parent().find("td").eq(0).html();
-		
+		group_id = id;
 		$.ajax({
 			url:"organization/getByIdUser",
 			type:"post",
 			dataType:"json",
 			data:{"id":id},
 			success:function(result){
+				console.log(result)
 				var user = result.data.user;
 				var notUser = result.data.notUser;
 				if(result.code ==1){
 					var td_notUser = "<select  name='first' multiple='multiple' size=10 class='td3' id='first'>";
 					for (var i = 0; i < notUser.length; i++) {
-						td_notUser+="<option>"+notUser[i]["account"]+"</option>";
+						td_notUser+="<option value='"+notUser[i]["userId"]+"'>"+notUser[i]["account"]+"</option>";
 					}
 					$("#notUser").html(td_notUser+="</select>");
 					var td_getByIdUser = "<select name='second' size='10' multiple='multiple' class='td3' id='second'>";
 					for (var j = 0; j < user.length; j++) {
-						td_getByIdUser+="<option>"+user[j]["account"]+"</option>";
+						td_getByIdUser+="<option value='"+user[j]["userId"]+"'>"+user[j]["account"]+"</option>";
 					}
 					$("#getByIdUser").html(td_getByIdUser+="</select>");
 				}
 				evt();
 				show_GU();
-			},
+				
+				},
 			error:function(){
 				
 			}
-		})
+		});
 	});
+	//为群组添加用户或移除用户
+	$("#add_GUser").click(function(){
+		//获取全部当前select中的用户ID
+		var str = $("#getByIdUser option").map(function(){return $(this).val();}).get().join(",");
+		$.ajax({
+			url:"organization/addGUser",
+			type:"post",
+			dataType:"json",
+			data:{"user_id":str,"group_id":group_id},
+			success:function(result){
+				if(result.code == 1){
+					swal("操作成功!", "", "success");
+				}
+			},
+			error:function(){
+				console.log("error");
+			}
+		});
+		
+	});
+	//隐藏视图
 	$("#Colseone").click(function(){
 		hidden_GU();
 	});
@@ -196,7 +220,8 @@ $(function(){
 		var id = $(this).parent().parent().find("td").eq(0).html();
 		getResource(1,id);
 		showResourceTreeDIV();
-	})
+	});
+	
 });
 //更新数据事件
 function update(id){
@@ -258,7 +283,6 @@ function load(){
 		type:"get",
 		dataType:"json",
 		success:function(result){
-			console.log(result);
 			var html="";
 			if(result.code == 1){
 				$.each(result.data,function(i,data){

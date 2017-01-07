@@ -24,27 +24,48 @@
 					<input class="btn btn-default" type="button" id="submitQQ" value="Go!"/>
 				</span>
 			</div>
-			<div class="input-group" style="width: 280px; position: absolute;left: 39%; padding-top: 0.2%;">
+			<div class="input-group" style="width: 100%; position: absolute; padding-top: 0.3%;">
 				<!-- <input id="queryQQ" type="text" class="form-control"
 					 onkeydown="EnterPressQun()" 
 	value="输入QQ群号" onfocus="if(value=='输入QQ群号'){value=''}" 
 	onblur="if(value==''){value='输入QQ群号'}"/> <span class="input-group-btn">
 					<button class="btn btn-default" type="button" id="submitQQqun">Go!</button>
 				</span> -->
-				<label class="radio-inline" style="margin-left: 35px;">	
+				<label class="radio-inline" style="margin-left: 25px;">	
 				  <input type="radio" name="radio" value="qq" checked> QQ
 				</label>
-				<label class="radio-inline" style="margin-left: 35px;">
+				<label class="radio-inline" style="margin-left: 25px;">
 				  <input type="radio" name="radio" value="qqqun"> QQ群
 				</label>
-				<label class="radio-inline" style="margin-left: 35px;">
+				<label class="radio-inline" style="margin-left: 25px;">
 				  <input type="radio" name="radio" value="qqnick"> QQ昵称
+				</label>	
+				<label class="radio-inline" style="margin-left: 25px;">	
+				  <input type="radio" name="radio" value="qqtopyw"> QQ找朋友网
+				</label>
+				<label class="radio-inline" style="margin-left: 25px;">
+				  <input type="radio" name="radio" value="qqtowb"> QQ反找微博
+				</label>
+				<label class="radio-inline" style="margin-left: 25px;">
+				  <input type="radio" name="radio" value="qqtosession"> 对查找qq发起临时会话
+				</label>
+				<label class="radio-inline" style="margin-left: 25px;">
+				  <input type="radio" name="radio" value="qqtotalk"> qq查找最后说说
+				</label>
+				<label class="radio-inline" style="margin-left: 25px;">
+				  <input type="radio" name="radio" value="pywtoqq"> 朋友网找QQ
+				</label>
+				<label class="radio-inline" style="margin-left: 25px;">
+				  <input type="radio" name="radio" value="wbtoqq"> 微博url找QQ  
+				</label>
+				<label class="radio-inline" style="margin-left: 25px;">
+				  <input type="radio" name="radio" value="phonetoqq"> 手机号找QQ   
 				</label>
 			</div>
 			<!-- 显示QQ的基本信息 -->
 			<div id="resultsQQ" align="center" style="padding-top: 1.2%;">
-				<label class="styleTitleOne">QQ基本信息</label>
-				<table class="table table-striped table-bordered">
+				<label class="styleTitleOne">关联信息</label>
+				<table  style="width: 100%;">
 					<thead class="styleQQThead">
 						
 					</thead>
@@ -56,8 +77,7 @@
 			</div>
 			<!-- 显示群信息 -->
 			<div id="results" align="center">
-				<label class="styleTitleOne">群信息</label>
-				<table class="table table-striped table-bordered">
+				<table  style="width: 100%;">
 					<thead class="styleThead">
 
 					</thead>
@@ -90,6 +110,9 @@
 		</table>
 		<!-- 显示总数 -->
 		<div id="count1" align="center"></div>
+	</div>
+	<div id="pengyousearch">
+	
 	</div>
 	<!-- 点击进入群详情页面后的背景 -->
 	<div id="fade" class="black_overlay"></div>

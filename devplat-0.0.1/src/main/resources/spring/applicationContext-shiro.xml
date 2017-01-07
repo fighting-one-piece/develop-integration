@@ -13,7 +13,7 @@
 						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd"
 	default-autowire="byName">
 	
-	<bean id="dbAuthorizingService" class="org.cisiondata.modules.authentication.service.impl.DBAuthorizingServiceImpl">
+	<bean id="dbAuthorizingService" class="org.cisiondata.modules.auth.service.impl.DBAuthorizingServiceImpl">
 		<!-- 如果用切面缓存代理了 此处就不缓存了 -->
 		<property name ="authService" ref="authService"/>
 		<property name="authenticationCachingEnabled" value="true" />
@@ -58,12 +58,12 @@
 		<property name="cacheManager" ref="shiroCacheManager" /> 
 	</bean>
     
-    <bean id="onlineSessionDAO" class="org.cisiondata.modules.authentication.session.OnlineSessionDAO">
+    <bean id="onlineSessionDAO" class="org.cisiondata.modules.auth.session.OnlineSessionDAO">
         <property name="sessionIdGenerator" ref="sessionIdGenerator"/>
         <property name="activeSessionsCacheName" value="${shiro.active.session.cacheName}"/>
     </bean>
 
-    <bean id="onlineSessionFactory" class="org.cisiondata.modules.authentication.session.OnlineSessionFactory"/>
+    <bean id="onlineSessionFactory" class="org.cisiondata.modules.auth.session.OnlineSessionFactory"/>
 
 	<!-- manager -->
 	<!-- remembered vs authenticated http://www.ituring.com.cn/article/287 -->
@@ -86,19 +86,19 @@
         <property name="cacheManager" ref="springEhCacheManager"/>
     </bean>
 	
-	<bean id="shiroCacheManager" class="org.cisiondata.modules.authentication.cache.CacheManagerWrapper">
+	<bean id="shiroCacheManager" class="org.cisiondata.modules.auth.cache.CacheManagerWrapper">
 		<property name="cacheManager" ref="springCacheManager" />
 	</bean>
 
 	<!-- 会话验证调度 -->
-	<bean id="sessionValidationScheduler" class="org.cisiondata.modules.authentication.session.scheduler.SpringSessionValidationScheduler">
+	<bean id="sessionValidationScheduler" class="org.cisiondata.modules.auth.session.scheduler.SpringSessionValidationScheduler">
 		<property name="sessionValidationInterval" value="${shiro.session.validation.interval}" />
 		<property name="sessionManager" ref="sessionManager" />
 		<property name="scheduler" ref="scheduler" />
 	</bean>
 	
 	<!-- 会话管理器 -->
-	<bean id="onlineSessionManager" class="org.cisiondata.modules.authentication.session.manager.OnlineWebSessionManager">
+	<bean id="onlineSessionManager" class="org.cisiondata.modules.auth.session.manager.OnlineWebSessionManager">
 		<property name="globalSessionTimeout" value="${shiro.session.globalSessionTimeout}"></property>
 		<property name="sessionFactory" ref="onlineSessionFactory" />
 		<property name="sessionDAO" ref="onlineSessionDAO" />
@@ -121,11 +121,11 @@
 	   	<property name="sessionDAO" ref="sessionDAO"/> 
 	</bean>
 	
-	<bean id="customSessionListener" class="org.cisiondata.modules.authentication.session.CustomSessionListener" />
+	<bean id="customSessionListener" class="org.cisiondata.modules.auth.session.CustomSessionListener" />
 	
 	<!-- filter -->
 	<!--替换默认的form 验证过滤器 -->
-	<bean id="formAuthenticationFilter" class="org.cisiondata.modules.authentication.web.filter.UserFormAuthenticationFilter">
+	<bean id="formAuthenticationFilter" class="org.cisiondata.modules.auth.web.filter.UserFormAuthenticationFilter">
 		<property name="userService" ref="userService" />
 		<property name="usernameParam" value="username" />
 		<property name="passwordParam" value="password" />
@@ -140,7 +140,7 @@
 	</bean>
 	
 	<!--提取系统用户（User） 验证用户是否合法的过滤器（如是否删除了 是否锁定了） -->
-	<bean id="userAccessControlFilter" class="org.cisiondata.modules.authentication.web.filter.UserAccessControlFilter">
+	<bean id="userAccessControlFilter" class="org.cisiondata.modules.auth.web.filter.UserAccessControlFilter">
 		<property name="authService" ref="authService"></property>
 		<property name="userBlockedUrl" value="${shiro.user.blocked.url}" />
 		<property name="userNotFoundUrl" value="${shiro.user.notfound.url}" />
@@ -149,13 +149,13 @@
 	
 	<!-- 验证会话是否是强制退出等的filter -->
 	<!--  
-	<bean id="onlineSessionFilter" class="org.cision.modules.authentication.filter.OnlineSessionFilter">
+	<bean id="onlineSessionFilter" class="org.cision.modules.auth.filter.OnlineSessionFilter">
 		<property name="forceLogoutUrl" value="${shiro.user.force.logout.url}" />
 		<property name="onlineSessionDAO" ref="onlineSessionDAO" />
 	</bean>
 	-->
 
-	<bean id="jCaptchaValidateFilter" class="org.cisiondata.modules.authentication.web.filter.JCaptchaValidateFilter">
+	<bean id="jCaptchaValidateFilter" class="org.cisiondata.modules.auth.web.filter.JCaptchaValidateFilter">
 		<property name="jcaptchaEbabled" value="${shiro.jcaptcha.enable}" />
 		<property name="jcaptchaParam" value="jcaptchaCode" />
 		<property name="failureKeyAttribute" value="shiroLoginFailure"/>  

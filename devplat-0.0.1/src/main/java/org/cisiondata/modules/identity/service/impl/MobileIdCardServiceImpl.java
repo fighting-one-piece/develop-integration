@@ -48,7 +48,7 @@ public class MobileIdCardServiceImpl implements IMobileIdCardService {
 			idcards.add(identity);
 			boolQueryBuilder.should(QueryBuilders.termQuery("idCard", identity));			
 		}
-		List<Map<String, Object>> resultList = esService.readDataListByCondition(boolQueryBuilder);
+		List<Map<String, Object>> resultList = esService.readDataListByCondition(boolQueryBuilder, 1000);
 		for (int i = 0, len = resultList.size(); i < len; i++) {
 			Map<String, Object> result = resultList.get(i);	
 			//遍历数据

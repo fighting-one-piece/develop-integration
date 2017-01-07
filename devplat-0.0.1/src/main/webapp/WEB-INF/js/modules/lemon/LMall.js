@@ -1,31 +1,190 @@
 $(document).ready(function () {
-	
-	//37
-	$("#SubmitIdNameCheck").click(function(){
+
+	//37 学历查询（D机构）
+	$("#lemonSubmit37").click(function(){
 		var name = $("#name").val();
 		var idCard=$("#idCard").val();
-		$("#resultIdNameCheck").empty();
-		console.log(name+"--"+idCard+"--")
-		console.log(1)
+		$("#result37").empty();
 		$.ajax({
-			url:"idName/Check",
+			url:"education/organizeD",
 			type:"post",
 			dataType:"json",
 			data:{"name":name,"idCard":idCard},
 			success:function(result){
 				var tab;
-				tab =	"<p></p>";
-				tab += 	"<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
 				if (result.code == 1) {
-					var html="<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'>" +
-					"<tr><td style='background: #EEE8AA;text-align: center;'>状态码</td><td style='background: #EEE8AA;text-align: center;'>描述信息</td></tr>" +
-					"<tr><td style='text-align: center;'>"+result.data.checkStatus+"</td><td style='text-align: center;'>"+result.data.message+"</td></tr></table>";
+					tab = "<table style='width:100%;margin: 5px;'><tr>";
+					$.each(result.data.checkResult.college,function(key,value){
+						tab += "<td style='background: #EEE8AA;'>"+key+"</td>";
+					});
+					tab +=	"</tr><tr>";
+					$.each(result.data.checkResult.college,function(key,value){
+						tab += "<td>"+value+"</td>";
+					});
+					tab +=	"<table style='width:100%;margin: 5px;margin-top:15px'><tr>";
+					$.each(result.data.checkResult.degree,function(key,value){
+						tab += "<td style='background: #EEE8AA;'>"+key+"</td>";
+					});
+					tab +=	"</tr><tr>";
+					$.each(result.data.checkResult.degree,function(key,value){
+						tab += "<td>"+value+"</td>";
+					});
+					tab +=	"<table style='width:100%;margin: 5px;margin-top:15px'><tr>";
+					$.each(result.data.checkResult.personBase,function(key,value){
+						tab += "<td style='background: #EEE8AA;'>"+key+"</td>";
+					});
+					tab +=	"</tr><tr>";
+					$.each(result.data.checkResult.personBase,function(key,value){
+						tab += "<td>"+value+"</td>";
+					});
+					tab +=	"</tr></table>";
 				}else {
-					html = "未找到相关信息";
+					tab = "未找到相关信息";
 				}
-				$("#resultIdNameCheck").append(html);
+				$("#result37").append(tab);
 			},
 			error:function(){
+				console.log("系统错误");
+			}
+		});
+	});	
+	
+	//36、搜索黑名单
+	$("#SubmitSearch").click(function(){
+		var idCard = $("#idCard").val();
+		var name = $("#name").val();
+		var phone = $("#phone").val();
+		console.log(idCard)
+		$("#resultSearch").empty();
+		$.ajax({
+			url:"blacklist/search",
+			type:"post",
+			dataType:"json",
+			data:{"idCard":idCard,"name":name,"phone":phone},
+			success:function(result){
+				console.log(result.data)
+				var tab;
+				if (result.code == 1) {
+					tab = "<table style='width:100%;margin: 5px;'><tr>";
+					 if(result.data.blackLevel=="A"){
+						 if(result.data.blackReason=="T01"){
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"法人失信,偷税漏税、工商股权冻结、工商无照经营等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T02") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"法院失信"+"</td></tr>";
+						 }else if (result.data.blackReason=="T03") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"高危网络行为,贴吧（套现吧等）、黑网站（赌博、吸毒）、高危app等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T04") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"高危号码,黑产电话、号码标签（欺诈、套现等）、阿里小号等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T05") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"身份伪冒风险,身份证丢失、12306泄露等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T06") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"网贷失信	网贷黑名单"+"</td></tr>";
+						 }else if (result.data.blackReason=="T07") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"信贷欺诈,信贷秒借疑似欺诈用户列表、百度内部业务反馈等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T08") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"信贷逾期,P2P、消费金融公司逾期名单、百度信贷场景等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T09") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"信用卡逾期,银行共享"+"</td></tr>";
+						 }else if (result.data.blackReason=="T10") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"账号伪冒风险,账号途径来自机器注册、马甲、撞库或泄露等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T11") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"支付欺诈,支付黑名单"+"</td></tr>";
+						 }else if (result.data.blackReason=="T12") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"羊毛党,刷单电话、某某宝薅羊毛等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T13") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"在逃嫌犯"+"</td></tr>";
+						 }
+					 }if(result.data.blackLevel=="B"){
+						 if(result.data.blackReason=="T01"){
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"法人失信,偷税漏税、工商股权冻结、工商无照经营等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T02") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"法院失信"+"</td></tr>";
+						 }else if (result.data.blackReason=="T03") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"高危网络行为,贴吧（套现吧等）、黑网站（赌博、吸毒）、高危app等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T04") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"高危号码,黑产电话、号码标签（欺诈、套现等）、阿里小号等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T05") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"身份伪冒风险,身份证丢失、12306泄露等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T06") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"网贷失信	网贷黑名单"+"</td></tr>";
+						 }else if (result.data.blackReason=="T07") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"信贷欺诈,信贷秒借疑似欺诈用户列表、百度内部业务反馈等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T08") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"信贷逾期,P2P、消费金融公司逾期名单、百度信贷场景等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T09") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"信用卡逾期,银行共享"+"</td></tr>";
+						 }else if (result.data.blackReason=="T10") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"账号伪冒风险,账号途径来自机器注册、马甲、撞库或泄露等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T11") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"支付欺诈,支付黑名单"+"</td></tr>";
+						 }else if (result.data.blackReason=="T12") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"羊毛党,刷单电话、某某宝薅羊毛等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T13") {
+							 tab += "<td style='background: #EEE8AA;'>"+"极黑，建议拒绝"+"</td></tr><tr><td>"+"在逃嫌犯"+"</td></tr>";
+						 }
+					 }if(result.data.blackLevel=="C"){
+						 if(result.data.blackReason=="T01"){
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"法人失信,偷税漏税、工商股权冻结、工商无照经营等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T02") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"法院失信"+"</td></tr>";
+						 }else if (result.data.blackReason=="T03") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"高危网络行为,贴吧（套现吧等）、黑网站（赌博、吸毒）、高危app等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T04") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"高危号码,黑产电话、号码标签（欺诈、套现等）、阿里小号等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T05") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"身份伪冒风险,身份证丢失、12306泄露等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T06") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"网贷失信	网贷黑名单"+"</td></tr>";
+						 }else if (result.data.blackReason=="T07") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"信贷欺诈,信贷秒借疑似欺诈用户列表、百度内部业务反馈等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T08") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"信贷逾期,P2P、消费金融公司逾期名单、百度信贷场景等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T09") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"信用卡逾期,银行共享"+"</td></tr>";
+						 }else if (result.data.blackReason=="T10") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"账号伪冒风险,账号途径来自机器注册、马甲、撞库或泄露等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T11") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"支付欺诈,支付黑名单"+"</td></tr>";
+						 }else if (result.data.blackReason=="T12") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"羊毛党,刷单电话、某某宝薅羊毛等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T13") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，建议列为重点观察名单"+"</td></tr><tr><td>"+"在逃嫌犯"+"</td></tr>";
+						 }
+					 }if(result.data.blackLevel=="D"){
+						 if(result.data.blackReason=="T01"){
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"法人失信,偷税漏税、工商股权冻结、工商无照经营等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T02") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"法院失信"+"</td></tr>";
+						 }else if (result.data.blackReason=="T03") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"高危网络行为,贴吧（套现吧等）、黑网站（赌博、吸毒）、高危app等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T04") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"高危号码,黑产电话、号码标签（欺诈、套现等）、阿里小号等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T05") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"身份伪冒风险,身份证丢失、12306泄露等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T06") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"网贷失信	网贷黑名单"+"</td></tr>";
+						 }else if (result.data.blackReason=="T07") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"信贷欺诈,信贷秒借疑似欺诈用户列表、百度内部业务反馈等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T08") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"信贷逾期,P2P、消费金融公司逾期名单、百度信贷场景等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T09") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"信用卡逾期,银行共享"+"</td></tr>";
+						 }else if (result.data.blackReason=="T10") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"账号伪冒风险,账号途径来自机器注册、马甲、撞库或泄露等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T11") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"支付欺诈,支付黑名单"+"</td></tr>";
+						 }else if (result.data.blackReason=="T12") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"羊毛党,刷单电话、某某宝薅羊毛等"+"</td></tr>";
+						 }else if (result.data.blackReason=="T13") {
+							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"在逃嫌犯"+"</td></tr>";
+						 }
+					 }if(result.data.blackLevel=="未命中"){
+						 tab += "<td style='background: #EEE8AA;'>"+"未命中"+"</td></tr><tr><td>"+"未命中"+"</td></tr>";
+					 }
+				}else {
+					tab = "未找到相关信息";
+				}
+				$("#resultSearch").append(tab);
 			}
 		});
 	});	
@@ -433,23 +592,26 @@ $(document).ready(function () {
 	$("#phoneQuery").click(function(){
 		var phone=$("#phone").val();
 		$("#resultTagQuery").empty();
+		console.log(111)
 			$.ajax({
 				url:"phone/query",
 				type:"post",
 				dataType:"json",
 				data:{"phone":phone},
 				success:function(result){
-					console.log(result.data);
 					var tab;
 					tab =	"<p></p>";
 					tab += 	"<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
 					if (result.code == 1) {
-						$.each(result.data,function(key,value){
-							tab += "<td style='background: #EEE8AA;'>"+result.code+"</td>";
-						})
-						tab += "</tr>";
-						tab +=	"</tr></table>";
-						
+						tab +="<td style='background: #EEE8AA;'>carrier</td>" +
+							  "<td style='background: #EEE8AA;'>phone</td>" +
+							  "<td style='background: #EEE8AA;'>count</td>" +
+							  "<td style='background: #EEE8AA;'>tag_name</td></tr><tr>";
+						tab +="<td>"+result.data.content[0].carrier+"</td>" +
+							  "<td>"+result.data.content[0].phone+"</td>" +
+							  "<td>"+result.data.content[0].tags[0].count+"</td>" +
+							  "<td>"+result.data.content[0].tags[0].tag_name+"</td>";
+						tab +="</tr></table>";
 					}else {
 						tab = "未找到相关信息";
 					}
@@ -479,16 +641,34 @@ $(document).ready(function () {
 				data:{"idCard":idCard,"name":name,"phone":phone,"idType":idType,"homeCity":homeCity,"homeAddress":homeAddress,"companyCity":companyCity,"companyAddress":companyAddress},
 				success:function(result){
 					console.log(result.data);
+					console.log(result.data.content[0].company_address_list);
+					console.log(result.data.content[0].company_address_list[0].distance);
+					console.log(result.data.content[0].company_address_list[0].verify_result);
 					var tab;
 					tab =	"<p></p>";
 					tab += 	"<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
 					if (result.code == 1) {
-						$.each(result.data,function(key,value){
-							tab += "<td style='background: #EEE8AA;'>"+result.code+"</td>";
-						})
-						tab += "</tr>";
+						tab += "<td style='background: #EEE8AA;'>baidu_account</td>" +
+							   "<td style='background: #EEE8AA;'>cell_phone</td>" +
+							   "<td style='background: #EEE8AA;'>id_no</td>" +
+							   "<td style='background: #EEE8AA;'>id_type</td>" +
+							   "<td style='background: #EEE8AA;'>imei</td>" +
+							   "<td style='background: #EEE8AA;'>real_name</td>";
+						tab += "</tr><tr><td>"+result.data.content[0].baidu_account+"</td>" +
+							   "<td>"+result.data.content[0].cell_phone+"</td>" +
+							   "<td>"+result.data.content[0].id_no+"</td>" +
+							   "<td>"+result.data.content[0].id_type+"</td>" +
+							   "<td>"+result.data.content[0].imei+"</td>" +
+							   "<td>"+result.data.content[0].real_name+"</td>";
 						tab +=	"</tr></table>";
-						
+						tab += "<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
+						tab += "<td style='background: #EEE8AA;'>distance</td>" +
+							   "<td style='background: #EEE8AA;'>verify_result</td></tr><tr>";
+						tab +=	"<td>"+result.data.content[0].company_address_list[0].distance+"</td>" +
+								"<td>"+result.data.content[0].company_address_list[0].verify_result+"</td></tr></table>";
+//						tab += "<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
+//						tab += "<td style='background: #EEE8AA;'>distance</td><td style='background: #EEE8AA;'>verify_result</td></tr><tr>";
+//						tab +=	"<td>"+result.data.content[0].home_address_list[0].distance+"</td><td>"+result.data.content[0].home_address_list[0].verify_result+"</td></tr></table>";
 					}else {
 						tab = "未找到相关信息";
 					}
@@ -523,10 +703,12 @@ $(document).ready(function () {
 					if (result.code == 1) {
 						$.each(result.data,function(key,value){
 							tab += "<td style='background: #EEE8AA;'>"+key+":"+"</td>";
-							tab += "<td style='background: #EEE8AA;'>"+value+"</td>";
 						})
-						tab += "</tr>";
-						tab +=	"</tr></table>";
+						tab+="<tr>";
+						$.each(result.data,function(key,value){
+							tab += "<td>"+value+"</td>";
+						})
+						tab +=	"</tr></tr></table>";
 						
 					}else {
 						tab = "未找到相关信息";
@@ -1260,4 +1442,26 @@ $(document).ready(function () {
 		});
 	});	
 	
+	//多种接口
+	$("#Relational").click(function(){
+		var type=  $("input[name='searchType']:checked").val()
+		var index = $("input[name='searchContent']").val()
+		$("#pvalue").html("查询中......").css("color","red");
+		$.ajax({
+			url:'relational/query',
+			type:'get',
+			dataType:"json",
+			data:{"type":type,"index":index},
+			success:function(result){
+				if(result.code ==1){
+					$("#pvalue").html(result.data).css("color","black");
+				}else{
+					$("#pvalue").html("查询失败").css("color","black");
+				}
+			},
+			error:function(){
+				alert("系统故障")
+			}
+		});
+	});
 });

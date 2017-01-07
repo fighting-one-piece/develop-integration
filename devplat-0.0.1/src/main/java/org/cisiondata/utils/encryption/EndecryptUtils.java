@@ -18,11 +18,11 @@ public class EndecryptUtils {
 
 	/** 
      * base64进制加密 
-     * @param password 
+     * @param text 
      * @return 
      */ 
-    public static String encrytBase64(String password) { 
-        return Base64.encodeToString(password.getBytes()); 
+    public static String encrytBase64(String text) { 
+        return Base64.encodeToString(text.getBytes()); 
     } 
     
     /** 
@@ -36,11 +36,11 @@ public class EndecryptUtils {
     
     /** 
      * 16进制加密 
-     * @param password 
+     * @param text 
      * @return 
      */ 
-    public static String encrytHex(String password) { 
-        return Hex.encodeToString(password.getBytes()); 
+    public static String encrytHex(String text) { 
+        return Hex.encodeToString(text.getBytes()); 
     } 
     
     /** 

@@ -33,8 +33,7 @@ public class MongoDBUtils {
         MongoCredential credential = MongoCredential.createCredential(  
                 "root", "admin", "123456".toCharArray());  
         credentials.add(credential);  
-//        mongoClient20 = new MongoClient(serverAddressList, credentials);  
-        mongoClient = new MongoClient(serverAddressList);  
+        mongoClient = new MongoClient(serverAddressList, credentials);  
     }  
       
     public MongoClient getClient() {  

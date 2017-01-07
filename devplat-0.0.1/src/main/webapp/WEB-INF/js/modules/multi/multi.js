@@ -1,17 +1,19 @@
+var pathName=window.document.location.pathname;
+var projectName=pathName.substring(0,pathName.substr(1).indexOf('/')+1);
 $(function(){
 		/*
 		获取所有类型
 		*/
 		$.ajax({
 			type:"get",
-			url:"../indices",
+			url:projectName+"/indices",
 			dataType:"json",
 			success:function(result){
 				$.each(result.data,function(indexKey,indexValue){
 					var index = indexKey;
 					$.ajax({
 						type:"get",
-						url:"../"+index+"/types",
+						url:projectName+"/"+index+"/types",
 						dataType:"json",
 						success:function(result){
 							$.each(result.data,function(typeKey,typeValue){
@@ -46,7 +48,7 @@ $(function(){
 			}else{
 				$.ajax({
 					type:"get",
-					url:"../"+index+"/"+type+"/attributes",
+					url:projectName+"/"+index+"/"+type+"/attributes",
 					dataType:"json",
 					success:function(result){
 						$.each(result.data,function(key,value){
@@ -163,7 +165,7 @@ $(function(){
 			var type = $(".chooseClass").children("option:selected").data("type");
 			if(index == "n" || type == "n"){
 			}else{
-				var url = "../search/multi/scroll?scrollId=&pageSize=10&esindex="+index+"&estype="+type;
+				var url = projectName+"/search/multi/scroll?scrollId=&pageSize=10&esindex="+index+"&estype="+type;
 				var op = $("#term div:gt(0)").find("option:selected")
 				$.each(op,function(i,option){
 					var value = $(option).parent().siblings("input").val();

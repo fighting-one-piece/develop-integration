@@ -7,7 +7,7 @@
 <body>
 <h5 align="center">&nbsp;</h5>
 <div align="center">
-	<p><input id="idCard" type="text"  style="width: 220px;" placeholder="请输入身份证号Address"/></p>
+	<p><input id="idCard" type="text"  style="width: 220px;" placeholder="请输入身份证号"/></p>
 	<p><input id="name" type="text"  style="width: 220px;" placeholder="请输入名字"/></p>
 	<p><input id="phone" type="text"  style="width: 220px;" placeholder="请输入手机号"/></p>
 	<p><label style="padding-right: 65px;">证件类型:</label>
@@ -27,7 +27,7 @@
 	<p><input id="companyAddress" type="text"  style="width: 220px;" placeholder="请输入公司地址"/></p>
 	<p><input id="address" type="button" value="确定"/></p>
 </div>
-<div id="resultAddress" align="center" style="top: 30%;position: absolute;">
+<div id="resultAddress" align="center" style="position: absolute;">
 
 </div>
 </body>

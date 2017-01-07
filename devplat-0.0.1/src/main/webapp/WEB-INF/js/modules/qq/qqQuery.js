@@ -16,8 +16,6 @@ $(document).ready(function(){
 			showDIV();
 		})
 		$("#submitQQ").click(function(){
-			$("#submitQQ").attr("disabled", true); 
-			$("#submitQQ").attr("style", "color:gray;"); 
 			$("#nextQQNick").hide();
 			$(".styleQQThead tr").empty();
 			$(".styleQQTbody tr").empty();
@@ -30,8 +28,7 @@ $(document).ready(function(){
 	        for(var i=0;i<chkObjs.length;i++){
 	            if(chkObjs[i].checked==true){
 	                if(chkObjs[i].value =="qq"){
-	        			search();
-	        			readQQ();
+	        			readQQBaseQun();
 	                }else if(chkObjs[i].value =="qqqun"){
 	        			var qunNum=$("#query").val();
 	        			searchQQ(qunNum);
@@ -60,8 +57,7 @@ $(document).ready(function(){
 			 for(var i=0;i<chkObjs.length;i++){
 		            if(chkObjs[i].checked==true){
 		                if(chkObjs[i].value =="qq"){
-		        			search();
-		        			readQQ();
+		                	readQQBaseQun();
 		                }else if(chkObjs[i].value =="qqqun"){
 		        			var qunNum=$("#query").val();
 		        			searchQQ(qunNum);
@@ -74,13 +70,15 @@ $(document).ready(function(){
 		
 		//通过QQ昵称查询
 		function searchQQNick() {
-			var qqnick = encodeURI($("#query").val());
+//			var qqnick = encodeURI($("#query").val());
+			var qqnick = $("#query").val();
+			console.log(qqnick);
 			$("#count").empty();
 				$.ajax({
-					url:"qqdata/qqnick",
+					url:"qq/nickname/search",
 					type:"get",
 					dataType:"json",
-					data:{"qqnick":qqnick,"scrollId":scrollId,"rowNumPerPage":rowNumPerPage},
+					data:{"nickname":qqnick,"scrollId":scrollId,"rowNumPerPage":rowNumPerPage},
 					success:function(result){
 						if(result.data){
 							es = result.data.es;
@@ -121,7 +119,6 @@ $(document).ready(function(){
 								$(".styleQQThead tr").empty();
 								$(".styleQQTbody tr").empty();
 								$("#resultsQQ .ss").empty();
-								$("#resultsQQ .ss").append("暂无数据");
 								//清除群基本信息并提示数据量
 								$(".styleTbody").html(html);
 								$("#results .ss").empty();
@@ -140,7 +137,6 @@ $(document).ready(function(){
 								$(".styleQQThead tr").empty();
 								$(".styleQQTbody tr").empty();
 								$("#resultsQQ .ss").empty();
-								$("#resultsQQ .ss").append("暂无数据");
 							}
 						}else{
 							//清除群基本信息并提示暂无数据
@@ -153,7 +149,6 @@ $(document).ready(function(){
 							$(".styleQQThead tr").empty();
 							$(".styleQQTbody tr").empty();
 							$("#resultsQQ .ss").empty();
-							$("#resultsQQ .ss").append("暂无数据");
 						}
 						$("#submitQQ").attr("disabled", false); 
 						$("#submitQQ").attr("style", "color:black;"); 
@@ -163,76 +158,54 @@ $(document).ready(function(){
 					}
 				})
 		}
-		
-		function readQQ(){
+		//整合
+		function readQQBaseQun(){
 			var qq = $("#query").val();
 			if(qq.length > 0){
 				$.ajax({
-					url:"qqdata/qqsearch",
+					url:"qq/search",
 					type:"get",
 					dataType:"json",
-					data:{"qq":qq},
+					data:{"qqNum":qq},
 					success:function(result){
-						console.log(result.data.length)
-						if(result.data.length > 0){
-								$("#resultsQQ .ss").empty();
+						console.log(!result.data)
+						if(result.data){
+							$("#results .ss").empty();
+							$("#resultsQQ .ss").empty();
+							if(result.data["qqBase"].length > 0){
 								//拼接表头
-								var thead = "<tr>";
-								for (var i = 0; i < result.data.length; i++) {
-									for ( var key in result.data[i]) {
-										thead+="<td>"+key+"</td>";
+								var theadQQ = "<tr>";
+								for (var i = 0; i < result.data["qqBase"].length; i++) {
+									for ( var key in result.data["qqBase"][i]) {
+										theadQQ+="<td>"+key+"</td>";
 									}
 									break;
 								}
-								$(".styleQQThead").html(thead+="</tr>");
+								$(".styleQQThead").html(theadQQ+="</tr>");
 								//拼接内容
-								var html = "";
-								for(var j = 0; j < result.data.length; j++){
-									html += "<tr>";
-									for(var key in result.data[i]){
-										html += "<td>"+result.data[i][key]+"</td>";
+								var htmlQQ = "";
+								for(var j = 0; j < result.data["qqBase"].length; j++){
+									htmlQQ += "<tr>";
+									for(var key in result.data["qqBase"][i]){
+										htmlQQ += "<td>"+result.data["qqBase"][i][key]+"</td>";
 									}
-									html += "</tr>";
+									htmlQQ += "</tr>";
 								}
-								$(".styleQQTbody").html(html);
-							
-						}else{
-							//清除QQ基本信息并提示暂无数据
-							$(".styleQQThead tr").empty();
-							$(".styleQQTbody tr").empty();
-							$("#resultsQQ .ss").empty();
-							$("#resultsQQ .ss").append("暂无数据");
-						}
-						$("#submitQQ").attr("disabled", false); 
-						$("#submitQQ").attr("style", "color:black;"); 
-					}
-				})
-			}
-		}
-		//群信息
-		function search(){
-			$("#results .ss").empty();
-			var qq=$("#query").val();
-			if(qq.length > 0){
-				$.ajax({
-					url:"qqdata/search",
-					type:"get",
-					dataType:"json",
-					data:{"qq":qq},
-					success:function(result){
-						if(result.data){
-							if(result.data.length > 0){
+								$(".styleQQTbody").html(htmlQQ);
+							}
+							if(result.data["qun"].length > 0){
+								//拼接群信息
 								var thead = "<tr><td>群账号</td><td>群名称</td><td>创建时间</td><td>群人数</td><td>用户昵称</td><td>群通知</td></tr>";
 								$(".styleThead").html(thead);
 								var html ="";
-								for(var i = 0;i<result.data.length;i++){
+								for(var i = 0;i<result.data["qun"].length;i++){
 									html+="<tr>"+
-									"<td><a>"+result.data[i]["群账号"]+"</a></td>"+
-									"<td>"+result.data[i]["群名称"]+"</td>"+
-									"<td>"+result.data[i]["创建时间"]+"</td>"+
-									"<td>"+result.data[i]["群人数"]+"</td>"+
-									"<td>"+result.data[i]["nick"]+"</td>"+
-									"<td>"+result.data[i]["群通知"]+"</td>"+
+									"<td><a>"+result.data["qun"][i]["群账号"]+"</a></td>"+
+									"<td>"+result.data["qun"][i]["群名称"]+"</td>"+
+									"<td>"+result.data["qun"][i]["创建时间"]+"</td>"+
+									"<td>"+result.data["qun"][i]["群人数"]+"</td>"+
+									"<td>"+result.data["qun"][i]["nick"]+"</td>"+
+									"<td>"+result.data["qun"][i]["群通知"]+"</td>"+
 									"</tr>";
 									
 								}
@@ -240,22 +213,23 @@ $(document).ready(function(){
 								$(".styleTbody").html(html);
 								$("#results .ss").empty();
 								addLog(qq);
-							}else {
-								//清除群基本信息并提示暂无数据
-								$(".styleThead tr").empty();
-								$(".styleTbody tr").empty();
-								$("#results .ss").empty();
+							}
+							if(result.data["qun"].length == 0 && result.data["qqBase"].length == 0){
 								$("#results .ss").append("未找到相关数据");
 							}
 						}else{
+							//清除QQ基本信息并提示暂无数据
+							$(".styleQQThead tr").empty();
+							$(".styleQQTbody tr").empty();
+							$("#resultsQQ .ss").empty();
+							//清除群基本信息并提示暂无数据
+							$(".styleThead tr").empty();
+							$(".styleTbody tr").empty();
 							$("#results .ss").empty();
-							$("#results .ss").append("未找到相关数据");
+							$("#results .ss").append("抱歉!该查询涉及敏感信息");
 						}
 						$("#submitQQ").attr("disabled", false); 
-						$("#submitQQ").attr("style", "color:black;"); 
-					},
-					error:function(){
-						alert("错误");
+						$("#submitQQ").attr("style", "color:black;");
 					}
 				})
 			}
@@ -264,7 +238,7 @@ $(document).ready(function(){
 		function searchQQ(qunNum){
 			if(qunNum.length > 0){
 				$.ajax({
-					url:"qqdata/qun",
+					url:"qq/qun/search",
 					type:"get",
 					dataType:"json",
 					data:{"qunNum":qunNum},
@@ -295,7 +269,6 @@ $(document).ready(function(){
 								$(".styleQQThead tr").empty();
 								$(".styleQQTbody tr").empty();
 								$("#resultsQQ .ss").empty();
-								$("#resultsQQ .ss").append("暂无数据");
 								//清除群基本信息并提示数据量
 								$(".styleTbody").html(html);
 								$("#results .ss").empty();
@@ -313,7 +286,6 @@ $(document).ready(function(){
 								$(".styleQQThead tr").empty();
 								$(".styleQQTbody tr").empty();
 								$("#resultsQQ .ss").empty();
-								$("#resultsQQ .ss").append("暂无数据");
 							}
 						}else{
 							//清除群基本信息并提示暂无数据
@@ -326,7 +298,6 @@ $(document).ready(function(){
 							$(".styleQQThead tr").empty();
 							$(".styleQQTbody tr").empty();
 							$("#resultsQQ .ss").empty();
-							$("#resultsQQ .ss").append("暂无数据");
 						}
 						$("#submitQQ").attr("disabled", false); 
 						$("#submitQQ").attr("style", "color:black;"); 
@@ -340,7 +311,7 @@ $(document).ready(function(){
 		//另一个页面显示
 		function searchQQA(qunNum){
 			$.ajax({
-				url:"qqdata/qun",
+				url:"qq/qun/search",
 				type:"get",
 				dataType:"json",
 				data:{"qunNum":qunNum},

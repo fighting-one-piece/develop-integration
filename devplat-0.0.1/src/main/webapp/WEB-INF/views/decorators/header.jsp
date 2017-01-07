@@ -45,6 +45,8 @@
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/NameIdPhoneBank.js"></script> --%>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/NameIDPhoto3D.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/LMall.js"></script>
+<script type="text/javascript" src="<%=basePath %>/js/modules/user/updatepassword.js"></script>
+<script type="text/javascript" src="<%=basePath %>/js/modules/qq/honggu.js"></script>
 <script type="text/javascript">
 	//处理键盘事件 禁止后退键（Backspace）密码或单行、多行文本框除外 
 	function banBackSpace(e){ 
@@ -88,24 +90,25 @@
 			var projectName=pathName.substring(0,pathName.substr(1).indexOf('/')+1);
 			location.href = projectName+"/logout"
 		});
+		$("#newpassword").click(function() {
+			showDIV();
+		});
 	});
 </script>
 
-<div align="center">
+<div align="center" id="headerpage">
 	<hr style="margin-bottom: 0.25%; margin-top: 1%"/>
 	<div class="nav" align="center" style="margin-top: 5px;margin-bottom: 0px;">
 	<a id="title" href="<%=basePath %>/portal" style="color: black; text-decoration: none;font-size: 30px;" >
 	CisionData
 	<!-- 获取用户名 -->
 	</a>
-		<div class="ce">
-			<strong>用户名：</strong><i class="username"><shiro:principal/></i>
-			<button id="btnlogout" class="btn btn-sm btn-danger">
-				<i class="glyphicon glyphicon-off"></i>&nbsp;&nbsp;退出
-			</button>
+		<div class="ce"  style="margin-top: 25px;margin-right: 0;">
+			<strong>当前用户：</strong><i class="username"><shiro:principal/></i>
+			<a id="updatepassword" href="<%=basePath %>/user/updatepassword">修改密码</a>
+			<a id="btnlogout" href="#">退出系统</a>
 		</div>
 	</div>
 	<hr style="margin-bottom: 5px;margin-top: 5px;"/>
 </div>
-
 

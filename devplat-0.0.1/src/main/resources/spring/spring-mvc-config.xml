@@ -20,6 +20,22 @@
 		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
 	</context:component-scan>
 	
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="stringHttpMessageConverter" />
+                <ref bean="jsonHttpMessageConverter" />
+			</list>
+		</property>
+        <property name="webBindingInitializer">  
+		    <bean class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">  
+		        <property name="conversionService">  
+		            <bean class="org.springframework.format.support.FormattingConversionServiceFactoryBean"></bean>  
+		        </property>  
+		    </bean>  
+		</property>  
+	</bean>
+	
 	<!-- 实现@AspectJ注解的 -->
 	<aop:aspectj-autoproxy proxy-target-class="true"/>
 	
@@ -168,17 +184,18 @@
 	</bean>
 	
 	<mvc:interceptors>
-    	<bean class="org.cisiondata.modules.authentication.web.interceptor.CommonDataInterceptor">
+    	<bean class="org.cisiondata.modules.auth.web.interceptor.CommonDataInterceptor">
             <property name="excludeUrlPatterns">
                 <value>
-                    /admin/polling
+                    /app
                 </value>
             </property>
         </bean>
     </mvc:interceptors>
     
-    <bean id="frontContextInterceptor" class="org.cisiondata.modules.authentication.web.interceptor.FrontContextInterceptor"/>
-	<bean id="frontLocaleInterceptor" class="org.cisiondata.modules.authentication.web.interceptor.FrontLocaleInterceptor"/>
+    <bean id="frontContextInterceptor" class="org.cisiondata.modules.auth.web.interceptor.FrontContextInterceptor"/>
+	<bean id="frontLocaleInterceptor" class="org.cisiondata.modules.auth.web.interceptor.FrontLocaleInterceptor"/>
+    <bean id="urlHandlerAdapter" class="org.cisiondata.modules.auth.web.handler.UrlHandlerAdapter"/>
     
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
 		<property name="interceptors">
@@ -191,7 +208,6 @@
 	
 	<mvc:view-controller path="/" view-name="redirect:/front/login"/>
 	
-	<!-- 当在web.xml 中   DispatcherServlet使用 <url-pattern>/</url-pattern> 映射时，能映射静态资源 -->
     <mvc:default-servlet-handler/>
 	
 	<mvc:resources mapping="/js/**" location="/WEB-INF/js/" />

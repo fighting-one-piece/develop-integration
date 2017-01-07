@@ -1,7 +1,12 @@
 var pathName=window.document.location.pathname;
 var projectName=pathName.substring(0,pathName.substr(1).indexOf('/')+1);
 $(function(){
-	var bodystr = '<div id="resourceTreeDiv" class="resource_link_white_content"><div class="styleWhite"><button class="btn btn-sm btn-info" id="closeResourceTreeDiv" style="margin-bottom: 10px; margin-left: 5%">关闭</button></div><div><ul id="resourceTreeUl"></ul></div><button class="btn btn-sm btn-info pull-right" id="submitUpdatePermissionBtn" style="margin-top: 10px; margin-right: 5%">提交</button></div><!-- 背景 --><div id="resourceTreeFade" class="resource_black_overlay"></div>';
+	var bodystr = '<div id="resourceTreeDiv" class="resource_link_white_content">'+
+		'<div class="styleWhite">'+
+		'<button class="btn btn-sm btn-info" id="closeResourceTreeDiv" style="margin-bottom: 10px; margin-left: 5%">关闭</button></div>'+
+		'<div><ul id="resourceTreeUl"></ul></div><button class="btn btn-sm btn-info pull-right" id="submitUpdatePermissionBtn" style="margin-top: 10px; margin-right: 5%">'+
+		'提交</button></div>'+
+		'<!-- 背景 --><div id="resourceTreeFade" class="resource_black_overlay"></div>';
 	$("body").append(bodystr);
 //	$("body").on("click",".addpermissions",function(){
 //		$("#resourceTreeUl").html("");
@@ -14,15 +19,41 @@ $(function(){
 	});
 	
 	$("body").on("click","#submitUpdatePermissionBtn",function(){
-		
+		var principalType = $("#resourceTreeUl").data("principalType");
+		var principalId = $("#resourceTreeUl").data("principalId");
+		var $lis = $("#resourceTreeUl li");
+		var str = "";
+		$.each($lis,function(index,li){
+			var readFlag = $(li).children(".read").is(":checked");
+			var writeFlag = $(li).children(".write").is(":checked");
+			var resourceId = $(li).attr("id").replace("li","");
+			if (index == 0){
+				str += readFlag+","+writeFlag+","+resourceId+","+principalId+","+principalType;
+			} else {
+				str += "|"+readFlag+","+writeFlag+","+resourceId+","+principalId+","+principalType;
+			}
+		})
+		$.ajax({
+			type:"post",
+			url:projectName+"/admin/aResource/permission",
+			data:{"param":str},
+			dataType:"json",
+			success:function(result){
+				if(result.code == 1){
+					swal("Success!", "操作成功!", "success");
+				} else {
+					swal("Error!", "系统繁忙，请稍后再试！", "error");
+				}
+			}
+		});
 	})
 	
 })
 function getResource(principalType,principalId){
 	$("#resourceTreeUl").data("principalType",principalType);
 	$("#resourceTreeUl").data("principalId",principalId);
-	alert($("#resourceTreeUl").data("principalId"))
-	alert($("#resourceTreeUl").data("principalType"))
+//	alert($("#resourceTreeUl").data("principalId"))
+//	alert($("#resourceTreeUl").data("principalType"))
 	$.ajax({
 		type:"get",
 		url:projectName+"/admin/aResource/tree",
@@ -32,6 +63,33 @@ function getResource(principalType,principalId){
 				$.each(result.data,function(index,resource){
 					showResourceTree(resource);
 				});
+				//将已有权限勾上
+				$.ajax({
+					type:"get",
+					url:projectName+"/admin/aResource/permissionstatus",
+					dataType:"json",
+					data:{"principalType":principalType,"principalId":principalId},
+					success:function(result){
+						if (result.code == 1){
+							if (result.data) {
+								$.each(result.data,function(key,value){
+									//在这里设置初始状态
+									var listr = "#li"+key;
+									$.each(value,function(index,authStatus){
+										if (authStatus == "read") {
+											$(listr).children(".read").attr("checked",true)
+										}
+										if (authStatus == "update") {
+											$(listr).children(".write").attr("checked",true)
+										}
+									})
+								})
+							}
+						}
+					}
+				})
+				
+				
 			} else {
 				swal("Error!", "系统繁忙，请稍后再试！", "error")
 			}

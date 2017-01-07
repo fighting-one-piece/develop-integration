@@ -12,6 +12,8 @@ import java.util.concurrent.Future;
 
 import javax.annotation.Resource;
 
+import org.cisiondata.modules.identity.dao.MobileAttributionDao;
+import org.cisiondata.modules.identity.entity.MobileAttributionModel;
 import org.cisiondata.modules.identity.service.IMobileAddressService;
 import org.cisiondata.modules.identity.service.IMobileNameService;
 import org.cisiondata.modules.identity.service.IMobileService;
@@ -30,7 +32,8 @@ public class MobileServiceImpl implements IMobileService {
 	//读取手机号归属地(readAddressFromMoblie)
 	@Resource(name="mobileAddressService")
 	private IMobileAddressService mobileAddressService=null;
-
+	@Resource(name = "attributiondao")
+	private MobileAttributionDao dao;
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
 	@Override
@@ -67,6 +70,13 @@ public class MobileServiceImpl implements IMobileService {
 			LOG.error(e.getMessage(), e);
 		}
 		return resultMap;
+	}
+
+	@Override
+	public List<MobileAttributionModel> selByDnseg(String phone) {
+		//截取字符串
+		String mobile = phone.substring(0, 7);
+		return dao.selByDnseg(mobile);
 	}
 	
 }

@@ -242,7 +242,6 @@ public class ConnectionPool {
      * 查找连接池中所有的连接，查找一个可用的数据库连接， 如果没有可用的连接，返回 null 
      * @return 返回一个可用的数据库连接 
      */  
-	@SuppressWarnings("resource")
 	private Connection findFreeConnection() throws SQLException {  
         Connection conn = null;  
         WrapperConnection pConn = null;  
@@ -259,7 +258,6 @@ public class ConnectionPool {
                         conn = newConnection();  
                     } catch (SQLException e) {  
                         LOG.info(e.getMessage(), e);  
-                        return null;  
                     }  
                     pConn.setConnection(conn);  
                 }  

@@ -74,25 +74,6 @@
     <!-- 注解事务配置 -->
 	<tx:annotation-driven transaction-manager="transactionManager" />
     
-	<!-- MyBatis 配置 -->
-	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-		<property name="typeAliasesPackage" value="org.cisiondata.modules.abstr.entity,
-			org.cisiondata.modules.authentication.entity,org.cisiondata.modules.admin.auth.entity,
-			org.cisiondata.modules.log.entity,org.cisiondata.modules.admin.statistics.entity" />
-		<property name="configLocation" value="classpath:mybatis/mybatis-config.xml" />
-		<property name="mapperLocations" value="classpath*:org/cisiondata/modules/**/mapper/**/*.xml" />
-	</bean>
-	
-	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-       <constructor-arg index="0" ref="sqlSessionFactory" />
-    </bean>
-    
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-	  	<property name="basePackage" value="org.cisiondata.modules.**.dao" />
-	  	<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
-	</bean>
-	
 	<!-- 国际化资源 -->
 	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">  
         <property name="basenames">  
@@ -109,5 +90,6 @@
     <import resource="classpath:spring/applicationContext-task.xml"/>
     <import resource="classpath:spring/applicationContext-redis.xml"/>
     <import resource="classpath:spring/applicationContext-shiro.xml"/>
+    <import resource="classpath:spring/applicationContext-mybatis.xml"/>
     
 </beans>

@@ -42,29 +42,30 @@ import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 
 @Service("esMetadataService")
 public class ESMetadataServiceImpl implements IESMetadataService, InitializingBean {
-	
+
 	private Logger LOG = LoggerFactory.getLogger(ESMetadataServiceImpl.class);
-	
+
 	private Map<String, List<Map<String, Map<String, String>>>> metadatas = null;
-	
+
 	private Map<String, List<String>> indexTypes = null;
-	
+
 	private Map<String, Long> datas = new HashMap<String, Long>();
-	
+
 	private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
 	@Resource(name = "jedisCluster")
 	private JedisCluster jedisCluster = null;
-	
+
 	@Autowired
 	private ESMetadataDAO esMetadataDAO = null;
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		initMetadataCache();
 		long result = jedisCluster.setnx("es:statistics:datas:lock", "ok");
 		LOG.info("es:statistics:datas:lock : {}", result);
-		if (result == 0) return;
+		if (result == 0)
+			return;
 		scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
@@ -77,33 +78,33 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 			}
 		}, 1, 60 * 12, TimeUnit.MINUTES);
 	}
-	
+
 	private void initializeDatas() {
 		datas.clear();
-		initMetadataIndexTypes10(datas);
-		initMetadataIndexTypes105(datas);
+		initMetadataIndexTypes(datas);
 	}
-	
+
 	@Override
 	public Map<String, Long> readESStatisticsDatas() throws BusinessException {
-		if (datas.isEmpty()) initializeDatas();
+		if (datas.isEmpty())
+			initializeDatas();
 		return datas;
 	}
-	
-	//查询10集群index和type
-	private void initMetadataIndexTypes10(Map<String, Long> datas) {
+
+	// 查询10集群index和type
+	private void initMetadataIndexTypes(Map<String, Long> datas) {
 		indexTypes = new HashMap<String, List<String>>();
-		Client client = ESClient.getInstance().getClient10();
+		Client client = ESClient.getInstance().getClient();
 		try {
 			IndicesAdminClient indicesAdminClient = client.admin().indices();
 			GetMappingsResponse getMappingsResponse = indicesAdminClient.getMappings(new GetMappingsRequest()).get();
-			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = 
-					getMappingsResponse.getMappings();
-			Iterator<ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>> 
-			mappingIterator = mappings.iterator();
+			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = getMappingsResponse
+					.getMappings();
+			Iterator<ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>> mappingIterator = mappings
+					.iterator();
 			while (mappingIterator.hasNext()) {
-				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>
-				objectObjectCursor = mappingIterator.next();
+				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>> objectObjectCursor = mappingIterator
+						.next();
 				String index = objectObjectCursor.key;
 				List<String> types = indexTypes.get(index);
 				if (null == types) {
@@ -113,61 +114,21 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 				ImmutableOpenMap<String, MappingMetaData> immutableOpenMap = objectObjectCursor.value;
 				ObjectLookupContainer<String> keys = immutableOpenMap.keys();
 				Iterator<ObjectCursor<String>> keysIterator = keys.iterator();
-				while(keysIterator.hasNext()) {
+				while (keysIterator.hasNext()) {
 					String type = keysIterator.next().value;
 					types.add(type);
-					}
 				}
+			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
-		for (Entry<String, List<String>> entry : indexTypes.entrySet()) { 
-		    List<String> data = entry.getValue();
-		    for(int i = 0;i<data.size();i++){
-		    	String values = data.get(i);
-		    	 handleIndexTypeCount(client, entry.getKey(), values, datas);
-		    }
-		}  
-	}
-	
-	//查询105集群index和type
-	private void initMetadataIndexTypes105(Map<String, Long> datas) {
-		indexTypes = new HashMap<String, List<String>>();
-		Client client = ESClient.getInstance().getClient105();
-		try {
-			IndicesAdminClient indicesAdminClient = client.admin().indices();
-			GetMappingsResponse getMappingsResponse = indicesAdminClient.getMappings(new GetMappingsRequest()).get();
-			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = 
-					getMappingsResponse.getMappings();
-			Iterator<ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>> 
-			mappingIterator = mappings.iterator();
-			while (mappingIterator.hasNext()) {
-				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>
-				objectObjectCursor = mappingIterator.next();
-				String index = objectObjectCursor.key;
-				List<String> types = indexTypes.get(index);
-				if (null == types) {
-					types = new ArrayList<String>();
-					indexTypes.put(index, types);
-				}
-				ImmutableOpenMap<String, MappingMetaData> immutableOpenMap = objectObjectCursor.value;
-				ObjectLookupContainer<String> keys = immutableOpenMap.keys();
-				Iterator<ObjectCursor<String>> keysIterator = keys.iterator();
-				while(keysIterator.hasNext()) {
-					String type = keysIterator.next().value;
-					types.add(type);
-					}
-				}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
+		for (Entry<String, List<String>> entry : indexTypes.entrySet()) {
+			List<String> data = entry.getValue();
+			for (int i = 0; i < data.size(); i++) {
+				String values = data.get(i);
+				handleIndexTypeCount(client, entry.getKey(), values, datas);
+			}
 		}
-		for (Entry<String, List<String>> entry : indexTypes.entrySet()) { 
-		    List<String> data = entry.getValue();
-		    for(int i = 0;i<data.size();i++){
-		    	String values = data.get(i);
-		    	 handleIndexTypeCount(client, entry.getKey(), values, datas);
-		    }
-		}  
 	}
 
 	public long readIndexTypeCount(Client client, String index, String type) {
@@ -178,7 +139,7 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 		SearchResponse response = searchRequestBuilder.execute().actionGet();
 		return response.getHits().getTotalHits();
 	}
-	
+
 	public void handleIndexTypeCount(Client client, String index, String type, Map<String, Long> datas) {
 		long current_count = readIndexTypeCount(client, index, type);
 		Long logistics_count = datas.get(type);
@@ -188,22 +149,23 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 			datas.put(type, logistics_count + current_count);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void initMetadataCache() {
-		metadatas = new HashMap<String, List<Map<String, Map<String, String>>>>(); 
+		metadatas = new HashMap<String, List<Map<String, Map<String, String>>>>();
 		try {
-			Client client = ESClient.getInstance().getClient105();
+			Client client = ESClient.getInstance().getClient();
 			IndicesAdminClient indicesAdminClient = client.admin().indices();
 			GetMappingsResponse getMappingsResponse = indicesAdminClient.getMappings(new GetMappingsRequest()).get();
 			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = 
-					getMappingsResponse.getMappings();
+				getMappingsResponse.getMappings();
 			Iterator<ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>> 
-			mappingIterator = mappings.iterator();
+				mappingIterator = mappings.iterator();
 			while (mappingIterator.hasNext()) {
-				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>
-				objectObjectCursor = mappingIterator.next();
+				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>> 
+					objectObjectCursor = mappingIterator.next();
 				String index = objectObjectCursor.key;
+				if (index.startsWith(".marvel-es")) continue;
 				List<Map<String, Map<String, String>>> indexMetadatas = metadatas.get(index);
 				if (null == indexMetadatas) {
 					indexMetadatas = new ArrayList<Map<String, Map<String, String>>>();
@@ -212,7 +174,7 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 				ImmutableOpenMap<String, MappingMetaData> immutableOpenMap = objectObjectCursor.value;
 				ObjectLookupContainer<String> keys = immutableOpenMap.keys();
 				Iterator<ObjectCursor<String>> keysIterator = keys.iterator();
-				while(keysIterator.hasNext()) {
+				while (keysIterator.hasNext()) {
 					String type = keysIterator.next().value;
 					Map<String, Map<String, String>> typeMetadatas = new HashMap<String, Map<String, String>>();
 					MappingMetaData mappingMetaData = immutableOpenMap.get(type);
@@ -233,14 +195,14 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 			LOG.error(e.getMessage(), e);
 		}
 	}
-	
-	
+
 	@Override
 	public Object readMetadatas() throws BusinessException {
-		if (null == metadatas) initMetadataCache();
+		if (null == metadatas)
+			initMetadataCache();
 		return metadatas;
 	}
-	
+
 	@Override
 	public Map<String, String> readIndices() throws BusinessException {
 		Map<String, String> indices = new HashMap<String, String>();
@@ -249,12 +211,13 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 		}
 		return indices;
 	}
-	
+
 	@Override
 	public Map<String, String> readIndexTypes(String index) throws BusinessException {
 		Map<String, String> types = new HashMap<String, String>();
 		for (Map.Entry<String, List<Map<String, Map<String, String>>>> entry : metadatas.entrySet()) {
-			if (!index.equalsIgnoreCase(entry.getKey())) continue;
+			if (!index.equalsIgnoreCase(entry.getKey()))
+				continue;
 			List<Map<String, Map<String, String>>> typesMappings = entry.getValue();
 			for (Map<String, Map<String, String>> typeMappings : typesMappings) {
 				if (typeMappings.size() == 1) {
@@ -265,7 +228,7 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 		}
 		return types;
 	}
-	
+
 	@Override
 	public Map<String, List<String>> readIndicesTypes() throws BusinessException {
 		Map<String, List<String>> indicesTypes = new HashMap<String, List<String>>();
@@ -285,48 +248,49 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 		}
 		return indicesTypes;
 	}
-	
+
 	@Override
-	public Map<String, String> readIndexTypeAttributes(String index, String type)
-			throws BusinessException {
+	public Map<String, String> readIndexTypeAttributes(String index, String type) throws BusinessException {
 		List<Map<String, Map<String, String>>> typesMappings = metadatas.get(index);
 		for (Map<String, Map<String, String>> typeMappings : typesMappings) {
-			if (typeMappings.size() != 1) continue;
+			if (typeMappings.size() != 1)
+				continue;
 			String typeName = new ArrayList<String>(typeMappings.keySet()).get(0);
-			if (!typeName.equalsIgnoreCase(type)) continue;
+			if (!typeName.equalsIgnoreCase(type))
+				continue;
 			return typeMappings.get(type);
 		}
 		return new HashMap<String, String>();
 	}
-		
+
 	@Override
 	public void updateMetadatasNull() throws BusinessException {
 		metadatas.clear();
 		metadatas = null;
 	}
-	
-	//根据type查询
+
+	// 根据type查询
 	@Override
 	public List<ESMetadata> findType(String type) {
-		List<ESMetadata> list =new  ArrayList<ESMetadata>();
+		List<ESMetadata> list = new ArrayList<ESMetadata>();
 		list = esMetadataDAO.findType(type);
 		return list;
 	}
-	
-	//根据ID删除
+
+	// 根据ID删除
 	@Override
 	public int deleteId(int id) {
 		int num = esMetadataDAO.deleteId(id);
 		return num;
 	}
-	
-	//添加
+
+	// 添加
 	@Override
 	public void save(ESMetadata metadata) {
 		esMetadataDAO.save(metadata);
 	}
 
-	//根据ID修改
+	// 根据ID修改
 	@Override
 	public int updateId(ESMetadata metadata) {
 		int num = esMetadataDAO.updateId(metadata);

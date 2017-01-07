@@ -14,8 +14,8 @@
 	
 	#body {
 		width: 98%;
-		height: 81%;
-		min-height: 700px;
+		height: 89%;
+		min-height: 760px;
 		top: 13%;
 		left: 2%;
 		position: relative;
@@ -30,7 +30,7 @@
 	}
 	.ce{
 		float: right;
-		padding-right: 3%;
+		padding-right: 1%;
 		padding-top: 0.4%;
 	}
 	.username{

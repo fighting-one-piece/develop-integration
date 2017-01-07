@@ -68,7 +68,24 @@ public class MobileController  {
 		}
 		return result;
 	}
-	
+	/**
+	 * 查询手机归属地  ----fb
+	 * @param mobile
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/{mobile}/MobileAttribution", method = RequestMethod.GET)
+	public WebResult readMobileAttribution(@PathVariable String mobile){
+		WebResult result = new WebResult();
+		try {
+			result.setData(mobileService.selByDnseg(mobile));
+			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView toMoblie(){
 		return new ModelAndView("/mobile/mobile");

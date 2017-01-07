@@ -26,5 +26,4 @@ $(document).ready(function () {
 		img_area.innerHTML = '<div class="sitetip">图片img标签展示：</div><img src="'+this.result+'" alt=""/>'; 
 		 } 
 		} 
-	
 });

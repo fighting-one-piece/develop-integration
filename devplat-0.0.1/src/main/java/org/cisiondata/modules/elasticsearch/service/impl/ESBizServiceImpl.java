@@ -28,6 +28,12 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	private static final String CN_REG = "[\\u4e00-\\u9fa5]+";
 	
 	@Override
+	public List<Map<String, Object>> readDataListByCondition(String query, int size) 
+			throws BusinessException {
+		return readDataListByCondition(buildBoolQuery(query), size);
+	}
+	
+	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(
 			String query, String scrollId, int size) throws BusinessException {
 		return readPaginationDataListByCondition(buildBoolQuery(query), scrollId, size);
@@ -40,7 +46,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		for (String attribute : identity_attributes) {
 			queryBuilder.should(QueryBuilders.termQuery(attribute, query));
 		}
-		return super.readPaginationDataListByCondition(index, type, queryBuilder, scrollId, size);
+		return readPaginationDataListByCondition(index, type, queryBuilder, scrollId, size);
 	}
 	
 	private BoolQueryBuilder buildBoolQuery(String keyword) {
@@ -165,8 +171,11 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		qr.setScrollId(String.valueOf(from + 1));
 		int fromIndex = (from - 1) * size;
 		int toIndex = (fromIndex + size) > totalRowNum ? (int) totalRowNum : (fromIndex + size);
+		LOG.info("fromIndex {} toIndex {}", fromIndex, toIndex);
 		if (fromIndex <= toIndex) {
 			qr.setResultList(qr.getResultList().subList(fromIndex, toIndex));
+		} else {
+			qr.getResultList().clear();
 		}
 		return qr;
 	}
@@ -177,6 +186,11 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	
 	private String genLabelDatasCacheKey(String index, String type, String label, String query) {
 		return index + ":" + type + ":" + label + ":" + MD5Utils.hash(query);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readLogisticsDataList(String query) throws BusinessException {
+		return readDataListByCondition("financial", "logistics", buildBoolQuery(query));
 	}
 	
 	class ReadPaginationDataListTask implements Callable<QueryResult<Map<String, Object>>> {

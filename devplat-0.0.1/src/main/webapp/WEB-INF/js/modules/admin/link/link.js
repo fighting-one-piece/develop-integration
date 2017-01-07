@@ -31,7 +31,7 @@ $(function(){
 							icon = "";
 						}
 						str = str + "<tr id='"+link.id+"'><td>"+link.name+"</td><td>"+link.identity+"</td><td>"+link.url
-						+"</td><td>"+type+"</td><td>"+icon+"</td><td>"+priority+"</td><td id='parentId"+link.parentId+"'>"+parentName+"</td><td><button class='btn btn-warning update-link'>修改</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class='btn btn-warning delete-link'>删除</button></td></tr>";
+						+"</td><td>"+type+"</td><td>"+icon+"</td><td>"+priority+"</td><td id='parentId"+link.parentId+"'>"+parentName+"</td><td><button class='btn btn-sm btn-info update-link'>修改</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class='btn btn-sm btn-info delete-link'>删除</button></td></tr>";
 					});
 					$("#AResourceendpage").val(result.data.pageCount);
 					$("#AResourcelastpage").val(result.data.pageNum);

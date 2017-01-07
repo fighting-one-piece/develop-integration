@@ -6,7 +6,7 @@ $(function(){
 	
 	$.ajax({
 		type:"get",
-		url:projectName+"/admin/aResource/menuLink",
+		url:projectName+"/resource/menuResource",
 		dataType:"json",
 		success:function(result){
 			if (result.code == 1){

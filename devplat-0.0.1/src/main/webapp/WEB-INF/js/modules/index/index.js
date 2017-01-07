@@ -191,6 +191,16 @@ $(document).ready(function () {
 			}
 		})
 	}
+	//导出
+	$("#poiExpExcel").click(function(){
+		var query = $("#query").val();
+		if(query==""||query==null){
+			swal("导出内容不能为空!");
+		}else{
+			var url = "export/xls?query=" + query;
+			window.location.href=url;
+		}
+	})
 });
 
 
@@ -198,6 +208,6 @@ $(document).ready(function () {
 function EnterPressIndex(){ //传入 event 
 	var e = e || window.event; 
 	if(e.keyCode == 13){ 
-	document.getElementById("submitIndex").click(); 
+		document.getElementById("submitIndex").click(); 
 	} 
-	}; 
+}; 

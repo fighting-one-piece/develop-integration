@@ -41,6 +41,7 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -516,10 +517,17 @@ public class ESClientHelper {
 	
 	public static void main(String[] args) {
 		Client client = ESClient.getInstance().getClient();
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch("email").setTypes("email");
-		searchRequestBuilder.setQuery(QueryBuilders.matchAllQuery());
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch("financial").setTypes("logistics");
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+		boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("city", "成都"));
+		boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("orderTime", "2015/1"));
+//		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("orderTime", "2015-1"));
+		boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("endTime", "2015/1"));
+//		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("endTime", "2015-1"));
+//		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("sourceFile", "台湾"));
+		searchRequestBuilder.setQuery(boolQueryBuilder);
 		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-		searchRequestBuilder.setSize(10).setExplain(false);
+		searchRequestBuilder.setSize(1000).setExplain(false);
 		searchRequestBuilder.addSort("updateTime", SortOrder.DESC);
 		SearchResponse response = searchRequestBuilder.execute().actionGet();
 		SearchHit[] hits = response.getHits().getHits();

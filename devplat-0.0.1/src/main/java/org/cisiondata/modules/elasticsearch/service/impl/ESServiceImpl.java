@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import javax.annotation.PostConstruct;
 
@@ -62,16 +61,20 @@ public class ESServiceImpl implements IESService {
 	protected static Set<String> all_attributes = null;
 	
 	/** ES INDEX TYPE 映射关系*/
-	protected static Map<String, List<String>> index_types_map = null;
+	protected static Map<String, List<String>> index_types_mapping = null;
+	
+	/** ES INDEX TYPE ATTRIBUTES 映射关系*/
+	protected static Map<String, Map<String, Set<String>>> index_type_attributes_mapping = null;
 	
 	/** 属性字段过滤*/
 	protected static Set<String> filter_attributes = null;
+	/** 标识属性字段过滤*/
+	protected static Set<String> identity_filter_attributes = null;
 	
 	@PostConstruct
 	public void postConstruct() {
 		initAttributeCache();
-		initESIndicesTypesCache();
-		initES10IndicesTypesCache();
+		initESIndicesTypesAttributesCache();
 	}
 	
 	private void initAttributeCache() {
@@ -82,18 +85,47 @@ public class ESServiceImpl implements IESService {
 		chinese_attributes = new HashSet<String>();
 		identity_attributes = new HashSet<String>();
 		location_attributes = new HashSet<String>();
-		index_types_map = new HashMap<String, List<String>>();
+		index_types_mapping = new HashMap<String, List<String>>();
+		index_type_attributes_mapping = new HashMap<String, Map<String, Set<String>>>();
 		filter_attributes = new HashSet<String>();
 		filter_attributes.add("insertTime");
 		filter_attributes.add("updateTime");
-		filter_attributes.add("sourceFile");
+		filter_attributes.add("inputPerson");
+		identity_filter_attributes = new HashSet<String>();
+		identity_filter_attributes.add("phoneAssociation");
+		identity_filter_attributes.add("phonePackage");
+		identity_filter_attributes.add("phoneModel");
+		identity_filter_attributes.add("phoneState");
+		identity_filter_attributes.add("phonePrice");
+		identity_filter_attributes.add("phoneType");
+		identity_filter_attributes.add("qqPoint");
+		identity_filter_attributes.add("qqCoin");
+		identity_filter_attributes.add("mastQQ");
+		identity_filter_attributes.add("cityId");
+		identity_filter_attributes.add("carName");
+		identity_filter_attributes.add("cardName");
+		identity_filter_attributes.add("bankName");
+		identity_filter_attributes.add("payName");
+		identity_filter_attributes.add("provinceId");
+		identity_filter_attributes.add("ipAddress");
+		identity_filter_attributes.add("companyNo");
+		identity_filter_attributes.add("companyCode");
+		identity_filter_attributes.add("companyType");
+		identity_filter_attributes.add("companyNature");
+		identity_filter_attributes.add("companyZipcode");
+		identity_filter_attributes.add("emailSuffix");
+		identity_filter_attributes.add("accountType");
+		identity_filter_attributes.add("gameAreaName");
+		identity_filter_attributes.add("manufactoryName");
+		identity_filter_attributes.add("registionAccount");
 	}
 	
-	private void filterAttributeCache(String attribute) {
+	private void filterAttributeCache(String attribute, Map<String, Set<String>> indexTypeAttributes) {
 		String attributeLowerCase = attribute.toLowerCase();
-		if (attributeLowerCase.indexOf("name") != -1) {
+		if (identity_filter_attributes.contains(attribute)) return;
+		if (attributeLowerCase.indexOf("name") != -1 && 
+				attributeLowerCase.indexOf("alias") == -1) {
 			name_attributes.add(attribute);
-			identity_attributes.add(attribute);
 		} else if (attributeLowerCase.indexOf("call") != -1) {
 			phone_attributes.add(attribute);
 			identity_attributes.add(attribute);
@@ -113,21 +145,37 @@ public class ESServiceImpl implements IESService {
 			identity_attributes.add(attribute);
 		} else if (attributeLowerCase.indexOf("address") != -1) {
 			location_attributes.add(attribute);
-		} else if (attributeLowerCase.indexOf("company") != -1) {
+		} else if (attributeLowerCase.indexOf("company") != -1 && 
+				attributeLowerCase.indexOf("alias") == -1) {
 			location_attributes.add(attribute);
 		} else if (attributeLowerCase.indexOf("province") != -1) {
 			location_attributes.add(attribute);
 		} else if (attributeLowerCase.indexOf("city") != -1) {
 			location_attributes.add(attribute);
+		} else if (attributeLowerCase.indexOf("county") != -1) {
+			location_attributes.add(attribute);
 		}
 		chinese_attributes.addAll(name_attributes);
 		chinese_attributes.addAll(location_attributes);
+		all_attributes.addAll(name_attributes);
 		all_attributes.addAll(identity_attributes);
 		all_attributes.addAll(location_attributes);
+		Set<String> it_identity_attributes = indexTypeAttributes.get("identity_attributes");
+		if (null == it_identity_attributes) {
+			it_identity_attributes = new HashSet<String>();
+			indexTypeAttributes.put("identity_attributes", it_identity_attributes);
+		}
+		if (identity_attributes.contains(attribute)) it_identity_attributes.add(attribute);
+		Set<String> it_chinese_attributes = indexTypeAttributes.get("chinese_attributes");
+		if (null == it_chinese_attributes) {
+			it_chinese_attributes = new HashSet<String>();
+			indexTypeAttributes.put("chinese_attributes", it_chinese_attributes);
+		}
+		if (chinese_attributes.contains(attribute)) it_chinese_attributes.add(attribute);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void initES10IndicesTypesCache() {
+	private void initESIndicesTypesAttributesCache() {
 		indices = new HashSet<String>();
 		types = new HashSet<String>();
 		try {
@@ -140,20 +188,33 @@ public class ESServiceImpl implements IESService {
 			while (mappingIterator.hasNext()) {
 				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>
 				objectObjectCursor = mappingIterator.next();
-				if (objectObjectCursor.key.startsWith(".marvel-es")) continue;
-				indices.add(objectObjectCursor.key);
+				String index = objectObjectCursor.key;
+				if (index.startsWith(".marvel-es")) continue;
+				indices.add(index);
+				List<String> indexTypes = index_types_mapping.get(index);
+				if (null == indexTypes) {
+					indexTypes = new ArrayList<String>();
+					index_types_mapping.put(index, indexTypes);
+				}
 				ImmutableOpenMap<String, MappingMetaData> immutableOpenMap = objectObjectCursor.value;
 				ObjectLookupContainer<String> keys = immutableOpenMap.keys();
 				Iterator<ObjectCursor<String>> keysIterator = keys.iterator();
 				while(keysIterator.hasNext()) {
 					String type = keysIterator.next().value;
 					types.add(type);
+					indexTypes.add(type);
+					String indexType = index + type;
+					Map<String, Set<String>> index_type_attributes = index_type_attributes_mapping.get(indexType);
+					if (null == index_type_attributes_mapping.get(indexType)) {
+						index_type_attributes = new HashMap<String, Set<String>>();
+						index_type_attributes_mapping.put(indexType, index_type_attributes);
+					}
 					MappingMetaData mappingMetaData = immutableOpenMap.get(type);
 					Map<String, Object> mapping = mappingMetaData.getSourceAsMap();
 					if (mapping.containsKey("properties")) {
 						Map<String, Object> properties = (Map<String, Object>) mapping.get("properties");
 						for (String attribute : properties.keySet()) {
-							filterAttributeCache(attribute);
+							filterAttributeCache(attribute, index_type_attributes);
 						}
 					}
 				}
@@ -163,56 +224,85 @@ public class ESServiceImpl implements IESService {
 		} 
 	}
 	
-	private void initESIndicesTypesCache() {
-		try {
-			IndicesAdminClient indicesAdminClient = ESClient.getInstance().getClient().admin().indices();
-			GetMappingsResponse getMappingsResponse = indicesAdminClient.getMappings(new GetMappingsRequest()).get();
-			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = 
-					getMappingsResponse.getMappings();
-			Iterator<ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>> 
-			mappingIterator = mappings.iterator();
-			while (mappingIterator.hasNext()) {
-				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>
-				objectObjectCursor = mappingIterator.next();
-				String index = objectObjectCursor.key;
-				List<String> types = index_types_map.get(index);
-				if (null == types) {
-					types = new ArrayList<String>();
-					index_types_map.put(index, types);
-				}
-				ImmutableOpenMap<String, MappingMetaData> immutableOpenMap = objectObjectCursor.value;
-				ObjectLookupContainer<String> keys = immutableOpenMap.keys();
-				Iterator<ObjectCursor<String>> keysIterator = keys.iterator();
-				while(keysIterator.hasNext()) {
-					types.add(keysIterator.next().value);
-				}
-			}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		} 
+//	private void initESIndicesTypesCache() {
+//		try {
+//			IndicesAdminClient indicesAdminClient = ESClient.getInstance().getClient().admin().indices();
+//			GetMappingsResponse getMappingsResponse = indicesAdminClient.getMappings(new GetMappingsRequest()).get();
+//			ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = 
+//					getMappingsResponse.getMappings();
+//			Iterator<ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>> 
+//			mappingIterator = mappings.iterator();
+//			while (mappingIterator.hasNext()) {
+//				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>
+//				objectObjectCursor = mappingIterator.next();
+//				String index = objectObjectCursor.key;
+//				List<String> types = index_types_mapping.get(index);
+//				if (null == types) {
+//					types = new ArrayList<String>();
+//					index_types_mapping.put(index, types);
+//				}
+//				ImmutableOpenMap<String, MappingMetaData> immutableOpenMap = objectObjectCursor.value;
+//				ObjectLookupContainer<String> keys = immutableOpenMap.keys();
+//				Iterator<ObjectCursor<String>> keysIterator = keys.iterator();
+//				while(keysIterator.hasNext()) {
+//					types.add(keysIterator.next().value);
+//				}
+//			}
+//		} catch (Exception e) {
+//			LOG.error(e.getMessage(), e);
+//		} 
+//	}
+	
+	@Override
+	public Set<String> readIdentityAttributes() throws BusinessException {
+		return identity_attributes;
 	}
 	
 	@Override
 	public List<Map<String, Object>> readDataListByCondition(QueryBuilder query) throws BusinessException {
-		return readDataListByCondition(null, new String[0], query);
+		return readDataListByCondition(query, true);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readDataListByCondition(QueryBuilder query, boolean highLight)
+			throws BusinessException {
+		return readDataListByCondition(null, new String[0], query, highLight);
 	}
 	
 	@Override
 	public List<Map<String, Object>> readDataListByCondition(QueryBuilder query, int size) 
 			throws BusinessException {
-		return readDataListByCondition(null, new String[0], query, size);
+		return readDataListByCondition(query, size, true);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readDataListByCondition(QueryBuilder query, int size, 
+			boolean isHighLight) throws BusinessException {
+		return readDataList(null, new String[0], query, size, isHighLight);
 	}
 
 	@Override
 	public List<Map<String, Object>> readDataListByCondition(String index, String type, 
 			QueryBuilder query) throws BusinessException {
-		return readDataListByCondition(index, new String[]{type}, query);
+		return readDataListByCondition(index, type, query, true);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readDataListByCondition(String index, String type, 
+			QueryBuilder query, boolean isHighLight) throws BusinessException {
+		return readDataListByCondition(index, new String[]{type}, query, isHighLight);
 	}
 	
 	@Override
 	public List<Map<String, Object>> readDataListByCondition(String index, String[] types, 
 			QueryBuilder query) throws BusinessException {
-		return readDataListByCondition(index, types, query, 200);
+		return readDataListByCondition(index, types, query, true);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readDataListByCondition(String index, String[] types, 
+			QueryBuilder query, boolean isHighLight) throws BusinessException {
+		return readDataList(index, types, query, 200, isHighLight);
 	}
 	
 	@Override
@@ -224,13 +314,53 @@ public class ESServiceImpl implements IESService {
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
 			QueryBuilder query, String scrollId, int size) throws BusinessException {
-		return readPaginationDataListByCondition(index, new String[]{type}, query, scrollId, size);
+		return readPaginationDataListByCondition(index, type, query, scrollId, size, true);
+	}
+	
+	@Override
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type,
+			QueryBuilder query, String scrollId, int size, boolean isHighLight) throws BusinessException {
+		return readPaginationDataListByCondition(index, new String[]{type}, query, scrollId, size, isHighLight);
+	}
+	
+	@Override
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
+			QueryBuilder query, SearchType searchType, String scrollId, int size, boolean isHighLight) 
+				throws BusinessException {
+		return readPaginationDataListByCondition(index, new String[]{type}, query, 
+				searchType, scrollId, size, isHighLight);
+	}
+	
+	@Override
+	public QueryResult<Map<String, Object>> readPaginationDataListByConditionWithScore(String index, 
+			String type, QueryBuilder query, String scrollId, int size) throws BusinessException {
+		return readPaginationDataListByConditionWithScore(index, new String[]{type}, query, scrollId, size);
 	}
 	
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String[] types, 
 			QueryBuilder query, String scrollId, int size) throws BusinessException {
-		return readIndexsTypesPaginationDatas(index, types, query, scrollId, size);
+		return readPaginationDataList(index, types, query, scrollId, size, true, false);
+	}
+	
+	@Override
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String[] types,
+			QueryBuilder query, String scrollId, int size, boolean isHighLight) throws BusinessException {
+		return readPaginationDataList(index, types, query, scrollId, size, isHighLight, false);
+	}
+	
+	@Override
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String[] types,
+			QueryBuilder query, SearchType searchType, String scrollId, int size, 
+				boolean isHighLight) throws BusinessException {
+		return readPaginationDataList(index, types, query, searchType, scrollId, size, isHighLight, false);
+	}
+	
+	@Override
+	public QueryResult<Map<String, Object>> readPaginationDataListByConditionWithScore(String index, 
+			String[] types, QueryBuilder query, String scrollId, int size) throws BusinessException {
+		return readPaginationDataList(index, types, query, SearchType.DFS_QUERY_AND_FETCH, 
+				scrollId, size, true, true);
 	}
 	
 	private String[] buildIndices(Set<String> defaultIndices, String index) {
@@ -249,7 +379,6 @@ public class ESServiceImpl implements IESService {
 	}
 	
 	private void wrapperSearchRequestBuilder(SearchRequestBuilder searchRequestBuilder) {
-		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
 		searchRequestBuilder.setExplain(false);
         searchRequestBuilder.setHighlighterPreTags("<span style=\"color:red\">");
         searchRequestBuilder.setHighlighterPostTags("</span>");
@@ -266,23 +395,33 @@ public class ESServiceImpl implements IESService {
 		return indicesExistsResponse.isExists();
 	}
 	
-	private List<Map<String, Object>> readDataListByCondition(String index, String[] types, 
-			QueryBuilder query, int size) throws BusinessException {
+	private List<Map<String, Object>> readDataList(String index, String[] types, 
+			QueryBuilder query, int size, boolean isHighLight) throws BusinessException {
 		if (!indicesExists(index)) return new ArrayList<Map<String,Object>>();
 		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(index, types);
 		searchRequestBuilder.setQuery(query);
+		searchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
 		wrapperSearchRequestBuilder(searchRequestBuilder);
 		searchRequestBuilder.setSize(size);
 		SearchResponse response = searchRequestBuilder.execute().actionGet();
 		SearchHit[] hitArray = response.getHits().getHits();
-		return buildResultList(hitArray, false);
+		return buildResultList(hitArray, false, isHighLight, false);
 	}
 	
-	private QueryResult<Map<String, Object>> readIndexsTypesPaginationDatas(String index, String[] types,
-			QueryBuilder query, String scrollId, int size) throws BusinessException {
+	private QueryResult<Map<String, Object>> readPaginationDataList(String index, String[] types,
+			QueryBuilder query, String scrollId, int size, boolean isHighLight, 
+				boolean isReturnScore) throws BusinessException {
+		return readPaginationDataList(index, types,query, SearchType.DFS_QUERY_THEN_FETCH, 
+				scrollId, size, isHighLight, isReturnScore);
+	}
+	
+	private QueryResult<Map<String, Object>> readPaginationDataList(String index, String[] types,
+			QueryBuilder query, SearchType searchType, String scrollId, int size, boolean isHighLight, 
+				boolean isReturnScore) throws BusinessException {
 		if (!indicesExists(index)) return new QueryResult<Map<String,Object>>();
 		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(index, types);
 		searchRequestBuilder.setQuery(query);
+		searchRequestBuilder.setSearchType(searchType);
 		wrapperSearchRequestBuilder(searchRequestBuilder);
         searchRequestBuilder.setScroll(TimeValue.timeValueMinutes(3));
         searchRequestBuilder.setSize(size);
@@ -292,44 +431,40 @@ public class ESServiceImpl implements IESService {
 					.setScroll(TimeValue.timeValueMinutes(3)).execute().actionGet();
 		}
 		SearchHit[] hitArray = response.getHits().getHits();
-		QueryResult<Map<String, Object>> qr = new QueryResult<Map<String,Object>>();
+		QueryResult<Map<String, Object>> qr = new QueryResult<Map<String, Object>>();
 		qr.setTotalRowNum(response.getHits().getTotalHits());
 		qr.setScrollId(response.getScrollId());
-		qr.setResultList(buildResultList(hitArray, true));
+		qr.setResultList(buildResultList(hitArray, true, isHighLight, isReturnScore));
 		return qr;
 	}
 	
-	private List<Map<String, Object>> buildResultList(SearchHit[] hitArray, boolean isPagination) {
+	private List<Map<String, Object>> buildResultList(SearchHit[] hitArray, boolean isPagination, 
+			boolean isHighLight, boolean isReturnScore) {
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		SearchHit hit = null;
 		String key = null;
 		Object value = null;
 		Map<String, Object> source = null;
 		Map<String, Object> replaceSource = null;
-		Map<String, HighlightField> highLightFields = null;
 		for (int i = 0, len = hitArray.length; i < len; i++) {
 			hit = hitArray[i];
-			highLightFields = hit.getHighlightFields();
 			source = hit.getSource();
+			if (isHighLight) {
+				wrapperHighLight(source, hit.getHighlightFields());
+			}
 			replaceSource = new HashMap<String, Object>();
 			String prefix = hit.getIndex() + "." + hit.getType();
 			for (Map.Entry<String, Object> entry : source.entrySet()) {
 				key = entry.getKey();
-				if (filter_attributes.contains(key)) continue;
-				value = entry.getValue();
-				if (highLightFields.containsKey(key)) {
-					Text[] texts = highLightFields.get(key).getFragments();
-					StringBuilder highLightText = new StringBuilder();
-					for (int t = 0, tlen = texts.length; t < tlen; t++) {
-						highLightText.append(texts[t]);
-					}
-					if (highLightText.length() > 0) value = highLightText.toString();
-				}
+				if (filter_attributes.contains(key) || key.endsWith("Alias")) continue;
 				String account = (String) SecurityUtils.getSubject().getPrincipal();
 				value = key.toLowerCase().indexOf("password") != -1 
-						&& !"liqien".equals(account) ? "********" : value;
+						&& !"liqien".equals(account) ? "********" : entry.getValue();
 				String chValue = MessageUtils.getInstance().getMessage(prefix + "." + key);
 				replaceSource.put(StringUtils.isBlank(chValue) ? key : chValue, value);
+			}
+			if (isReturnScore) {
+				replaceSource.put("score", hit.getScore());
 			}
 			if (isPagination) {
 				Map<String, Object> result = new HashMap<String, Object>();
@@ -346,55 +481,22 @@ public class ESServiceImpl implements IESService {
 		return resultList;
 	}
 	
-	class ReadDataListTask implements Callable<List<Map<String, Object>>> {
-		
-		private String index = null;
-		
-		private String[] types = null;
-		
-		private QueryBuilder query = null;
-		
-		public ReadDataListTask(String index, String[] types, QueryBuilder query) {
-			this.index = index;
-			this.types = types;
-			this.query = query;
+	private void wrapperHighLight(Map<String, Object> source, Map<String, HighlightField> highLightFields) {
+		String entryKey = null;
+		Object entryValue = null;
+		for (Map.Entry<String, Object> entry : source.entrySet()) {
+			entryKey = entry.getKey();
+			if (!highLightFields.containsKey(entryKey)) continue;
+			Text[] texts = highLightFields.get(entryKey).getFragments();
+			StringBuilder highLightText = new StringBuilder(100);
+			for (int i = 0, tlen = texts.length; i < tlen; i++) {
+				highLightText.append(texts[i]);
+			}
+			if (highLightText.length() > 0) entryValue = highLightText.toString();
+			entry.setValue(entryValue);
 		}
-		
-		@Override
-		public List<Map<String, Object>> call() throws Exception {
-			return readDataListByCondition(index, types, query);
-		}
-		
 	}
 	
-	class ReadPaginationDataListTask implements Callable<QueryResult<Map<String, Object>>> {
-		
-		private String index = null;
-		
-		private String[] types = null;
-		
-		private QueryBuilder query = null;
-		
-		private String scrollId = null;
-		
-		private int size = 50;
-		
-		public ReadPaginationDataListTask(String index, String[] types, 
-				QueryBuilder query, String scrollId, int size) {
-			this.index = index;
-			this.types = types;
-			this.query = query;
-			this.scrollId = scrollId;
-			this.size = size;
-		}
-		
-		@Override
-		public QueryResult<Map<String, Object>> call() throws Exception {
-			return readIndexsTypesPaginationDatas(index, types, query, scrollId, size);
-		}
-		
-	}
-
 }
 
 

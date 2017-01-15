@@ -18,6 +18,46 @@ public class LMContorller {
 
 	@Resource(name = "lmInternetService")
 	private ILMInternetService lmInternetService = null;
+	// 38、信贷综合信息查询
+	@ResponseBody
+	@RequestMapping(value = "/loan/info")
+	public WebResult loaninfo(String phone){
+		WebResult result = new WebResult();
+		try {
+			Map<String, String> map = lmInternetService.readLoanInfo(phone);
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(map);
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
+	@RequestMapping(value = "/loanInfo",method = RequestMethod.GET)
+	public String lemonLoanInfo(){
+		return "lemoncome/loanInfo";
+	}
+	
+	//46、反欺诈黑名单验证
+	@ResponseBody
+	@RequestMapping(value = "/audit/phone")
+	public WebResult bbs(String phone) {
+		WebResult result = new WebResult();
+		try {
+			Map<String, String> data = lmInternetService.auditphone(phone);
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(data);
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
+	
+	@RequestMapping(value = "/audit", method = RequestMethod.GET)
+	public String lemonaudit() {
+		return "lemoncome/auditphone";
+	}
 
 	// 37、学历查询（D机构）
 	@ResponseBody
@@ -773,12 +813,13 @@ public class LMContorller {
 		return "lemoncome/nameIdCardAccountVerify";
 	}
 
+	// 2、M姓名-身份证号-银行卡号一致性校验
 	@ResponseBody
 	@RequestMapping(value = "/nameIdCard/AccountVerifyM")
-	public WebResult nameIdCardAccountVerifyM(String idCard, String name, String bankCard) {
+	public WebResult nameIdCardAccountVerifyV(String idCard, String name, String bankCard) {
 		WebResult result = new WebResult();
 		try {
-			Map<String, String> data = lmInternetService.nameIdCardAccountVerifyM(idCard, name, bankCard);
+			Map<String, String> data = lmInternetService.nameIdCardAccountVerifyV(idCard, name, bankCard);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
@@ -793,6 +834,26 @@ public class LMContorller {
 		return "lemoncome/nameIdCardAccountVerifyM";
 	}
 
+	// 2、F姓名-身份证号-银行卡号一致性校验
+	@ResponseBody
+	@RequestMapping(value = "/nameIdCard/AccountVerifyF")
+	public WebResult nameIdCardAccountVerifyF(String idCard, String name, String bankCard) {
+		WebResult result = new WebResult();
+		try {
+			Map<String, String> data = lmInternetService.nameIdCardAccountVerifyF(idCard, name, bankCard);
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(data);
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
+
+	@RequestMapping(value = "accountVerifyF")
+	public String AccountVerifyF() {
+		return "lemoncome/nameIdCardAccountVerifyF";
+	}
 	// 1、姓名-身份证号一致性校验
 	@ResponseBody
 	@RequestMapping(value = "/idName/Check")

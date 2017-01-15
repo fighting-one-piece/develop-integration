@@ -78,8 +78,9 @@ $(document).ready(function(){
 				success:function(result){
 					if (result.code == 1) {
 						var str = new Array();
-						 str = result.data.split("http");
-						 var wb = "<a href='http"+str[1]+"' target='_blank'>微博："+str[0]+"http"+str[1]+"</a><br/>";
+						 str = result.data.split("@");
+						 strs = str[1].split(")");
+						 var wb = "<a href='http://t.qq.com/"+strs[0]+"' target='_blank'>微博："+result.data+"</a><br/>";
 						 $(".styleQQThead").append(wb);
 					}else {
 						$("#results .ss").append("未找到相关数据");

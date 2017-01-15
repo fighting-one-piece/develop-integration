@@ -178,7 +178,7 @@ $(document).ready(function () {
 						 }else if (result.data.blackReason=="T13") {
 							 tab += "<td style='background: #EEE8AA;'>"+"灰黑，较弱，建议列为观察名单"+"</td></tr><tr><td>"+"在逃嫌犯"+"</td></tr>";
 						 }
-					 }if(result.data.blackLevel=="未命中"){
+					 }if(result.data.blackLevel=="-9999"){
 						 tab += "<td style='background: #EEE8AA;'>"+"未命中"+"</td></tr><tr><td>"+"未命中"+"</td></tr>";
 					 }
 				}else {
@@ -201,59 +201,45 @@ $(document).ready(function () {
 			dataType:"json",
 			data:{"idCard":idCard,"name":name,"phone":phone},
 			success:function(result){
-				console.log(result);
-				var tab;
-				var ss = result.data.content;
+				var tab = "";
 				if (result.code == 1) {
-					tab = 	"<table style='width:100%;margin: 5px;'><tr>";
-					tab += "<td style='background: #EEE8AA;'>date</td>";
-					tab += "<td style='background: #EEE8AA;'>desc</td>";
-					tab += "<td style='background: #EEE8AA;'>age</td>";
-					tab += "<td style='background: #EEE8AA;'>xingzuo</td>";
-					tab += "<td style='background: #EEE8AA;'>app_id_card</td>";
-					tab += "<td style='background: #EEE8AA;'>type</td>";
-					tab += "<td style='background: #EEE8AA;'>app_name</td>";
-					tab += "<td style='background: #EEE8AA;'>app_mobile</td>";
-					tab += "<td style='background: #EEE8AA;'>app_qq</td>";
-					tab += "<td style='background: #EEE8AA;'>hit_num</td>";
-					tab += "<td style='background: #EEE8AA;'>home</td>";
-					tab += "<td style='background: #EEE8AA;'>message</td>";
-					tab += "<td style='background: #EEE8AA;'>sex</td>";
-					tab += "<td style='background: #EEE8AA;'>type</td>";
-					tab += "<td style='background: #EEE8AA;'>comp_name</td>";
-					tab += "<td style='background: #EEE8AA;'>court</td>";
-					tab += "<td style='background: #EEE8AA;'>file_time</td>";
-					tab += "<td style='background: #EEE8AA;'>overdue_amount</td>";
-					tab += "<td style='background: #EEE8AA;'>province</td>";
-					tab += "<td style='background: #EEE8AA;'>publish_date</td>";
-					tab += "<td style='background: #EEE8AA;'>source_url</td>";
-					
-					
-					tab +=	"</tr><tr>";
-					tab += "<td>"+ss[0].date+"</td>";
-					tab += "<td>"+ss[0].desc+"</td>";
-					tab += "<td>"+ss[0].originalRet.age+"</td>";
-					tab += "<td>"+ss[0].originalRet.xingzuo+"</td>";
-					tab += "<td>"+ss[0].originalRet.app_id_card+"</td>";
-					tab += "<td>"+ss[0].originalRet.type+"</td>";
-					tab += "<td>"+ss[0].originalRet.app_name+"</td>";
-					tab += "<td>"+ss[0].originalRet.app_mobile+"</td>";
-					tab += "<td>"+ss[0].originalRet.app_qq+"</td>";
-					tab += "<td>"+ss[0].originalRet.hit_num+"</td>";
-					tab += "<td>"+ss[0].originalRet.home+"</td>";
-					tab += "<td>"+ss[0].originalRet.message+"</td>";
-					tab += "<td>"+ss[0].originalRet.sex+"</td>";
-					tab += "<td>"+ss[0].type+"</td>";
-					tab += "<td>"+(ss[0].originalRet.hit_list)[0].comp_name+"</td>";
-					tab += "<td>"+(ss[0].originalRet.hit_list)[0].court+"</td>";
-					tab += "<td>"+(ss[0].originalRet.hit_list)[0].file_time+"</td>";
-					tab += "<td>"+(ss[0].originalRet.hit_list)[0].overdue_amount+"</td>";
-					tab += "<td>"+(ss[0].originalRet.hit_list)[0].province+"</td>";
-					tab += "<td>"+(ss[0].originalRet.hit_list)[0].publish_date+"</td>";
-					tab += "<td>"+(ss[0].originalRet.hit_list)[0].source_url+"</td>";
-					
-					
-					tab +=	"</tr></table>";
+					$.each(result.data.content,function(index,content){
+						var tab1 = "<table style='width:100%;text-align: center;'>";
+						var keyStr = "<tr>";
+						var valueStr = "<tr>";
+						$.each(content,function(key,value){
+							if (key == "originalRet"){
+								$.each(value,function(key2,value2){
+									if (key2 == "hit_list"){
+										keyStr += "<td style='background: #EEE8AA;'>"+key2+"</td>";
+										var newTb = "<table>";
+										$.each(value2,function(index,value3){
+											var newKeystr = "<tr>";
+											var newValuestr = "<tr>";
+											$.each(value3,function(key1,value1){
+												newKeystr +="<td style='background: #EEE8AA;'>"+key1+"</td>";
+												newValuestr += "<td>"+value1+"</td>";
+											})
+											newKeystr += "</tr>";
+											newValuestr += "</tr>";
+											newTb += newKeystr;
+											newTb += newValuestr;
+											
+										})
+										newTb += "</table>";
+										valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+									} else {
+										keyStr += "<td style='background: #EEE8AA;'>"+key2+"</td>";
+										valueStr += "<td>"+value2+"</td>";
+									}
+								})
+							} else {
+								keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+								valueStr += "<td>"+value+"</td>";
+							}
+						})
+						tab += tab1 + keyStr + valueStr + "</table>";
+					})
 				}else {
 					tab = "未找到相关信息";
 				}
@@ -272,22 +258,18 @@ $(document).ready(function () {
 			dataType:"json",
 			data:{"phone":phone},
 			success:function(result){
-				var tab;
-				var ss = result.data.content;
+				var tab = "";
 				if (result.code == 1) {
-					tab = 	"<table style='width:100%;margin: 5px;'>";
-					for (var i = 0; i < ss.length; i++) {
-						tab += "<tr>";
-						$.each(ss[0],function(key,value){
-							tab += "<td style='background: #EEE8AA;'>"+key+"</td>";
-						});
-						tab += "</tr><tr>";
-						$.each(ss[0],function(key,value){
-							tab += "<td>"+value+"</td>";
-						});
-						tab += "</tr>";
-						}
-					tab +=	"</table>";
+					$.each(result.data.content,function(index,content){
+						var tab1 = "<table style='width:100%;text-align: center;'>";
+						var keyStr = "<tr>";
+						var valueStr = "<tr>";
+						$.each(content,function(key,value){
+							keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+							valueStr += "<td>"+value+"</td>";
+						})
+						tab += tab1+keyStr+valueStr+"</table>";
+					})
 				}else {
 					tab = "未找到相关信息";
 				}
@@ -307,25 +289,25 @@ $(document).ready(function () {
 			dataType:"json",
 			data:{"idCard":idCard,"phone":phone},
 			success:function(result){
-				console.log(result);
-				var tab;
-				var ss = result.data.content;
+				var tab = "";
 				if (result.code == 1) {
-					tab = 	"<table style='width:100%;margin: 5px;'><tr>";
-					tab += "<td style='background: #EEE8AA;'>date</td>";
-					tab += "<td style='background: #EEE8AA;'>desc</td>";
-					tab += "<td style='background: #EEE8AA;'>type</td>";
-					$.each(ss[0].originalRet,function(key,value){
-						tab += "<td style='background: #EEE8AA;'>"+key+"</td>";
-					});
-					tab +=	"</tr><tr>";
-					tab += "<td>"+ss[0].date+"</td>";
-					tab += "<td>"+ss[0].desc+"</td>";
-					tab += "<td>"+ss[0].type+"</td>";
-					$.each(ss[0].originalRet,function(key,value){
-						tab += "<td>"+value+"</td>";
-					});
-					tab +=	"</tr></table>";
+					$.each(result.data.content,function(index,content){
+						var tab1 = "<table style='width:100%;text-align: center;'>";
+						var keyStr = "<tr>";
+						var valueStr = "<tr>";
+						$.each(content,function(key,value){
+							if (key == "originalRet"){
+								$.each(value,function(key1,value1){
+									keyStr += "<td style='background: #EEE8AA;'>"+key1+"</td>";
+									valueStr += "<td>"+value1+"</td>";
+								})
+							}else {
+								keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+								valueStr += "<td>"+value+"</td>";
+							}
+						})
+						tab += tab1+keyStr+valueStr+"</table>";
+					})
 				}else {
 					tab = "未找到相关信息";
 				}
@@ -348,25 +330,25 @@ $(document).ready(function () {
 			dataType:"json",
 			data:{"idCard":idCard,"phone":phone,"name":name},
 			success:function(result){
-				console.log(result);
-				var tab;
-				var ss = result.data.content;
+				var tab = "";
 				if (result.code == 1) {
-					tab = 	"<table style='width:100%;margin: 5px;'><tr>";
-					tab += "<td style='background: #EEE8AA;'>date</td>";
-					tab += "<td style='background: #EEE8AA;'>desc</td>";
-					tab += "<td style='background: #EEE8AA;'>type</td>";
-					$.each(ss[0].originalRet,function(key,value){
-						tab += "<td style='background: #EEE8AA;'>"+key+"</td>";
-					});
-					tab +=	"</tr><tr>";
-					tab += "<td>"+ss[0].date+"</td>";
-					tab += "<td>"+ss[0].desc+"</td>";
-					tab += "<td>"+ss[0].type+"</td>";
-					$.each(ss[0].originalRet,function(key,value){
-						tab += "<td>"+value+"</td>";
-					});
-					tab +=	"</tr></table>";
+					$.each(result.data.content,function(index,content){
+						var tab1 = "<table style='width:100%;text-align: center;'>";
+						var keyStr = "<tr>";
+						var valueStr = "<tr>";
+						$.each(content,function(key,value){
+							if (key == "originalRet"){
+								$.each(value,function(key1,value1){
+									keyStr += "<td style='background: #EEE8AA;'>"+key1+"</td>";
+									valueStr += "<td>"+value1+"</td>";
+								})
+							}else {
+								keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+								valueStr += "<td>"+value+"</td>";
+							}
+						})
+						tab += tab1+keyStr+valueStr+"</table>";
+					})
 				}else {
 					tab = "未找到相关信息";
 				}
@@ -386,18 +368,25 @@ $(document).ready(function () {
 				dataType:"json",
 				data:{"phone":phone},
 				success:function(result){
-					console.log(result.data);
-					console.log(result.code);
-					var tab;
-					tab =	"<p></p>";
-					tab += 	"<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
+					var tab = "";
 					if (result.code == 1) {
-						$.each(result.data,function(key,value){
-							tab += "<td style='background: #EEE8AA;'>"+result.code+"</td>";
+						$.each(result.data.content,function(index,content){
+							var tab1 = "<table style='width:100%;text-align: center;'>";
+							var keyStr = "<tr>";
+							var valueStr = "<tr>";
+							$.each(content,function(key,value){
+								if (key == "originalRet"){
+									$.each(value,function(key1,value1){
+										keyStr += "<td style='background: #EEE8AA;'>"+key1+"</td>";
+										valueStr += "<td>"+value1+"</td>";
+									})
+								}else {
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									valueStr += "<td>"+value+"</td>";
+								}
+							})
+							tab += tab1+keyStr+valueStr+"</table>";
 						})
-						tab += "</tr>";
-						tab +=	"</tr></table>";
-						
 					}else {
 						tab = "未找到相关信息";
 					}
@@ -412,33 +401,28 @@ $(document).ready(function () {
 		$("#GambingDrug").click(function(){
 		var phone=$("#phone").val();
 		$("#resultGamble").empty();
-		console.log(phone)
 		$.ajax({
 			url:"gambing/dru",
 			type:"post",
 			dataType:"json",
 			data:{"phone":phone},
 			success:function(result){
-				var tab;
-				tab =	"<p></p>";
-				var keytr = "<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
-				var valuetr = "<tr>";
+				var tab = "";
 				if (result.code == 1) {
-					$.each(result.data,function(key,value){
-						$.each(value,function(keys,values){
-							$.each(values,function(index,desc){
-							keytr += "<td style='background: #EEE8AA;'>"+index+"</td>";
-							valuetr += "<td style='background: white;'>"+desc+"</td>";
+					$.each(result.data.content,function(index,content){
+						var tab1 = "<table style='width:100%;text-align: center;'>";
+						var keyStr = "<tr>";
+						var valueStr = "<tr>";
+						$.each(content,function(key,value){
+							keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+							valueStr += "<td>"+value+"</td>";
 						})
-						})
+						tab += tab1+keyStr+valueStr+"</table>";
 					})
-					keytr += "</tr>";
-					valuetr += "</tr></table></br>";
-					
 				}else {
 					tab = "未找到相关信息";
 				}
-				$("#resultGamble").append(keytr+valuetr);
+				$("#resultGamble").append(tab);
 			},
 			error:function(){
 			}
@@ -458,18 +442,18 @@ $(document).ready(function () {
 				dataType:"json",
 				data:{"idCard":idCard,"name":name,"phone":phone},
 				success:function(result){
-					console.log(result.data);
-					console.log(result.code);
-					var tab;
-					tab =	"<p></p>";
-					tab += 	"<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
+					var tab = "";
 					if (result.code == 1) {
-						$.each(result.data,function(key,value){
-							tab += "<td style='background: #EEE8AA;'>"+result.code+"</td>";
+						$.each(result.data.content,function(index,content){
+							var tab1 = "<table style='width:100%;text-align: center;'>";
+							var keyStr = "<tr>";
+							var valueStr = "<tr>";
+							$.each(content,function(key,value){
+								keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+								valueStr += "<td>"+value+"</td>";
+							})
+							tab += tab1+keyStr+valueStr+"</table>";
 						})
-						tab += "</tr>";
-						tab +=	"</tr></table>";
-						
 					}else {
 						tab = "未找到相关信息";
 					}
@@ -529,17 +513,61 @@ $(document).ready(function () {
 				dataType:"json",
 				data:{"idCard":idCard,"name":name,"phone":phone},
 				success:function(result){
-					console.log(result.data);
-					var tab;
-					tab =	"<p></p>";
-					tab += 	"<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
+					var tab = "";
 					if (result.code == 1) {
-						$.each(result.data,function(key,value){
-							tab += "<td style='background: #EEE8AA;'>"+result.code+"</td>";
+						$.each(result.data.content,function(index,content){
+							var tab1 = "<table style='width:100%;text-align: center;'>";
+							var keyStr = "<tr>";
+							var valueStr = "<tr>";
+							$.each(content,function(key,value){
+								if (key == "Flag"){
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									var newTb = "<table>";
+									var newKeystr = "<tr>";
+									var newValuestr = "<tr>";
+									$.each(value,function(key2,value2){
+										newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+										newValuestr += "<td>"+value2+"</td>";
+									})
+									newKeystr += "</tr>";
+									newValuestr += "</tr>";
+									newTb += newKeystr;
+									newTb += newValuestr;
+									newTb += "</table>";
+									valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+								} else if (key == "SpecialList_c"){
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									var newTb = "<table>";
+									var newKeystr = "<tr>";
+									var newValuestr = "<tr>";
+									$.each(value,function(key2,value2){
+										newKeystr += "<td style='background: #EEE8AA;'>"+key2+"</td>";
+										var newTb1 = "<table>";
+										var newKeystr1 = "<tr>";
+										var newValuestr1 = "<tr>";
+										$.each(value2,function(key3,value3){
+											newKeystr1 += "<td style='background: #EEE8AA;'>"+key3+"</td>";
+											newValuestr1 += "<td>"+value3+"</td>";
+										})
+										newKeystr1 += "</tr>";
+										newValuestr1 += "</tr>";
+										newTb1 += newKeystr1 + newValuestr1 + "</table>";
+										newValuestr += "<td style='padding: 0px;'>"+newTb1+"</td>";	
+									})
+									
+									newKeystr += "</tr>";
+									newValuestr += "</tr>";
+									newTb += newKeystr;
+									newTb += newValuestr;
+									newTb += "</table>";
+									valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+								} else {
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									valueStr += "<td>"+value+"</td>";
+								}
+							})
+							tab += tab1 + keyStr + valueStr + "</table>";
 						})
-						tab += "</tr>";
-						tab +=	"</tr></table>";
-						
 					}else {
 						tab = "未找到相关信息";
 					}
@@ -558,7 +586,6 @@ $(document).ready(function () {
 		var phone=$("#phone").val();
 		var idType=$("#idType").val();
 		var gender=$("#gender").val();
-		console.log(gender)
 		$("#resultCourt").empty();
 			$.ajax({
 				url:"court/execute",
@@ -567,16 +594,35 @@ $(document).ready(function () {
 				data:{"idCard":idCard,"name":name,"phone":phone,"idType":idType,"gender":gender},
 				success:function(result){
 					console.log(result.data);
-					var tab;
-					tab =	"<p></p>";
-					tab += 	"<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
+					var tab = "";
 					if (result.code == 1) {
-						$.each(result.data,function(key,value){
-							tab += "<td style='background: #EEE8AA;'>"+result.code+"</td>";
+						$.each(result.data.content,function(index,content){
+							var tab1 = "<table style='width:100%;text-align: center;'>";
+							var keyStr = "<tr>";
+							var valueStr = "<tr>";
+							$.each(content,function(key,value){
+								if (key == "discredit_records"){
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									var newTb = "<table>";
+									var newKeystr = "<tr>";
+									var newValuestr = "<tr>";
+									$.each(value,function(key1,value1){
+										newKeystr +="<td style='background: #EEE8AA;'>"+key1+"</td>";
+										newValuestr += "<td>"+value1+"</td>";
+									})
+									newKeystr += "</tr>";
+									newValuestr += "</tr>";
+									newTb += newKeystr;
+									newTb += newValuestr;
+									newTb += "</table>";
+									valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+								} else {
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									valueStr += "<td>"+value+"</td>";
+								}
+							})
+							tab += tab1+keyStr+valueStr+"</table>";
 						})
-						tab += "</tr>";
-						tab +=	"</tr></table>";
-						
 					}else {
 						tab = "未找到相关信息";
 					}
@@ -592,7 +638,7 @@ $(document).ready(function () {
 	$("#phoneQuery").click(function(){
 		var phone=$("#phone").val();
 		$("#resultTagQuery").empty();
-		console.log(111)
+//		console.log(111)
 			$.ajax({
 				url:"phone/query",
 				type:"post",
@@ -600,18 +646,37 @@ $(document).ready(function () {
 				data:{"phone":phone},
 				success:function(result){
 					var tab;
-					tab =	"<p></p>";
-					tab += 	"<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
 					if (result.code == 1) {
-						tab +="<td style='background: #EEE8AA;'>carrier</td>" +
-							  "<td style='background: #EEE8AA;'>phone</td>" +
-							  "<td style='background: #EEE8AA;'>count</td>" +
-							  "<td style='background: #EEE8AA;'>tag_name</td></tr><tr>";
-						tab +="<td>"+result.data.content[0].carrier+"</td>" +
-							  "<td>"+result.data.content[0].phone+"</td>" +
-							  "<td>"+result.data.content[0].tags[0].count+"</td>" +
-							  "<td>"+result.data.content[0].tags[0].tag_name+"</td>";
-						tab +="</tr></table>";
+						$.each(result.data.content,function(index,content){
+							var tab1 = "<table style='width:100%;text-align: center;'>";
+							var keyStr = "<tr>";
+							var valueStr = "<tr>";
+							$.each(content,function(key,value){
+								if (key == "tags"){
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									var newTb = "<table>";
+									$.each(value,function(index1,value1){
+										var newKeystr = "<tr>";
+										var newValuestr = "<tr>";
+										$.each(value1,function(key2,value2){
+											newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+											newValuestr += "<td>"+value2+"</td>";
+											
+										})
+										newKeystr += "</tr>";
+										newValuestr += "</tr>";
+										newTb += newKeystr;
+										newTb += newValuestr;
+									})
+									newTb += "</table>";
+									valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+								} else {
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									valueStr += "<td>"+value+"</td>";
+								}
+							})
+							tab += tab1+keyStr+valueStr+"</table>";
+						})
 					}else {
 						tab = "未找到相关信息";
 					}
@@ -625,6 +690,7 @@ $(document).ready(function () {
 		
 	//24地址验证
 	$("#address").click(function(){
+		$("#resultAddress").empty();
 		var idCard=$("#idCard").val();
 		var name=$("#name").val();
 		var phone=$("#phone").val();
@@ -633,42 +699,98 @@ $(document).ready(function () {
 		var homeAddress =$("#homeAddress").val();
 		var companyCity =$("#companyCity").val();
 		var companyAddress =$("#companyAddress").val();
-		$("#resultAddress").empty();
 			$.ajax({
 				url:"address/verification",
 				type:"post",
 				dataType:"json",
 				data:{"idCard":idCard,"name":name,"phone":phone,"idType":idType,"homeCity":homeCity,"homeAddress":homeAddress,"companyCity":companyCity,"companyAddress":companyAddress},
 				success:function(result){
-					console.log(result.data);
-					console.log(result.data.content[0].company_address_list);
-					console.log(result.data.content[0].company_address_list[0].distance);
-					console.log(result.data.content[0].company_address_list[0].verify_result);
-					var tab;
-					tab =	"<p></p>";
-					tab += 	"<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
+					var tab = "";
 					if (result.code == 1) {
-						tab += "<td style='background: #EEE8AA;'>baidu_account</td>" +
-							   "<td style='background: #EEE8AA;'>cell_phone</td>" +
-							   "<td style='background: #EEE8AA;'>id_no</td>" +
-							   "<td style='background: #EEE8AA;'>id_type</td>" +
-							   "<td style='background: #EEE8AA;'>imei</td>" +
-							   "<td style='background: #EEE8AA;'>real_name</td>";
-						tab += "</tr><tr><td>"+result.data.content[0].baidu_account+"</td>" +
-							   "<td>"+result.data.content[0].cell_phone+"</td>" +
-							   "<td>"+result.data.content[0].id_no+"</td>" +
-							   "<td>"+result.data.content[0].id_type+"</td>" +
-							   "<td>"+result.data.content[0].imei+"</td>" +
-							   "<td>"+result.data.content[0].real_name+"</td>";
-						tab +=	"</tr></table>";
-						tab += "<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
-						tab += "<td style='background: #EEE8AA;'>distance</td>" +
-							   "<td style='background: #EEE8AA;'>verify_result</td></tr><tr>";
-						tab +=	"<td>"+result.data.content[0].company_address_list[0].distance+"</td>" +
-								"<td>"+result.data.content[0].company_address_list[0].verify_result+"</td></tr></table>";
-//						tab += "<table style='width:100%;margin: 5px;' class='table table-striped table-bordered'><tr>";
-//						tab += "<td style='background: #EEE8AA;'>distance</td><td style='background: #EEE8AA;'>verify_result</td></tr><tr>";
-//						tab +=	"<td>"+result.data.content[0].home_address_list[0].distance+"</td><td>"+result.data.content[0].home_address_list[0].verify_result+"</td></tr></table>";
+						$.each(result.data.content,function(index,content){
+							var tab1 = "<table style='width:100%;text-align: center;'>";
+							var keyStr = "<tr>";
+							var valueStr = "<tr>";
+							$.each(content,function(key,value){
+								if (key == "local_freq_address_list" && value != null){
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									var newTb = "<table>";
+									$.each(value,function(index1,value1){
+										var newKeystr = "<tr>";
+										var newValuestr = "<tr>";
+										$.each(value1,function(key2,value2){
+											newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+											newValuestr += "<td>"+value2+"</td>";
+											
+										})
+										newKeystr += "</tr>";
+										newValuestr += "</tr>";
+										newTb += newKeystr;
+										newTb += newValuestr;
+									})
+									newTb += "</table>";
+									valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+								} else if (key == "company_address_list" && value != null){
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									var newTb = "<table>";
+									$.each(value,function(index1,value1){
+										var newKeystr = "<tr>";
+										var newValuestr = "<tr>";
+										$.each(value1,function(key2,value2){
+											newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+											newValuestr += "<td>"+value2+"</td>";
+											
+										})
+										newKeystr += "</tr>";
+										newValuestr += "</tr>";
+										newTb += newKeystr;
+										newTb += newValuestr;
+									})
+									newTb += "</table>";
+									valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+								} else if (key == "home_address_list" && value != null){
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									var newTb = "<table>";
+									$.each(value,function(index1,value1){
+										var newKeystr = "<tr>";
+										var newValuestr = "<tr>";
+										$.each(value1,function(key2,value2){
+											newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+											newValuestr += "<td>"+value2+"</td>";
+											
+										})
+										newKeystr += "</tr>";
+										newValuestr += "</tr>";
+										newTb += newKeystr;
+										newTb += newValuestr;
+									})
+									newTb += "</table>";
+									valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+								} else if (key == "nolocal_freq_address_list" && value != null){
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									var newTb = "<table>";
+									$.each(value,function(index1,value1){
+										var newKeystr = "<tr>";
+										var newValuestr = "<tr>";
+										$.each(value1,function(key2,value2){
+											newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+											newValuestr += "<td>"+value2+"</td>";
+											
+										})
+										newKeystr += "</tr>";
+										newValuestr += "</tr>";
+										newTb += newKeystr;
+										newTb += newValuestr;
+									})
+									newTb += "</table>";
+									valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+								} else {
+									keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+									valueStr += "<td>"+value+"</td>";
+								}
+							})
+							tab += tab1+keyStr+valueStr+"</table>";
+						})
 					}else {
 						tab = "未找到相关信息";
 					}
@@ -866,6 +988,8 @@ $(document).ready(function () {
 						"<td>"+result.data["hit"]+"</td>"+
 						"</tr></table>";
 					$("#resultVerify").html(html);
+				} else {
+					$("#resultVerify").html("未找到相关信息");
 				}
 			},
 			error:function(){
@@ -948,6 +1072,8 @@ $(document).ready(function () {
 									"<td>"+result.data.statusMsg.creditCardAging.unit+"</td>"+
 								"</tr>";
 					$("#resultBindInfo").append(html);
+				} else {
+					$("#resultBindInfo").append("未找到相关信息");
 				}
 			},
 			error:function(){
@@ -976,6 +1102,8 @@ $(document).ready(function () {
 						"<td>"+result.data.depositLongTermVoloatilityIndex+"</td>"+
 						"</tr></table>";
 					$("#resultPhoneActive").html(html);
+				} else {
+					$("#resultBindInfo").append("未找到相关信息");
 				}
 			},
 			error:function(){
@@ -1040,55 +1168,112 @@ $(document).ready(function () {
 			data:{"phone":phone},
 			success:function(result){
 				if(result.code == 1){
-					var html = "<tr>"+
-									"<td></td>"+
-									"<td><strong>是否包含最小值</strong></td>"+
-									"<td><strong>是否包含最大值</strong></td>"+
-									"<td><strong>最小值</strong></td>"+
-									"<td><strong>最大值</strong></td>"+
-									"<td><strong>单位</strong></td>"+
-								"</tr>"+
-								"<tr>"+
-									"<td><strong>借记卡余额总量</strong></td>"+
-									"<td>"+result.data["debitCardRemainingSum"]["minIncluded"]+"</td>"+
-									"<td>"+result.data["debitCardRemainingSum"]["maxIncluded"]+"</td>"+
-									"<td>"+result.data["debitCardRemainingSum"]["min"]+"</td>"+
-									"<td>"+result.data["debitCardRemainingSum"]["max"]+"</td>"+
-									"<td>"+result.data["debitCardRemainingSum"]["unit"]+"</td>"+
-								"</tr>"+
-								"<tr>"+
-									"<td><strong>3个月借记卡出账金额</strong></td>"+
-									"<td>"+result.data["debitCardPayment3m"]["minIncluded"]+"</td>"+
-									"<td>"+result.data["debitCardPayment3m"]["maxIncluded"]+"</td>"+
-									"<td>"+result.data["debitCardPayment3m"]["min"]+"</td>"+
-									"<td>"+result.data["debitCardPayment3m"]["max"]+"</td>"+
-									"<td>"+result.data["debitCardPayment3m"]["unit"]+"</td>"+
-								"</tr>"+
-								"<tr>"+
-									"<td><strong>3个月借记卡入账金额</strong></td>"+
-									"<td>"+result.data["debitCardDeposit3m"]["minIncluded"]+"</td>"+
-									"<td>"+result.data["debitCardDeposit3m"]["maxIncluded"]+"</td>"+
-									"<td>"+result.data["debitCardDeposit3m"]["min"]+"</td>"+
-									"<td>"+result.data["debitCardDeposit3m"]["max"]+"</td>"+
-									"<td>"+result.data["debitCardDeposit3m"]["unit"]+"</td>"+
-								"</tr>"+
-								"<tr>"+
-									"<td><strong>12个月借记卡出账金额</strong></td>"+
-									"<td>"+result.data["debitCardPayment12m"]["minIncluded"]+"</td>"+
-									"<td>"+result.data["debitCardPayment12m"]["maxIncluded"]+"</td>"+
-									"<td>"+result.data["debitCardPayment12m"]["min"]+"</td>"+
-									"<td>"+result.data["debitCardPayment12m"]["max"]+"</td>"+
-									"<td>"+result.data["debitCardPayment12m"]["unit"]+"</td>"+
-								"</tr>"+
-								"<tr>"+
-									"<td><strong>12个月借记卡入账金额</strong></td>"+
-									"<td>"+result.data["debitCardDeposit12m"]["minIncluded"]+"</td>"+
-									"<td>"+result.data["debitCardDeposit12m"]["maxIncluded"]+"</td>"+
-									"<td>"+result.data["debitCardDeposit12m"]["min"]+"</td>"+
-									"<td>"+result.data["debitCardDeposit12m"]["max"]+"</td>"+
-									"<td>"+result.data["debitCardDeposit12m"]["unit"]+"</td>"+
-								"</tr>";
-					$("#resultLines").html(html);
+					var tab = "";
+					if (result.data.flag == 1){
+						var tab1 = "<table style='width:100%;text-align: center;'>";
+						var keyStr = "<tr>";
+						var valueStr = "<tr>";
+						$.each(result.data.result,function(key,value){
+							
+							if (key == "debitCardRemainingSum" && value != null){
+								keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+								var newTb = "<table>";
+								$.each(value,function(index1,value1){
+									var newKeystr = "<tr>";
+									var newValuestr = "<tr>";
+									$.each(value1,function(key2,value2){
+										newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+										newValuestr += "<td>"+value2+"</td>";
+										
+									})
+									newKeystr += "</tr>";
+									newValuestr += "</tr>";
+									newTb += newKeystr;
+									newTb += newValuestr;
+								})
+								newTb += "</table>";
+								valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+							} else if (key == "debitCardPayment3m" && value != null){
+								keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+								var newTb = "<table>";
+								$.each(value,function(index1,value1){
+									var newKeystr = "<tr>";
+									var newValuestr = "<tr>";
+									$.each(value1,function(key2,value2){
+										newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+										newValuestr += "<td>"+value2+"</td>";
+										
+									})
+									newKeystr += "</tr>";
+									newValuestr += "</tr>";
+									newTb += newKeystr;
+									newTb += newValuestr;
+								})
+								newTb += "</table>";
+								valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+							} else if (key == "debitCardDeposit3m" && value != null){
+								keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+								var newTb = "<table>";
+								$.each(value,function(index1,value1){
+									var newKeystr = "<tr>";
+									var newValuestr = "<tr>";
+									$.each(value1,function(key2,value2){
+										newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+										newValuestr += "<td>"+value2+"</td>";
+										
+									})
+									newKeystr += "</tr>";
+									newValuestr += "</tr>";
+									newTb += newKeystr;
+									newTb += newValuestr;
+								})
+								newTb += "</table>";
+								valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+							} else if (key == "debitCardPayment12m" && value != null){
+								keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+								var newTb = "<table>";
+								$.each(value,function(index1,value1){
+									var newKeystr = "<tr>";
+									var newValuestr = "<tr>";
+									$.each(value1,function(key2,value2){
+										newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+										newValuestr += "<td>"+value2+"</td>";
+										
+									})
+									newKeystr += "</tr>";
+									newValuestr += "</tr>";
+									newTb += newKeystr;
+									newTb += newValuestr;
+								})
+								newTb += "</table>";
+								valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+							} else if (key == "debitCardDeposit12m" && value != null){
+								keyStr += "<td style='background: #EEE8AA;'>"+key+"</td>";
+								var newTb = "<table>";
+								$.each(value,function(index1,value1){
+									var newKeystr = "<tr>";
+									var newValuestr = "<tr>";
+									$.each(value1,function(key2,value2){
+										newKeystr +="<td style='background: #EEE8AA;'>"+key2+"</td>";
+										newValuestr += "<td>"+value2+"</td>";
+										
+									})
+									newKeystr += "</tr>";
+									newValuestr += "</tr>";
+									newTb += newKeystr;
+									newTb += newValuestr;
+								})
+								newTb += "</table>";
+								valueStr += "<td style='padding: 0px;'>"+newTb+"</td>";										
+							}
+							
+							
+						})
+						tab += tab1 + keyStr + valueStr + "</table>"
+						$("#resultLines").html(tab);
+					} else {
+						$("#resultLines").html("未找到相关信息");
+					}
 				}else{
 					$("#resultLines").html("未找到相关信息");
 				}

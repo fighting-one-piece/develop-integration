@@ -1,14 +1,6 @@
 package org.cisiondata.modules.auth.web.filter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -16,15 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.cisiondata.modules.auth.Constants;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.auth.service.IAuthService;
-import org.cisiondata.utils.date.DateFormatter;
-import org.cisiondata.utils.encryption.SHAUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,25 +69,15 @@ public class UserAccessControlFilter extends AccessControlFilter {
     	HttpServletRequest httpServletRequest = (HttpServletRequest) request;
     	String requestURI = httpServletRequest.getServletPath();
     	LOG.info("request path : {}", httpServletRequest.getServletPath());
-    	if (requestURI.startsWith("/app")) {
-    		if (!authenticationAppRequest(httpServletRequest)) {
-    			throw new AuthenticationException("该请求被拒绝访问");
-    		}
-    	} else if (requestURI.startsWith("/ext")){
-    		if (!authenticationExternalRequest(httpServletRequest)) {
-    			throw new AuthenticationException("该请求被拒绝访问");
-    		}
-    	} else {
-    		String readIdentity = authService.readResourceReadIdentityByUrl(requestURI);
-    		if (StringUtils.isNotBlank(readIdentity)) {
-    			boolean isPermitted = SecurityUtils.getSubject().isPermitted(readIdentity);
-    			LOG.info("identity {} is permitted : {}", readIdentity, isPermitted);
-    			if (!isPermitted) {
-    				request.setAttribute("error", "该请求被拒绝访问");
-    				saveRequestAndRedirectToLogin(request, response);
-    			}
-    		}
-    	}
+		String readIdentity = authService.readResourceReadIdentityByUrl(requestURI);
+		if (StringUtils.isNotBlank(readIdentity)) {
+			boolean isPermitted = SecurityUtils.getSubject().isPermitted(readIdentity);
+			LOG.info("identity {} is permitted : {}", readIdentity, isPermitted);
+			if (!isPermitted) {
+				request.setAttribute("error", "该请求被拒绝访问");
+				saveRequestAndRedirectToLogin(request, response);
+			}
+		}
         User user = (User) request.getAttribute(Constants.CURRENT_USER);
         if (user == null) return true;
         if (Boolean.TRUE.equals(user.getDeleteFlag())) {
@@ -124,41 +103,4 @@ public class UserAccessControlFilter extends AccessControlFilter {
 //        WebUtils.issueRedirect(request, response, url);
     }
     
-    private boolean authenticationAppRequest(HttpServletRequest httpServletRequest) {
-    	String token = httpServletRequest.getParameter("token");
-		return (StringUtils.isBlank(token) || !"cisiondata".equals(token)) ? false : true; 
-    }
-    
-    @SuppressWarnings("unchecked")
-	private boolean authenticationExternalRequest(HttpServletRequest httpServletRequest) {
-    	Map<String, String[]> requestParams = httpServletRequest.getParameterMap();
-    	Map<String, String> params = new HashMap<String, String>();
-    	for (Map.Entry<String, String[]> entry : requestParams.entrySet()) {
-			params.put(entry.getKey(), entry.getValue()[0]);
-    	}
-    	params.put("accessKey", "cisiondata");
-    	params.put("date", DateFormatter.DATE.get().format(Calendar.getInstance().getTime()).replace("-", ""));
-    	List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(params.entrySet());
-		Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
-			@Override
-			public int compare(Entry<String, String> o1, Entry<String, String> o2) {
-				return o1.getKey().compareTo(o2.getKey());
-			}
-		});
-		String token = null;
-		StringBuffer sb = new StringBuffer();
-		for (Map.Entry<String, String> entry : list) {
-			String paramName = entry.getKey();
-			if ("token".equalsIgnoreCase(paramName)) {
-				token = entry.getValue();
-				continue;
-			}
-			sb.append(paramName).append("=").append(entry.getValue()).append("&");
-		}
-		if (sb.length() > 0) sb.deleteCharAt(sb.length() - 1);
-		LOG.info("params: {}", sb.toString());
-		LOG.info("token: {}", SHAUtils.SHA1(sb.toString()));
-		return SHAUtils.SHA1(sb.toString()).equals(token) ? true : false;
-    }
-
 }

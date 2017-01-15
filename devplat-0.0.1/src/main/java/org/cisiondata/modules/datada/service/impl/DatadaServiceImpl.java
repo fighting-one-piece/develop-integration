@@ -55,15 +55,11 @@ public class DatadaServiceImpl implements IDatadaService {
 		QueryResult<Map<String, Object>> finalResult = new QueryResult<Map<String, Object>>();
 		QueryResult<Map<String, Object>> tempResult = crawlDatada(query, searchToken, dateline);
 		int item_count = 0;
-		// Set<String> itemIds = new HashSet<String>();
 		while (null != tempResult.getScrollId() && item_count < 10) {
 			List<Map<String, Object>> resultList = tempResult.getResultList();
 			if (!resultList.isEmpty()) {
 				for (int i = 0, len = resultList.size(); i < len; i++) {
 					Map<String, Object> result = resultList.get(i);
-					// String itemId = (String) result.get("itemId");
-					// if (itemIds.contains(itemId)) continue;
-					// itemIds.add(itemId);
 					finalResult.getResultList().add(result);
 					item_count++;
 				}
@@ -75,6 +71,7 @@ public class DatadaServiceImpl implements IDatadaService {
 		return finalResult;
 	}
 
+	@SuppressWarnings("unchecked")
 	private QueryResult<Map<String, Object>> crawlDatada(String query, String searchToken, String dateline) {
 		try {
 			Map<String, String> params = new HashMap<String, String>();
@@ -104,8 +101,10 @@ public class DatadaServiceImpl implements IDatadaService {
 				all_sb.deleteCharAt(all_sb.length() - 1);
 			sb.append("signature=").append(SHAUtils.SHA1(all_sb.toString()));
 			String json = HttpUtils.sendPost(URL, sb.toString());
-			DatadaResponse datadaResponse = gson.fromJson(json, DatadaResponse.class);
+			Map<String, Object> jsonObj = gson.fromJson(json, Map.class);
 			QueryResult<Map<String, Object>> qr = new QueryResult<Map<String, Object>>();
+			if (jsonObj.get("data") instanceof List) return qr;
+			DatadaResponse datadaResponse = gson.fromJson(json, DatadaResponse.class);
 			if (null == datadaResponse) return qr;
 			DataResponse dataResponse = datadaResponse.getData();
 			qr.setScrollId(dataResponse.getSearchToken());
@@ -127,7 +126,7 @@ public class DatadaServiceImpl implements IDatadaService {
 			return new QueryResult<Map<String, Object>>();
 		}
 	}
-
+	
 	// 查询所有集群中是否有该手机号码
 	@Override
 	public boolean readPhoneIsExists(String phone) throws BusinessException {
@@ -151,14 +150,19 @@ public class DatadaServiceImpl implements IDatadaService {
 	}
 
 	public static void main(String[] args) {
-		String query = "13512345678";
-		IDatadaService datadaService = new DatadaServiceImpl();
-		QueryResult<Map<String, Object>> qr = datadaService.readDatadaDatas(query, null, "0");
-		for (Map<String, Object> result : qr.getResultList()) {
-			for (String data : (String[]) result.get("data")) {
-				System.out.print(data + " ");
-			}
-		}
+//		String query = "13512345678";
+//		IDatadaService datadaService = new DatadaServiceImpl();
+//		QueryResult<Map<String, Object>> qr = datadaService.readDatadaDatas(query, null, "0");
+//		for (Map<String, Object> result : qr.getResultList()) {
+//			for (String data : (String[]) result.get("data")) {
+//				System.out.print(data + " ");
+//			}
+//		}
+//		String json = "{\"ret\":1003,\"msg\":\"\u7b7e\u540d\u9519\u8bef\",\"data\":[]}";
+//		String json = "{"ret":0,"msg":"","data":{"searchToken":"2837351","resArray":[]}}";
+//		DatadaResponse datadaResponse = new Gson().fromJson(json, DatadaResponse.class);
+//		Map<String, Object> jsonObj = new Gson().fromJson(json, Map.class);
+//		System.out.println(jsonObj.get("data"));
 	}
 
 	class DatadaResponse {

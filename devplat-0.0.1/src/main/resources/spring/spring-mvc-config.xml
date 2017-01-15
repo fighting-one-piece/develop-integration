@@ -20,6 +20,15 @@
 		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
 	</context:component-scan>
 	
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="stringHttpMessageConverter" />
+                <ref bean="jsonHttpMessageConverter" />
+            </list>
+        </property>
+    </bean>
+	
 	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
 		<property name="messageConverters">
 			<list>
@@ -39,9 +48,7 @@
 	<!-- 实现@AspectJ注解的 -->
 	<aop:aspectj-autoproxy proxy-target-class="true"/>
 	
-	<!-- 会自动注册了Validator ConversionService  -->
-    <mvc:annotation-driven	content-negotiation-manager="contentNegotiationManager"
-            enable-matrix-variables="true">
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" enable-matrix-variables="true">
         <!-- 异步支持 默认30秒超时 -->
         <mvc:async-support default-timeout="30000" task-executor="executor"/>
 
@@ -80,15 +87,6 @@
 
     </mvc:annotation-driven>
 	
-	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-        <property name="messageConverters">
-            <list>
-                <ref bean="stringHttpMessageConverter" />
-                <ref bean="jsonHttpMessageConverter" />
-            </list>
-        </property>
-    </bean>
-    
 	<bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter" /> 
 
 	<!--
@@ -195,7 +193,6 @@
     
     <bean id="frontContextInterceptor" class="org.cisiondata.modules.auth.web.interceptor.FrontContextInterceptor"/>
 	<bean id="frontLocaleInterceptor" class="org.cisiondata.modules.auth.web.interceptor.FrontLocaleInterceptor"/>
-    <bean id="urlHandlerAdapter" class="org.cisiondata.modules.auth.web.handler.UrlHandlerAdapter"/>
     
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
 		<property name="interceptors">

@@ -12,6 +12,7 @@
 	<p><a href="<%=basePath %>/checknameid">1、姓名-身份证校验</a></p>
 	<p><a href="<%=basePath %>/nameIdCardAccountVerify">2、姓名-身份证-银行卡校验</a></p>
 	<p><a href="<%=basePath %>/accountVerifyM">2、M姓名-身份证-银行卡校验</a></p>
+	<p><a href="<%=basePath %>/accountVerifyF">2、F姓名-身份证-银行卡校验</a></p>
 	<p><a href="<%=basePath %>/namephonection">3、姓名-身份证-手机号校验</a></p>
 	<p><a href="<%=basePath %>/nameidphonebankcat">4、姓名-身份证-手机号-银行卡校验</a></p>
 	<p><a href="<%=basePath %>/nameIDPhoto3Dcat">5、姓名-身份证-照片三维校验</a></p>
@@ -48,7 +49,8 @@
 	<p><a href="<%=basePath %>/blacklistLoanPlatform">35、数信网黑名单</a></p>
 	<p><a href="<%=basePath %>/blacklistsearch">36、搜索黑名单</a></p>
 	<p><a href="<%=basePath %>/education">37、学历查询（D机构）</a></p>
-	
+	<p><a href="<%=basePath %>/loanInfo">38、信贷综合信息查询</a></p>
+	<p><a href="<%=basePath %>/audit">46、反欺诈黑名单验证</a></p>
 </div>
 </body>
 </html>

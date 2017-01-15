@@ -40,7 +40,7 @@ public class MobileIdCardController {
 	public WebResult readClassifiedQuery(@PathVariable String index,@PathVariable String type,@PathVariable String identity) {
 		WebResult result = new WebResult();
 		try {
-			result.setData(mobileIdCardService.redClassifiedQuery(index,type,identity));
+			result.setData(mobileIdCardService.readClassifiedQuery(index,type,identity));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
@@ -65,7 +65,9 @@ public class MobileIdCardController {
 		}
 		return result;
 	}
-	@RequestMapping(value ="/identity/labels", method = RequestMethod.GET)
+	
+	//未使用
+	@RequestMapping(value ="/identity/labels/s", method = RequestMethod.GET)
 	public ModelAndView toMoblie(){
 		return new ModelAndView("/user/user_phoneCard");
 	}

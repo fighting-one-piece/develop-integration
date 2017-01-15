@@ -99,20 +99,20 @@ $(document).ready(function(){
 //									break;
 //								}
 								thead+="<td>"+"QQ昵称"+"</td>";
-								thead+="<td>"+"QQ号码"+"</td>";
+								thead+="<td>"+"QQ群号"+"</td>";
+								thead+="<td>"+"QQ号"+"</td>";
 								thead+="<td>"+"年龄"+"</td>";
 								thead+="<td>"+"性别"+"</td>";
-								thead+="<td>"+"QQ群号"+"</td>";
 								$(".styleThead").html(thead+="</tr>");
 								
 								var html ="";
 								for(var i=0;i<result.data.resultList.length;i++){
-									html+="<tr align='center'>";
+									html+="<tr align='left'>";
 									html+="<td>"+result.data.resultList[i].data['QQ昵称']+"</td>";
-									html+="<td>"+result.data.resultList[i].data['QQ号码']+"</td>";
+									html+="<td><a>"+result.data.resultList[i].data['QQ群号']+"</a></td>";
+									html+="<td>"+result.data.resultList[i].data['QQ号']+"</td>";
 									html+="<td>"+result.data.resultList[i].data['年龄']+"</td>";
 									html+="<td>"+result.data.resultList[i].data['性别']+"</td>";
-									html+="<td><a>"+result.data.resultList[i].data['QQ群号']+"</a></td>";
 									html+="</tr>";
 								}
 								//清除QQ基本信息并提示暂无数据
@@ -195,12 +195,12 @@ $(document).ready(function(){
 							}
 							if(result.data["qun"].length > 0){
 								//拼接群信息
-								var thead = "<tr><td>群账号</td><td>群名称</td><td>创建时间</td><td>群人数</td><td>用户昵称</td><td>群通知</td></tr>";
+								var thead = "<tr><td>QQ群号</td><td>群名称</td><td>创建时间</td><td>群人数</td><td>用户昵称</td><td>群通知</td></tr>";
 								$(".styleThead").html(thead);
 								var html ="";
 								for(var i = 0;i<result.data["qun"].length;i++){
 									html+="<tr>"+
-									"<td><a>"+result.data["qun"][i]["群账号"]+"</a></td>"+
+									"<td><a>"+result.data["qun"][i]["QQ群号"]+"</a></td>"+
 									"<td>"+result.data["qun"][i]["群名称"]+"</td>"+
 									"<td>"+result.data["qun"][i]["创建时间"]+"</td>"+
 									"<td>"+result.data["qun"][i]["群人数"]+"</td>"+

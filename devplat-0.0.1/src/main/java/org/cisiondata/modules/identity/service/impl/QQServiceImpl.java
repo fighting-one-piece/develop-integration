@@ -15,8 +15,10 @@ import org.springframework.stereotype.Service;
 
 @Service("qqService")
 public class QQServiceImpl implements IQQService {
+	
 	@Resource(name = "esService")
 	private IESService esService = null;
+	
 	//根据QQ号码得到群详情和群昵称
 	@Override
 	public List<Map<String, Object>> readQQDatas(String qq) {
@@ -31,7 +33,7 @@ public class QQServiceImpl implements IQQService {
 			}
 			listMap = esService.readDataListByCondition("qq", "qqqundata", boolQueryBuilder);
 			for (int i = 0; i < listMap.size(); i++) {
-				listqun.add(listMap.get(i).get("群账号").toString());
+				listqun.add(listMap.get(i).get("QQ群号").toString());
 				list.add(listMap.get(i));
 			}
 			// 开始

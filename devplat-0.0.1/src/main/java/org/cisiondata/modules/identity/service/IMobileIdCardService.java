@@ -21,5 +21,5 @@ public interface IMobileIdCardService {
 	public Map<String,Object> readStatisticsAndLabels(String identity) throws BusinessException;
 	
 	//接收接口
-	public List<Map<String, Object>> redClassifiedQuery(String index, String type, String identity) throws BusinessException;
+	public List<Map<String, Object>> readClassifiedQuery(String index, String type, String identity) throws BusinessException;
 }

@@ -69,7 +69,7 @@ public class UrlMappingStorage {
 		}
 
 		public Map<String, String> getParams() {
-			return params;
+			return null == params ? new HashMap<String, String>() : params;
 		}
 	}
 
@@ -143,12 +143,7 @@ public class UrlMappingStorage {
 
 	public static ObjectMethodParams getObjectMethod(String url) throws UnsupportedEncodingException {
 		ObjectMethodParams omp = getObjectMethod(url, "GET");
-		if (omp != null) {
-			return omp;
-		} else {
-			omp = getObjectMethod(url, "POST");
-			return omp;
-		}
+		return omp != null ? omp : getObjectMethod(url, "POST");
 	}
 
 	public static ObjectMethodParams getObjectMethod(String url, String method) throws UnsupportedEncodingException {

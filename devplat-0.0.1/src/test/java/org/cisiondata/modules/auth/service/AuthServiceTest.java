@@ -5,17 +5,17 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.cisiondata.modules.auth.entity.User;
-import org.cisiondata.modules.auth.service.IAuthService;
-import org.cisiondata.modules.auth.service.IRoleService;
-import org.cisiondata.modules.auth.service.IUserService;
+import org.cisiondata.modules.datainterface.service.IAccessUserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import junit.framework.Assert;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:spring/applicationContext.xml"})
-public class AuthenticationServiceTest {
+public class AuthServiceTest {
 
 	@Resource(name = "userService")
 	private IUserService userService = null;
@@ -25,6 +25,9 @@ public class AuthenticationServiceTest {
 	
 	@Resource(name = "authService")
 	private IAuthService authService = null;
+	
+	@Resource(name = "accessUserService")
+	private IAccessUserService accessUserService = null;
 	
 	@Test
 	public void testUserServiceReadUserByAccount() {
@@ -48,6 +51,12 @@ public class AuthenticationServiceTest {
 		for (String identity : identities) {
 			System.out.println(identity);
 		}
+	}
+	
+	@Test
+	public void testReadAccessKeyByAccessId() {
+		String accessKey = accessUserService.readAccessKeyByAccessId("Fc89A13022BfdD2f");
+		Assert.assertEquals("F0de5A94aEb07f3a6F0959060fc4B697", accessKey);
 	}
 	
 }

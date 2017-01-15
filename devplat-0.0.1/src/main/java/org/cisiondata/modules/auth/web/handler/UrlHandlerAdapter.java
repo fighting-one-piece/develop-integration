@@ -5,9 +5,14 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +23,9 @@ import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.auth.web.handler.ClassScanner.ClassResourceHandler;
 import org.cisiondata.modules.auth.web.handler.UrlMappingStorage.Mapper;
 import org.cisiondata.modules.auth.web.handler.UrlMappingStorage.ObjectMethodParams;
+import org.cisiondata.modules.datainterface.service.IAccessUserService;
+import org.cisiondata.utils.date.DateFormatter;
+import org.cisiondata.utils.encryption.SHAUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -44,6 +52,8 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	private ApplicationContext ctx = null;
+	
+	private IAccessUserService accessUserService = null;
 	
 	public void setApplicationContext(ApplicationContext ctx) throws BeansException {
 		this.ctx = ctx;
@@ -83,7 +93,6 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 						}
 					});
 					UrlMappingStorage.addMapper(mapper);
-					//inject service
 					ReflectionUtils.doWithFields(clazz, new FieldCallback() {
 						public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
 							if (ctx.containsBean(field.getName()) && ctx.isTypeMatch(field.getName(), field.getType())) {
@@ -97,18 +106,24 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 				}
 			}
 		}).scan();
+		this.accessUserService = (IAccessUserService) ctx.getBean("accessUserService");
 	}
 	
 	@Override
 	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		try {
-			String path = request.getServletPath();
-			LOG.info("url handler request uri: {}", path);
-			if(path.startsWith("/app")) {
-//				String token = request.getParameter("token");
-				Map<String, String> paramMap = new HashMap<String, String>();
-				Object result = handleExternalRequest(path, paramMap, request, response);
-				writeResponse(response, result);
+			String path = request.getRequestURI().replace("/devplat", "");
+			LOG.info("url handler adapter request path: {}", path);
+			if (path.startsWith("/app")) {
+				if (authenticationAppRequest(request, response)) {
+					Object result = handleExternalRequest(path.replace("/app", ""), request, response);
+					writeResponse(response, result);
+				}
+			} else if (path.startsWith("/ext")) {
+				if (authenticationExternalRequest(request, response)) {
+					Object result = handleExternalRequest(path.replace("/ext", ""), request, response);
+					writeResponse(response, result);
+				}
 			} else {
 				Object result = handleNormalRequest(path, request, response);
 				writeResponse(response, result);
@@ -121,7 +136,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		return null;
 	}
 
-	private WebResult getFailureMap(int code, String failure) {
+	private WebResult wrapperFailureResult(int code, String failure) {
 		WebResult result = new WebResult();
 		result.setCode(code);
 		result.setFailure(failure);
@@ -147,14 +162,14 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	private Object handleNormalRequest(String path, HttpServletRequest request, HttpServletResponse response) 
 			throws UnsupportedEncodingException {
 		String requestMethod = request.getMethod();
-		String interfaceUrl = path.replaceAll("/+", "/").replaceAll("^/app", "");
+		String interfaceUrl = path.replaceAll("/+", "/").replaceAll("^/app", "").replaceAll("^/ext", "");
 		ObjectMethodParams omp = UrlMappingStorage.getObjectMethod(interfaceUrl, requestMethod);
 		if (omp == null) {
-			return getFailureMap(ResultCode.URL_ERROR.getCode(), "No mapping found for HTTP request with URI " + path);
+			return wrapperFailureResult(ResultCode.URL_ERROR.getCode(), "No mapping found for HTTP request with URI " + path);
 		}
 		Method method = omp.getMethod();
 		if (method == null) {
-			return getFailureMap(ResultCode.URL_ERROR.getCode(), "No mapping found for HTTP request with URI " + path);
+			return wrapperFailureResult(ResultCode.URL_ERROR.getCode(), "No mapping found for HTTP request with URI " + path);
 		}
 		try {
 			ParameterBinder parameterBinder = new ParameterBinder(ctx);
@@ -166,25 +181,28 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			if (e.getCause() != null) e = (Exception) e.getCause();
-			return getFailureMap(ResultCode.FAILURE.getCode(), e.getMessage());
+			return wrapperFailureResult(ResultCode.FAILURE.getCode(), e.getMessage());
 		}
+	}
+	
+	private Object handleExternalRequest(String interfaceUrl, HttpServletRequest request, HttpServletResponse response)
+			throws UnsupportedEncodingException {
+		return handleExternalRequest(interfaceUrl, new HashMap<String, String>(), request, response);
 	}
 
 	private Object handleExternalRequest(String interfaceUrl, Map<String, String> paramMap, HttpServletRequest request, HttpServletResponse response)
 			throws UnsupportedEncodingException {
 		ObjectMethodParams omp = UrlMappingStorage.getObjectMethod(interfaceUrl);
 		if (omp == null) {
-			return getFailureMap(ResultCode.URL_ERROR.getCode(), "No mapping found for HTTP request with URI " + interfaceUrl);
+			return wrapperFailureResult(ResultCode.URL_ERROR.getCode(), "No mapping found for HTTP request with URI " + interfaceUrl);
 		}
 		Method method = omp.getMethod();
 		if (method == null) {
-			return getFailureMap(ResultCode.URL_ERROR.getCode(), "No mapping found for HTTP request with URI " + interfaceUrl);
+			return wrapperFailureResult(ResultCode.URL_ERROR.getCode(), "No mapping found for HTTP request with URI " + interfaceUrl);
 		}
 		try {
 			ParameterBinder parameterBinder = new ParameterBinder(ctx);
-			if (omp.getParams() != null) {
-				paramMap.putAll(omp.getParams());
-			}
+			paramMap.putAll(omp.getParams());
 			Object[] params = parameterBinder.bindParameters(omp, paramMap, request, response);
 			Object result = ReflectionUtils.invokeMethod(method, omp.getObject(), params);
 			if (method.getReturnType() == void.class || response.isCommitted()) {
@@ -197,7 +215,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			if (e.getCause() != null) {
 				e = (Exception) e.getCause();
 			}
-			return getFailureMap(ResultCode.FAILURE.getCode(), e.getMessage());
+			return wrapperFailureResult(ResultCode.FAILURE.getCode(), e.getMessage());
 		}
 	}
 	
@@ -208,5 +226,61 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		//objectMapper.setSerializationInclusion(Inclusion.NON_NULL);
 		response.getWriter().write(objectMapper.writeValueAsString(obj));
 	}
+	
+	private boolean authenticationAppRequest(HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+    	String token = request.getParameter("token");
+		if (StringUtils.isBlank(token) || !"cisiondata".equals(token)) {
+			writeResponse(response, wrapperFailureResult(
+					ResultCode.FAILURE.getCode(), "该请求被拒绝访问"));
+			return false;
+		}
+		return true;
+    }
+    
+    @SuppressWarnings("unchecked")
+	private boolean authenticationExternalRequest(HttpServletRequest request, 
+			HttpServletResponse response) throws Exception {
+    	Map<String, String[]> requestParams = request.getParameterMap();
+    	Map<String, String> params = new HashMap<String, String>();
+    	for (Map.Entry<String, String[]> entry : requestParams.entrySet()) {
+			params.put(entry.getKey(), entry.getValue()[0]);
+    	}
+    	try {
+	    	String accessKey = accessUserService.readAccessKeyByAccessId(params.get("accessId"));
+	    	params.put("accessKey", accessKey);
+    	} catch (Exception e) {
+    		LOG.error(e.getMessage(), e);
+    		writeResponse(response, wrapperFailureResult(
+					ResultCode.FAILURE.getCode(), e.getMessage()));
+    		return false;
+    	}
+    	params.put("date", DateFormatter.DATE.get().format(Calendar.getInstance().getTime()).replace("-", ""));
+    	List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(params.entrySet());
+		Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
+			@Override
+			public int compare(Entry<String, String> o1, Entry<String, String> o2) {
+				return o1.getKey().compareTo(o2.getKey());
+			}
+		});
+		String token = null;
+		StringBuffer sb = new StringBuffer();
+		for (Map.Entry<String, String> entry : list) {
+			String paramName = entry.getKey();
+			if ("token".equalsIgnoreCase(paramName)) {
+				token = entry.getValue();
+				continue;
+			}
+			sb.append(paramName).append("=").append(entry.getValue()).append("&");
+		}
+		if (sb.length() > 0) sb.deleteCharAt(sb.length() - 1);
+		LOG.info("access token: {}", SHAUtils.SHA1(sb.toString()));
+		if (!SHAUtils.SHA1(sb.toString()).equals(token)) {
+			writeResponse(response, wrapperFailureResult(
+					ResultCode.FAILURE.getCode(), "该请求被拒绝访问"));
+			return false;
+		}
+		return true;
+    }
 
 }

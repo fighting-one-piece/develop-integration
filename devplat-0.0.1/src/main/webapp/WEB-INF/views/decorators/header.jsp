@@ -47,6 +47,9 @@
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/LMall.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/user/updatepassword.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/qq/honggu.js"></script>
+<script type="text/javascript" src="<%=basePath %>/js/modules/lemon/LMTwice.js"></script>
+<script type="text/javascript" src="<%=basePath %>/js/modules/lemon/LMThird.js"></script>
+<script type="text/javascript" src="<%=basePath %>/js/modules/appsearch/appsearch.js"></script>
 <script type="text/javascript">
 	//处理键盘事件 禁止后退键（Backspace）密码或单行、多行文本框除外 
 	function banBackSpace(e){ 

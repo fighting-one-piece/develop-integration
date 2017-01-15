@@ -30,7 +30,7 @@
 				<div class="input-group" style="width:240px;" >
 					<input id="query" type="text" class="form-control" style="width: 220px"  onkeydown="EnterPressCard()" placeholder="请输入身份证号码"/>
 					<span class="input-group-btn">
-						<button class="btn btn-default" type="button" id="submitCard">Go!</button>
+						<button class="btn btn-default" type="button" id="submitCard">搜索</button>
 					</span>
 				</div>
 			<div id="results" align="center" style="margin-left: 20px;">

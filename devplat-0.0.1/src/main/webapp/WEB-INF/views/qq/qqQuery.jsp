@@ -21,7 +21,7 @@
 				<input id="query" type="text" class="form-control" onkeydown="EnterPressQuery()" 
 				style="width: 280px"  placeholder="输入QQ号或者QQ群号或者QQ昵称"/> 
 				<span class="input-group-btn" >
-					<input class="btn btn-default" type="button" id="submitQQ" value="Go!"/>
+					<input class="btn btn-default" type="button" id="submitQQ" value="搜索"/>
 				</span>
 			</div>
 			<div class="input-group" style="width: 100%; position: absolute; padding-top: 0.3%;">

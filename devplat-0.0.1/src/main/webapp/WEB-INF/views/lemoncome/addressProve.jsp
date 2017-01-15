@@ -23,7 +23,7 @@
 	<p style="color: red">提示:Home和company两类,必须有一类填写</p>
 	<p><input id="homeCity" type="text"  style="width: 220px;" placeholder="请输入家庭所在城市"/></p>
 	<p><input id="homeAddress" type="text"  style="width: 220px;" placeholder="请输入家庭地址"/></p>
-	<p><input id="companyCity" type="text"  style="width: 220px;" placeholder="请输入公司所在地址"/></p>
+	<p><input id="companyCity" type="text"  style="width: 220px;" placeholder="请输入公司所在城市"/></p>
 	<p><input id="companyAddress" type="text"  style="width: 220px;" placeholder="请输入公司地址"/></p>
 	<p><input id="address" type="button" value="确定"/></p>
 </div>

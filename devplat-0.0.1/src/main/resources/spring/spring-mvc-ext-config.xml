@@ -13,8 +13,12 @@
 			http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
 			http://www.springframework.org/schema/mvc 
 			http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
-	<!--  	
+			
+	<context:component-scan base-package="org.cisiondata.modules">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+	
 	<bean id="urlHandlerAdapter" class="org.cisiondata.modules.auth.web.handler.UrlHandlerAdapter"/>
-	-->
 	
 </beans>

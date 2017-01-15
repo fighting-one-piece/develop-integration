@@ -36,17 +36,17 @@ public class MobileIdCardServiceImpl implements IMobileIdCardService {
 		boolean phoneFlag = true;
 		boolean idCardFlag = true;
 		
-		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 		if(identity.length()==11){
 			phoneFlag = false;
 			mobiles.add(identity);
-			boolQueryBuilder.should(QueryBuilders.termQuery("phone", identity));			
-			boolQueryBuilder.should(QueryBuilders.termQuery("mobilePhone", identity));			
-			boolQueryBuilder.should(QueryBuilders.termQuery("telePhone", identity));			
 		}else if(identity.length()==18 || identity.length()==15){
 			idCardFlag = false;
 			idcards.add(identity);
-			boolQueryBuilder.should(QueryBuilders.termQuery("idCard", identity));			
+		}
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+		Set<String> identityAttributes = esService.readIdentityAttributes();
+		for (String identityAttribute : identityAttributes) {
+			boolQueryBuilder.should(QueryBuilders.termQuery(identityAttribute, identity));			
 		}
 		List<Map<String, Object>> resultList = esService.readDataListByCondition(boolQueryBuilder, 1000);
 		for (int i = 0, len = resultList.size(); i < len; i++) {
@@ -76,7 +76,7 @@ public class MobileIdCardServiceImpl implements IMobileIdCardService {
 	/**
 	 * 标签查询
 	 */
-	public List<Map<String, Object>> redClassifiedQuery(String index, String type, String identity) throws BusinessException {
+	public List<Map<String, Object>> readClassifiedQuery(String index, String type, String identity) throws BusinessException {
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 		if(identity.length()==18 || identity.length()==15){
 			boolQueryBuilder.should(QueryBuilders.prefixQuery("idCard", identity));

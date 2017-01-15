@@ -1,13 +1,16 @@
 package org.cisiondata.modules.elasticsearch.service.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
@@ -17,8 +20,8 @@ import org.cisiondata.utils.encryption.MD5Utils;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.message.MessageUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,8 @@ import org.springframework.stereotype.Service;
 public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	
 	private static final String CN_REG = "[\\u4e00-\\u9fa5]+";
+	
+	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
 	@Override
 	public List<Map<String, Object>> readDataListByCondition(String query, int size) 
@@ -36,51 +41,31 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(
 			String query, String scrollId, int size) throws BusinessException {
+//		return readPaginationDataListWithThread(query, scrollId, size);
 		return readPaginationDataListByCondition(buildBoolQuery(query), scrollId, size);
 	}
 
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
 			String query, String scrollId, int size) throws BusinessException {
+		return readPaginationDataListByCondition(index, type, query, scrollId, size, true);
+	}
+	
+	@Override
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
+			String query, String scrollId, int size, boolean isHighLight) throws BusinessException {
 		BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
 		for (String attribute : identity_attributes) {
 			queryBuilder.should(QueryBuilders.termQuery(attribute, query));
 		}
-		return readPaginationDataListByCondition(index, type, queryBuilder, scrollId, size);
-	}
-	
-	private BoolQueryBuilder buildBoolQuery(String keyword) {
-		if (keyword.trim().indexOf(" ") == -1) return buildSBoolQuery(keyword);
-		return buildMBoolQuery(keyword);
-	}
-	
-	private BoolQueryBuilder buildMBoolQuery(String keyword) {
-		BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-		String[] keywords = keyword.trim().split(" ");
-		for (int i = 0, len = keywords.length; i < len; i++) {
-			boolQueryBuilder.must(buildSBoolQuery(keywords[i]));
+		for (String attribute : name_attributes) {
+			queryBuilder.should(QueryBuilders.termQuery(attribute, query));
 		}
-		return boolQueryBuilder;
+		return readPaginationDataListByCondition(index, type, queryBuilder, scrollId, size, isHighLight);
 	}
 	
-	private BoolQueryBuilder buildSBoolQuery(String keyword) {
-		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-		Pattern pattern = Pattern.compile(CN_REG);
-		boolean isChinese = pattern.matcher(keyword).find();
-		if (isChinese) {
-			for (String attribute : chinese_attributes) {
-				boolQueryBuilder.should(QueryBuilders.matchPhraseQuery(attribute, keyword));
-			}
-		} else {
-			for (String attribute : identity_attributes) {
-				boolQueryBuilder.should(QueryBuilders.termQuery(attribute, keyword));
-			}
-		}
-		return boolQueryBuilder;
-	}
-
 	@Override
-	public QueryResult<Map<String, Object>> readPaginationDataListByIndexType(Map<String, String> map)
+	public QueryResult<Map<String, Object>> readPaginationDataListByMultiCondition(Map<String, String> map)
 			throws BusinessException {
 		String scrollId = map.remove("scrollId");
 		Integer size = Integer.parseInt(map.remove("pageSize"));
@@ -101,8 +86,6 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		return readPaginationDataListByCondition(index, type, qb, scrollId, size);
 	}
 	
-	private ExecutorService executorService = Executors.newCachedThreadPool();
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Map<String, Object>> readLabelsAndHitsByCondition(String query) throws BusinessException {
@@ -111,43 +94,27 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		if (null != cacheObject) {
 			return (List<Map<String, Object>>) cacheObject;
 		}
-		LOG.info("read labels and hits method not hit");
-		Map<String, Future<QueryResult<Map<String, Object>>>> fs = 
-				new HashMap<String, Future<QueryResult<Map<String, Object>>>>();
-		BoolQueryBuilder queryBuilder = buildBoolQuery(query);
-		for (Map.Entry<String, List<String>> index_types : index_types_map.entrySet()) {
+		LOG.info("read labels and hits method with cache not hit");
+		List<Future<Map<String, Object>>> fs = new ArrayList<Future<Map<String, Object>>>();
+		for (Map.Entry<String, List<String>> index_types : index_types_mapping.entrySet()) {
 			String index = index_types.getKey();
 			List<String> types = index_types.getValue();
 			for (int i = 0, len = types.size(); i < len; i++) {
 				String type = types.get(i);
-				fs.put(index + ":" + type, executorService.submit(
-						new ReadPaginationDataListTask(index, type, queryBuilder)));
+				fs.add(executorService.submit(new ReadLabelsAndHitsThread(index, type, query)));
 			}
 		}
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		try {
-			for (Map.Entry<String, Future<QueryResult<Map<String, Object>>>> entry : fs.entrySet()) {
-				Future<QueryResult<Map<String, Object>>> f = entry.getValue();
-				while (!f.isDone()) {}
-				QueryResult<Map<String, Object>> qr = f.get();
-				if (qr.getTotalRowNum() == 0) continue;
-				Map<String, Object> result = new HashMap<String, Object>();
-				result.put("hits", qr.getTotalRowNum());
-				String index_type = entry.getKey();
-				String[] index_type_array = index_type.split(":");
-				result.put("index", index_type_array[0]);
-				result.put("type", index_type_array[1]);
-				String label = MessageUtils.getInstance().getMessage(index_type.replace(":", "."));
-				result.put("label", label);
-				resultList.add(result);
-				qr.setResultList(new ArrayList<Map<String, Object>>(qr.getResultList()));
-				RedisClusterUtils.getInstance().set(genLabelDatasCacheKey(index_type_array[0], 
-						index_type_array[1],label, query), qr, 120);
+			for (int i = 0, len = fs.size(); i < len; i++) {
+				Future<Map<String, Object>> future = fs.get(i);
+				Map<String, Object> result = future.get(20, TimeUnit.SECONDS);
+				if (!result.isEmpty()) resultList.add(result);
 			}
-			RedisClusterUtils.getInstance().set(labelHitCacheKey, resultList, 60);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		} 
+		RedisClusterUtils.getInstance().set(labelHitCacheKey, resultList, 180);
 		return resultList;
 	}
 	
@@ -162,7 +129,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		if (null != cacheObject) {
 			qr = (QueryResult<Map<String, Object>>) cacheObject;
 		} else {
-			qr = readPaginationDataListByCondition(index, type, query, null, 100);
+			qr = readPaginationDataListByCondition(index, type, query, null, 100, false);
 			qr.setResultList(new ArrayList<Map<String, Object>>(qr.getResultList()));
 			RedisClusterUtils.getInstance().set(labelDatasCacheKey, qr, 120);
 		}
@@ -172,12 +139,161 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		int fromIndex = (from - 1) * size;
 		int toIndex = (fromIndex + size) > totalRowNum ? (int) totalRowNum : (fromIndex + size);
 		LOG.info("fromIndex {} toIndex {}", fromIndex, toIndex);
-		if (fromIndex <= toIndex) {
-			qr.setResultList(qr.getResultList().subList(fromIndex, toIndex));
-		} else {
-			qr.getResultList().clear();
-		}
+		List<Map<String, Object>> resultList = fromIndex <= toIndex ? 
+				qr.getResultList().subList(fromIndex, toIndex) : new ArrayList<Map<String, Object>>();
+		wrapperQQQunInformation(type, resultList);
+		qr.setResultList(resultList);
 		return qr;
+	}
+	
+	@Override
+	public List<Map<String, Object>> readLogisticsDataList(String query) throws BusinessException {
+		BoolQueryBuilder queryBuilder = null;
+		if (query.trim().indexOf(" ") == -1) {
+			queryBuilder = buildLogisticsSBoolQuery(query);
+		} else {
+			queryBuilder = new BoolQueryBuilder();
+			String[] keywords = query.trim().split(" ");
+			for (int i = 0, len = keywords.length; i < len; i++) {
+				queryBuilder.must(buildLogisticsSBoolQuery(keywords[i]));
+			}
+		}
+		return readDataListByCondition("financial", "logistics", queryBuilder);
+	}
+	
+	private BoolQueryBuilder buildBoolQuery(String index, String type, String keyword) {
+		boolean isChineseWord = isChineseWord(keyword);
+		Map<String, Set<String>> index_type_attributes = index_type_attributes_mapping.get(index + type);
+		Set<String> q_identity_attributes = index_type_attributes.get("identity_attributes");
+		if (!isChineseWord && q_identity_attributes.size() == 0) return null;
+		Set<String> q_chinese_attributes = index_type_attributes.get("chinese_attributes");
+		if (isChineseWord && q_chinese_attributes.size() == 0) return null;
+		return buildBoolQuery(keyword, q_identity_attributes, q_chinese_attributes);
+	}
+	
+	private BoolQueryBuilder buildBoolQuery(String keyword) {
+		return buildBoolQuery(keyword, identity_attributes, chinese_attributes);
+	}
+	
+	private BoolQueryBuilder buildBoolQuery(String keyword, Set<String> q_identity_attributes, 
+			Set<String> q_chinese_attributes) {
+		if (keyword.trim().indexOf(" ") == -1) {
+			return buildSingleBoolQuery(keyword, q_identity_attributes, q_chinese_attributes);
+		}
+		BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+		String[] keywords = keyword.trim().split(" ");
+		for (int i = 0, len = keywords.length; i < len; i++) {
+			boolQueryBuilder.must(buildSingleBoolQuery(keywords[i], q_identity_attributes, q_chinese_attributes));
+		}
+		return boolQueryBuilder;
+	}
+	
+	private BoolQueryBuilder buildSingleBoolQuery(String keyword, Set<String> q_identity_attributes, 
+			Set<String> q_chinese_attributes) {
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+		boolean isChineseWord = isChineseWord(keyword);
+		Set<String> attributes = isChineseWord ? q_chinese_attributes : q_identity_attributes;
+		for (String attribute : attributes) {
+			boolQueryBuilder.should(isChineseWord ? QueryBuilders.matchPhraseQuery(attribute, keyword)
+					: QueryBuilders.termQuery(attribute, keyword));
+		}
+		return boolQueryBuilder;
+	}
+	
+	private BoolQueryBuilder buildLogisticsSBoolQuery(String keyword) {
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+		boolean isChineseWord = isChineseWord(keyword);
+		String[] attributes = isChineseWord ? new String[]{"linkName","linkProvince","linkCity","linkCounty",
+				"linkAddress","name","nickname","province","city","county","address","good","expressCompany",
+				"sendCompany","expressContent"}: new String[]{"linkMobilePhone","linkTelePhone","linkIdCard",
+						"mobilePhone","telePhone","idCard","email","idCode"};
+		for (int i = 0, len = attributes.length; i < len; i++) {
+			boolQueryBuilder.should(isChineseWord ? QueryBuilders.matchPhraseQuery(attributes[i], keyword)
+					: QueryBuilders.termQuery(attributes[i], keyword));
+		}
+		return boolQueryBuilder;
+	}
+	
+	private boolean isChineseWord(String keyword) {
+		return Pattern.compile(CN_REG).matcher(keyword).find();
+	}
+	
+	@SuppressWarnings({ "unchecked" })
+	public QueryResult<Map<String, Object>> readPaginationDataListWithThread(String query,
+			String scrollId, int size) {
+		List<Future<QueryResult<Map<String, Object>>>> fs = 
+				new ArrayList<Future<QueryResult<Map<String, Object>>>>();
+		for (Map.Entry<String, List<String>> index_types : index_types_mapping.entrySet()) {
+			String index = index_types.getKey();
+			List<String> types = index_types.getValue();
+			for (int i = 0, len = types.size(); i < len; i++) {
+				String type = types.get(i);
+				fs.add(executorService.submit(new ReadPaginationDataListThread(
+						index, type, query, null, 100)));
+			}
+		}
+		long totalRowNum = 0;
+		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		for (int i = 0, len = fs.size(); i < len; i++) {
+			try {
+				Future<QueryResult<Map<String, Object>>> future = fs.get(i);
+				QueryResult<Map<String, Object>> result = future.get(20, TimeUnit.SECONDS);
+				totalRowNum += result.getTotalRowNum();
+				resultList.addAll(result.getResultList());
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			} 
+		}
+		resultList.sort(new Comparator<Map<String, Object>>() {
+			@Override
+			public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+				Object scoreObj1 = o1.get("score");
+				Double score1 = null == scoreObj1 ? 0 : Double.valueOf(String.valueOf(scoreObj1));
+				Object scoreObj2 = o2.get("score");
+				Double score2 = null == scoreObj2 ? 0 : Double.valueOf(String.valueOf(scoreObj2));
+				return score2.compareTo(score1);
+			}
+		});
+		QueryResult<Map<String, Object>> qr = new QueryResult<Map<String, Object>>();
+		int from = StringUtils.isBlank(scrollId) ? 1 : Integer.parseInt(scrollId);
+		qr.setScrollId(String.valueOf(from + 1));
+		int fromIndex = (from - 1) * size;
+		int toIndex = (fromIndex + size) > totalRowNum ? (int) totalRowNum : (fromIndex + size);
+		LOG.info("fromIndex {} toIndex {}", fromIndex, toIndex);
+		List<Map<String, Object>> sliceResultList = fromIndex <= toIndex ? 
+				resultList.subList(fromIndex, toIndex) : new ArrayList<Map<String, Object>>();
+		for (int i = 0, len = sliceResultList.size(); i < len; i++) {
+			((Map<String, Object>) sliceResultList.get(i).get("data")).remove("score");
+		}
+		qr.setTotalRowNum(totalRowNum);
+		qr.setResultList(sliceResultList);
+		return qr;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void wrapperQQQunInformation(String type, List<Map<String, Object>> resultList) {
+		if (!"qqqunrelation".equalsIgnoreCase(type)) return;
+		List<String> qunNumList = new ArrayList<String>();
+		for (int i = 0, len = resultList.size(); i < len; i++) {
+			Map<String, Object> result = resultList.get(i);
+			qunNumList.add(String.valueOf(((Map<String, Object>) result.get("data")).get("QQ群号")));
+		}
+		BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
+		for (int i = 0, len = qunNumList.size(); i < len; i++) {
+			queryBuilder.should(QueryBuilders.termQuery("qunNum", qunNumList.get(i)));
+		}
+		List<Map<String, Object>> qunDataList = readDataListByCondition("qq", "qqqundata", queryBuilder);
+		Map<String, Map<String, Object>> qunMappings = new HashMap<String, Map<String, Object>>();
+		for (int i = 0, len = qunDataList.size(); i < len; i++) {
+			Map<String, Object> qunData = qunDataList.get(i);
+			qunMappings.put(String.valueOf(qunData.get("QQ群号")), qunData);
+		}
+		for (int i = 0, len = resultList.size(); i < len; i++) {
+			Map<String, Object> data = (Map<String, Object>) resultList.get(i).get("data");
+			Map<String, Object> qunData = qunMappings.get(String.valueOf(data.get("QQ群号")));
+			data.put("群人数", qunData.get("群人数"));
+			data.put("创建时间", qunData.get("创建时间"));
+		}
 	}
 	
 	private String genLabelHitCacheKey(String query) {
@@ -188,30 +304,66 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		return index + ":" + type + ":" + label + ":" + MD5Utils.hash(query);
 	}
 	
-	@Override
-	public List<Map<String, Object>> readLogisticsDataList(String query) throws BusinessException {
-		return readDataListByCondition("financial", "logistics", buildBoolQuery(query));
-	}
-	
-	class ReadPaginationDataListTask implements Callable<QueryResult<Map<String, Object>>> {
+	class ReadPaginationDataListThread implements Callable<QueryResult<Map<String, Object>>> {
 		
 		private String index = null;
 		
 		private String type = null;
 		
-		private QueryBuilder query = null;
+		private String query = null;
 		
-		public ReadPaginationDataListTask(String index, String type, QueryBuilder query) {
+		private String scrollId = null;
+		
+		private int size = 100;
+		
+		public ReadPaginationDataListThread(String index, String type, String query, 
+				String scrollId, int size) {
+			this.index = index;
+			this.type = type;
+			this.query = query;
+			this.scrollId = scrollId;
+			this.size = size;
+		}
+
+		@Override
+		public QueryResult<Map<String, Object>> call() throws Exception {
+			BoolQueryBuilder queryBuilder = buildBoolQuery(index, type, query);
+			return null == queryBuilder ? new QueryResult<Map<String, Object>>() :
+				readPaginationDataListByConditionWithScore(index, type, queryBuilder, scrollId, size);
+		}
+	}
+	
+	class ReadLabelsAndHitsThread implements Callable<Map<String, Object>> {
+		
+		private String index = null;
+		
+		private String type = null;
+		
+		private String query = null;
+		
+		public ReadLabelsAndHitsThread(String index, String type, String query) {
 			this.index = index;
 			this.type = type;
 			this.query = query;
 		}
 
 		@Override
-		public QueryResult<Map<String, Object>> call() throws Exception {
-			return readPaginationDataListByCondition(index, type, query, null, 100);
+		public Map<String, Object> call() throws Exception {
+			Map<String, Object> result = new HashMap<String, Object>();
+			BoolQueryBuilder queryBuilder = buildBoolQuery(index, type, query);
+			if(null == queryBuilder) return result;
+			QueryResult<Map<String, Object>> qr = readPaginationDataListByCondition(index, type, 
+					queryBuilder, SearchType.QUERY_AND_FETCH, null, 100, false);
+			if (qr.getTotalRowNum() == 0) return result;
+			result.put("hits", qr.getTotalRowNum());
+			result.put("index", index);
+			result.put("type", type);
+			String label = MessageUtils.getInstance().getMessage(index + "." + type);
+			result.put("label", label);
+			qr.setResultList(new ArrayList<Map<String, Object>>(qr.getResultList()));
+			RedisClusterUtils.getInstance().set(genLabelDatasCacheKey(index, type, label, query), qr, 120);
+			return result;
 		}
-		
 	}
 	
 }

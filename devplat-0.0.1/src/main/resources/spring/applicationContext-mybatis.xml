@@ -13,7 +13,8 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="typeAliasesPackage" value="org.cisiondata.modules.abstr.entity,
 			org.cisiondata.modules.auth.entity,org.cisiondata.modules.admin.auth.entity,
-			org.cisiondata.modules.log.entity,org.cisiondata.modules.admin.statistics.entity" />
+			org.cisiondata.modules.log.entity,org.cisiondata.modules.admin.statistics.entity,
+			org.cisiondata.modules.datainterface.entity" />
 		<property name="configLocation" value="classpath:mybatis/mybatis-config.xml" />
 		<property name="mapperLocations" value="classpath*:org/cisiondata/modules/**/mapper/**/*.xml" />
 	</bean>

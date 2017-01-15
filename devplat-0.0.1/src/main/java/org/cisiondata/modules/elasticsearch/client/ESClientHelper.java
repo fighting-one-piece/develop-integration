@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -515,7 +516,7 @@ public class ESClientHelper {
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void test() {
 		Client client = ESClient.getInstance().getClient();
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch("financial").setTypes("logistics");
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -533,6 +534,18 @@ public class ESClientHelper {
 		SearchHit[] hits = response.getHits().getHits();
 		for (int i = 0, len = hits.length; i < len; i++) {
 			System.out.println(hits[i].getSource());
+		}
+	}
+	
+	public static void main(String[] args) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("1", "one");
+		map.put("2", "two");
+		for (Map.Entry<String, Object> entry : map.entrySet()) {
+			entry.setValue(entry.getValue() + "01");
+		}
+		for (Map.Entry<String, Object> entry : map.entrySet()) {
+			System.out.println(entry.getValue());
 		}
 	}
 

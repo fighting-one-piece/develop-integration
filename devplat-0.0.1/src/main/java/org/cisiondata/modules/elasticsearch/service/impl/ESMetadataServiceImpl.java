@@ -106,6 +106,7 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>> objectObjectCursor = mappingIterator
 						.next();
 				String index = objectObjectCursor.key;
+				if (index.startsWith(".marvel-es")) continue;
 				List<String> types = indexTypes.get(index);
 				if (null == types) {
 					types = new ArrayList<String>();

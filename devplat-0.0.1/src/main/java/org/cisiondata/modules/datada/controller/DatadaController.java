@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@RequestMapping(value = "/datada")
 public class DatadaController {
 	
 	private Logger LOG = LoggerFactory.getLogger(DatadaController.class);
@@ -20,13 +21,8 @@ public class DatadaController {
 	@Autowired
 	private IDatadaService datadaService = null;
 	
-	@RequestMapping(value = "/datada", method = RequestMethod.GET)
-	public String readDatadaDatasView() {
-		return "/datada/search";
-	}
-	
 	@ResponseBody
-	@RequestMapping(value = "/datada/search", method = RequestMethod.GET)
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	public WebResult readDatadaDatas(String query, String dateline, String searchToken) {
 		LOG.info("query : " + query + " dateline: " + dateline + " searchToken:" + searchToken);
 		WebResult result = new WebResult();
@@ -44,7 +40,7 @@ public class DatadaController {
 	
 	//查询手机号码是否在集群中
 	@ResponseBody
-	@RequestMapping(value="/datada/{phone}/exist")
+	@RequestMapping(value="/{phone}/exist")
 	public WebResult readDataPhone(@PathVariable String phone) {
 		WebResult result = new WebResult();
 		try {
@@ -58,7 +54,7 @@ public class DatadaController {
 	}
 	//查询身份证号码是否存在集群中
 		@ResponseBody
-		@RequestMapping(value="/data/{idcard}/exist")
+		@RequestMapping(value="/{idcard}/exist")
 		public WebResult readDataIdCard(@PathVariable String idCard) {
 			WebResult result = new WebResult();
 			try {

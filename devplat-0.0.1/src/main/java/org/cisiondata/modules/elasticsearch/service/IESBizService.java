@@ -42,6 +42,20 @@ public interface IESBizService {
 	 */
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
 			String query, String scrollId, int size) throws BusinessException;
+	
+	/**
+	 * 根据条件读取数据
+	 * @param index
+	 * @param type
+	 * @param query
+	 * @param scrollId
+	 * @param size
+	 * @param isHighLight
+	 * @return
+	 * @throws BusinessException
+	 */
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
+			String query, String scrollId, int size, boolean isHighLight) throws BusinessException;
 
 	/**
 	 * 多条件查询
@@ -49,7 +63,7 @@ public interface IESBizService {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public QueryResult<Map<String, Object>> readPaginationDataListByIndexType(Map<String, String> map) 
+	public QueryResult<Map<String, Object>> readPaginationDataListByMultiCondition(Map<String, String> map) 
 			throws BusinessException;
 	
 	/**

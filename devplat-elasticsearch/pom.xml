@@ -4,7 +4,7 @@
 
 	<groupId>org.cisiondata</groupId>
 	<artifactId>devplat-elasticsearch</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>DevPlat ElasticSearch Project</name>
@@ -14,7 +14,7 @@
 		<repository>
 			<id>public</id>
 			<name>public repository</name>
-			<url>http://192.168.0.115:8081/repository/maven-public/</url>
+			<url>http://192.168.0.115:8081/nexus/content/groups/public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -22,19 +22,21 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		
-		<repository>
-			<id>releases</id>
-			<name>releases repository</name>
-			<url>http://192.168.0.115:8081/repository/maven-releases/</url>
-		</repository>
-		
-		<repository>
-			<id>snapshots</id>
-			<name>snapshots repository</name>
-			<url>http://192.168.0.115:8081/repository/maven-snapshots/</url>
-		</repository>
 	</repositories>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>public</id>
+			<name>public repository</name>
+			<url>http://192.168.0.115:8081/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,7 +48,7 @@
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 		
 		<!-- Elastic Search依赖包 -->
@@ -130,5 +132,19 @@
 		</plugins>
 
 	</build>
+	
+	<distributionManagement>
+		<repository>  
+            <id>user-release</id>  
+            <name>User Project Release</name>  
+            <url>http://192.168.0.115:8081/nexus/content/repositories/releases/</url>  
+        </repository>  
+  
+        <snapshotRepository>  
+            <id>user-snapshots</id>  
+            <name>User Project SNAPSHOTS</name>  
+            <url>http://192.168.0.115:8081/nexus/content/repositories/snapshots/</url>  
+        </snapshotRepository>  
+	</distributionManagement>
 	
 </project>

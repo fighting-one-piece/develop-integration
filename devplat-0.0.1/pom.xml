@@ -14,274 +14,29 @@
 		<repository>
 			<id>public</id>
 			<name>public repository</name>
-			<url>http://192.168.0.115:8081/repository/maven-public/</url>
+			<url>http://192.168.0.115:8081/nexus/content/groups/public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
 			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		
-		<repository>
-			<id>releases</id>
-			<name>releases repository</name>
-			<url>http://192.168.0.115:8081/repository/maven-releases/</url>
-		</repository>
-		
-		<repository>
-			<id>snapshots</id>
-			<name>snapshots repository</name>
-			<url>http://192.168.0.115:8081/repository/maven-snapshots/</url>
-		</repository>
-
-		<repository>
-			<id>mvn</id>
-			<name>mvn repository</name>
-			<url>http://mvnrepository.com/</url>
-			<releases>
 				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-
-		<repository>
-			<id>maven</id>
-			<name>maven repository</name>
-			<url>http://maven-repository.com/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>repo1</id>
-			<name>maven repo1 repository</name>
-			<url>http://repo1.maven.org/maven2</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>central</id>
-			<name>central repository</name>
-			<url>https://nexus.sourcesense.com/nexus/content/repositories/public</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>ibiblio</id>
-			<name>ibiblio repository</name>
-			<url>http://mirrors.ibiblio.org/maven2</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>cloudhopper</id>
-			<name>cloudhopper repository</name>
-			<url>http://maven.cloudhopper.com/repos/third-party/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>flex</id>
-			<name>flex repository</name>
-			<url>http://repository.sonatype.org/content/groups/public</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>vaadin</id>
-			<name>Vaadin Repository</name>
-			<url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>vaadin-addons</id>
-			<name>Vaadin Addons Repository</name>
-			<url>http://maven.vaadin.com/vaadin-addons</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>jbpm</id>
-			<name>Jbpm Repository</name>
-			<url>http://repository.jboss.com/maven2/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>jbpm-snapshots</id>
-			<name>Jbpm Snapshots Repository</name>
-			<url> http://snapshots.jboss.org/maven2</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>jboss</id>
-			<name>Jboss Repository</name>
-			<url>https://repository.jboss.org/nexus/content/repositories/releases</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>thirdparty-releases</id>
-			<name>JBoss Thirdparty Releases</name>
-			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>activiti</id>
-			<name>Activiti Repository</name>
-			<url>https://maven.alfresco.com/nexus/content/groups/public/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>spring-maven-external</id>
-			<name>Springframework Maven External Repository</name>
-			<url>http://maven.springframework.org/external</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>NexusThirdParty</id>
-			<name>Nexus third party components</name>
-			<url>http://zcode.sunji.net/nexus/content/repositories/thirdparty/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>maven-sinusgear</id>
-			<name>maven-sinusgear</name>
-			<url>http://maven.sinusgear.com/maven_repo/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>atlassian-m2-repository</id>
-			<name>atlassian-m2-repository</name>
-			<url>http://repository.atlassian.com/maven2/</url>
-		</repository>
-
-		<repository>
-			<id>mavenhub-repository</id>
-			<name>mavenhub-repository</name>
-			<url>http://mavenhub.com/mvn/sourceforge-releases/</url>
-		</repository>
-
-		<repository>
-			<id>sourceforge-releases</id>
-			<name>Sourceforge Releases</name>
-			<url>https://oss.sonatype.org/content/repositories/sourceforge-releases/</url>
-		</repository>
-
-		<repository>
-			<id>apache-repo</id>
-			<name>apache Repository</name>
-			<url>https://repository.apache.org/content/groups/public/</url>
-		</repository>
-
-		<repository>
-			<id>travis-ci-repo</id>
-			<name>travis-ci Repository</name>
-			<url>http://maven.mirrors.travis-ci.org/nexus/content/repositories/central</url>
-		</repository>
-
-		<repository>
-			<id>java-repo</id>
-			<name>java Repository</name>
-			<url>http://download.java.net/maven/2/</url>
-		</repository>
-
-		<repository>
-			<id>typesafe</id>
-			<name>Typesafe Repository</name>
-			<url>http://repo.typesafe.com/typesafe/releases/</url>
-		</repository>
-
 	</repositories>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>public</id>
+			<name>public repository</name>
+			<url>http://192.168.0.115:8081/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -292,21 +47,21 @@
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 		
 		<!--DevPlat ElasticSearch依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-elasticsearch</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 		
 		<!--DevPlat Shiro依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-shiro</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 	
 		<!--JUnit依赖包 -->
@@ -407,6 +162,20 @@
 				</configuration>
 			</plugin>
 		</plugins>
-
+		
 	</build>
+	
+	<distributionManagement>
+		<repository>  
+            <id>user-release</id>  
+            <name>User Project Release</name>  
+            <url>http://192.168.0.115:8081/nexus/content/repositories/releases/</url>  
+        </repository>  
+  
+        <snapshotRepository>  
+            <id>user-snapshots</id>  
+            <name>User Project SNAPSHOTS</name>  
+            <url>http://192.168.0.115:8081/nexus/content/repositories/snapshots/</url>  
+        </snapshotRepository>  
+	</distributionManagement>
 </project>

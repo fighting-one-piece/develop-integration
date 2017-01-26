@@ -9,6 +9,8 @@ public interface IQQService {
 	
 	//根据QQ号得到QQ群信息
 	public List<Map<String, Object>> readQQDatas (String qq);
+	//根据QQ群号查询
+	public Map<String, Object> readQQqun(String qunNum);
 	//根据QQ群得到对应群的信息
 	public List<Map<String, Object>> readQQqunDatas(String qunNum);
 	//根据QQ号得到QQ基本信息

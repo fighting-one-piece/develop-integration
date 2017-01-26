@@ -1,31 +1,30 @@
 	#header {
-		width: 100%;
+		width: 98%;
 		height: 7%;
-    	position: relative; 
+    	position: absolute; 
     	top: 0%;
 	}
 	
 	#footer {
-		width: 100%;
-		height: 5%;
-    	position: relative;
-    	bottom: 1%;
+		width: 98%;
+		height: 4.7%;
+    	position: absolute;
+    	bottom: 0;
 	}
 	
 	#body {
 		width: 98%;
-		height: 89%;
-		min-height: 760px;
-		top: 13%;
+		height: 82%;
+		top: 13.4%;
 		left: 2%;
-		position: relative;
+		position: absolute;
 		overflow: scroll; 
 	}
 	#menu {
-		width: 100%;
+		width: 98%;
 		height: 5%;
-    	position: relative; 
-    	top: 8%;
+    	position: absolute; 
+    	top: 8.4%;
     	overflow: scroll;
 	}
 	.ce{

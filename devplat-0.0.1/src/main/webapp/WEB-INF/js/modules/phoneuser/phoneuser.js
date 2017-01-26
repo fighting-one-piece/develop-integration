@@ -30,21 +30,6 @@ function checkContactNumbersa() {
     $("#error").css("display", "none");
     return true;  
 } 
-//添加日志
-function addLog(keyword){
-	$.ajax({
-		url:"/devplat/log/addlog",
-		type:"post",
-		dataType:"json",
-		data:{"keyword":keyword},
-		success:function(){
-			
-		},
-		error:function(){
-			console.log(keyword);
-		}
-	})
-}
 	$(function(){
 		$("#submitss").click(function(){
 			if (checkContactNumbersa()==true) {
@@ -52,13 +37,13 @@ function addLog(keyword){
 				$("#submitss").attr("style", "color:gray;"); 
 				var mobile = $("#query").val();
 				var url =mobile+"/users";  
+				document.getElementById('background').style.display='block';
 				$.ajax({
 					type:"get",
 					url:url,
 					dataType:"json",
 					success:function(result){
 						$("#resultss").empty();
-						addLog(mobile);
 						if (result.code == 2) {
 							$("#resultss").append(result.failure);
 						}
@@ -87,9 +72,11 @@ function addLog(keyword){
 					
 						}
 						
+						document.getElementById('background').style.display='none';
 					},
 					error:function(){
-						alert("查询出错");
+						console.log("ajax发送请求失败！");
+						document.getElementById('background').style.display='none';
 						$("#submitss").attr("disabled", false); 
 						$("#submitss").attr("style", "color:black;"); 
 					}

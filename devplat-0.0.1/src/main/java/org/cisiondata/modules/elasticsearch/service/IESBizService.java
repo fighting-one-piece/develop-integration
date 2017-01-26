@@ -69,10 +69,22 @@ public interface IESBizService {
 	/**
 	 * 根据条件读取标签和命中数
 	 * @param query
+	 * @param includeTypes 指定表集合
 	 * @return
 	 * @throws BusinessException
 	 */
-	public List<Map<String, Object>> readLabelsAndHitsByCondition(String query) throws BusinessException;
+	public List<Map<String, Object>> readLabelsAndHitsIncludeTypes(String query, String... includeTypes) 
+			throws BusinessException;
+	
+	/**
+	 * 根据条件读取标签和命中数
+	 * @param query
+	 * @param excludeTypes 指定排除表集合
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<Map<String, Object>> readLabelsAndHitsExcludeTypes(String query, String... excludeTypes) 
+			throws BusinessException;
 	
 	/**
 	 * 根据条件读取标签数据
@@ -94,5 +106,13 @@ public interface IESBizService {
 	 * @throws BusinessException
 	 */
 	public List<Map<String, Object>> readLogisticsDataList(String query) throws BusinessException;
+	
+	/**
+	 * 根据条件读取物流关系数据列表
+	 * @param query
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<Map<String, Object>> readLogisticsRelationsDataList(String query) throws BusinessException;
 	
 }

@@ -8,9 +8,16 @@ import org.cisiondata.utils.exception.BusinessException;
 public interface ILMInternetService {
 	//众多接口
 	public String relational_query(String type,String index) throws BusinessException;
-	
+	//整合11-14接口
+	public Map<String, Object> readBankPhone(String phone)throws BusinessException;
 	//46、反欺诈黑名单验证
 	public Map<String, String> auditphone(String phone) throws BusinessException;
+	
+	//40、 法院被执行人查询（B机构）
+	public Map<String, String> court_executedPeopleB(String idCard,String name,String phone) throws BusinessException;
+	
+	//39、 学历查询（F机构）
+	public Map<String, String> education_organizeF(String idCard, String name) throws BusinessException;
 	
 	//38、信贷综合信息查询
 	public Map<String, String> readLoanInfo(String phone) throws BusinessException;
@@ -72,7 +79,12 @@ public interface ILMInternetService {
 	//19欺诈案件信息查询 
 	public Map<String, Map<String, String>> readCaseReportInfo(String phone, String idCard, String caseType) throws BusinessException;
 	
-	//18 没做
+	//18 银行卡消费信息查询
+	public Map<String, Map<String, String>> readqueryQuota1(String bankCard, String idCard,  String phone, String name) throws BusinessException;
+	public Map<String, Map<String, String>> readqueryQuota2(String bankCard, String idCard,  String phone, String name) throws BusinessException;
+	public Map<String, Map<String, String>> readqueryQuota3(String bankCard, String idCard,  String phone, String name) throws BusinessException;
+	public Map<String, Map<String, String>> readqueryQuota4(String bankCard, String idCard,  String phone, String name) throws BusinessException;
+	public Map<String, Map<String, String>> readqueryQuota5(String bankCard, String idCard,  String phone, String name) throws BusinessException;
 	
 	//17、逾期短信信息查询 
 	public Map<String, Map<String, String>> phoneIsInBlacklist(String phone) throws BusinessException;

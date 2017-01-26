@@ -1,6 +1,7 @@
 package org.cisiondata.modules.identity.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +52,19 @@ public class QQServiceImpl implements IQQService {
 		}
 		return list;
 	}
-	
+	//根据QQ群号获取QQ群名称、QQ群通知字段
+	public Map<String, Object> readQQqun(String qunNum){
+		Map<String, Object> map = new HashMap<String,Object>();
+		List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+		boolQueryBuilder.should(QueryBuilders.termQuery("qunNum", qunNum));
+		listMap = esService.readDataListByCondition("qq", "qqqundata", boolQueryBuilder);
+		for (int i = 0; i < listMap.size(); i++) {
+			map.put("群名称", listMap.get(i).get("群名称").toString());
+			map.put("群通知", listMap.get(i).get("群通知").toString());
+		}
+		return map;
+	}
 	// 根据QQ号获取QQ群号
 	private List<String> AllList(String qq) {
 		List<Map<String, Object>> listMap = esService.readDataListByCondition("qq", "qqqunrelation", QueryBuilders.termQuery("qqNum", qq));
@@ -76,8 +89,24 @@ public class QQServiceImpl implements IQQService {
 
 	//通过QQ昵称查询
 	@Override
+	@SuppressWarnings("unchecked")
 	public QueryResult<Map<String, Object>> readQQNickData(String nick, String scrollId, int rowNumPerPage) {
-		return esService.readPaginationDataListByCondition("qq", "qqqunrelation", 
+				QueryResult<Map<String, Object>> qr = esService.readPaginationDataListByCondition("qq", "qqqunrelation", 
 				QueryBuilders.matchPhraseQuery("nick", nick), scrollId, rowNumPerPage);
+				List<Map<String, Object>> resultList = qr.getResultList();
+				for (int i = 0; i < resultList.size(); i++) {
+					Map<String, Object> data =(Map<String, Object>) resultList.get(i).get("data");
+					String qunNum = (String) data.get("QQ群号");
+					//通过qunNum获取群名称 群通知
+					List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
+					BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+					boolQueryBuilder.should(QueryBuilders.termQuery("qunNum", qunNum));
+					listMap = esService.readDataListByCondition("qq", "qqqundata", boolQueryBuilder);
+					for (int j = 0; j < listMap.size(); j++) {
+						data.put("群名称", listMap.get(j).get("群名称").toString());
+						data.put("群通知", listMap.get(j).get("群通知").toString());
+					}
+				}
+				return qr;
 	}
 }

@@ -16,6 +16,7 @@ $(document).ready(function(){
 			showDIV();
 		})
 		$("#submitQQ").click(function(){
+			document.getElementById('background').style.display='block';
 			$("#nextQQNick").hide();
 			$(".styleQQThead tr").empty();
 			$(".styleQQTbody tr").empty();
@@ -39,8 +40,34 @@ $(document).ready(function(){
 	            }
 	        }
 		});
+		//关系图与数据间切换
+		$("#toShowForceDiv").click(function(){
+			console.log(123213)
+			$("#resultsQQ").css("visibility","hidden");
+			$("#results").css("visibility","hidden");
+			$("#toShowForceDiv").css("visibility","hidden");
+			$("#QQforceDiv").css("visibility","visible");
+			$("#toShowQQresult").css("visibility","visible");
+		})
+		$("#toShowQQresult").click(function(){
+			$("#QQforceDiv").css("visibility","hidden");
+			$("#toShowQQresult").css("visibility","hidden");
+			$("#resultsQQ").css("visibility","visible");
+			$("#results").css("visibility","visible");
+			$("#toShowForceDiv").css("visibility","visible");
+		})
+		//点击搜索时恢复到初始状态
+		$("#submitQQ").click(function(){
+			$("#toShowForceDiv").css("visibility","hidden");
+			$("#QQforceDiv").css("visibility","hidden");
+			$("#toShowQQresult").css("visibility","hidden");
+			$("#resultsQQ").css("visibility","visible");
+			$("#results").css("visibility","visible");
+			cleanForce();
+		})
 		
 		$("#nextQQNick").click(function(){
+			document.getElementById('background').style.display='block';
 			$("#submitQQ").attr("disabled", true); 
 			$("#nextQQNick").attr("disabled", true); 
 			$("#submitQQ").attr("style", "color:gray;"); 
@@ -76,7 +103,7 @@ $(document).ready(function(){
 			$("#count").empty();
 				$.ajax({
 					url:"qq/nickname/search",
-					type:"get",
+					type:"post",
 					dataType:"json",
 					data:{"nickname":qqnick,"scrollId":scrollId,"rowNumPerPage":rowNumPerPage},
 					success:function(result){
@@ -100,19 +127,47 @@ $(document).ready(function(){
 //								}
 								thead+="<td>"+"QQ昵称"+"</td>";
 								thead+="<td>"+"QQ群号"+"</td>";
+								thead+="<td>"+"群名称"+"</td>";
 								thead+="<td>"+"QQ号"+"</td>";
 								thead+="<td>"+"年龄"+"</td>";
 								thead+="<td>"+"性别"+"</td>";
+								thead+="<td>"+"群通知"+"</td>";
 								$(".styleThead").html(thead+="</tr>");
 								
 								var html ="";
 								for(var i=0;i<result.data.resultList.length;i++){
 									html+="<tr align='left'>";
 									html+="<td>"+result.data.resultList[i].data['QQ昵称']+"</td>";
-									html+="<td><a>"+result.data.resultList[i].data['QQ群号']+"</a></td>";
-									html+="<td>"+result.data.resultList[i].data['QQ号']+"</td>";
-									html+="<td>"+result.data.resultList[i].data['年龄']+"</td>";
-									html+="<td>"+result.data.resultList[i].data['性别']+"</td>";
+									if (! result.data.resultList[i].data['QQ群号']) {
+										html+="<td></td>";
+									}else {
+										html+="<td><a>"+result.data.resultList[i].data['QQ群号']+"</a></td>";
+									}
+									if (! result.data.resultList[i].data['群名称']) {
+										html+="<td></td>";
+									}else {
+										html+="<td>"+result.data.resultList[i].data['群名称']+"</td>";
+									}
+									if (! result.data.resultList[i].data['QQ号']) {
+										html+="<td></td>";
+									}else {
+										html+="<td>"+result.data.resultList[i].data['QQ号']+"</td>";
+									}
+									if (! result.data.resultList[i].data['年龄']) {
+										html+="<td></td>";
+									}else {
+										html+="<td>"+result.data.resultList[i].data['年龄']+"</td>";
+									}
+									if (! result.data.resultList[i].data['性别']) {
+										html+="<td></td>";
+									}else {
+										html+="<td>"+result.data.resultList[i].data['性别']+"</td>";
+									}
+									if (! result.data.resultList[i].data['群通知']) {
+										html+="<td></td>";
+									}else {
+										html+="<td>"+result.data.resultList[i].data['群通知']+"</td>";
+									}
 									html+="</tr>";
 								}
 								//清除QQ基本信息并提示暂无数据
@@ -125,7 +180,6 @@ $(document).ready(function(){
 								$("#count").empty();
 								$("#count").append("搜索共" + result.data.totalRowNum + "结果</br>");
 								
-								addLog(qqnick);
 							} else {
 								//清除群基本信息并提示暂无数据
 								$(".styleThead tr").empty();
@@ -152,9 +206,11 @@ $(document).ready(function(){
 						}
 						$("#submitQQ").attr("disabled", false); 
 						$("#submitQQ").attr("style", "color:black;"); 
+						document.getElementById('background').style.display='none';
 					},
 					error:function(){
-						alert("错误");
+						console.log("ajax发送请求失败！");
+						document.getElementById('background').style.display='none';
 					}
 				})
 		}
@@ -212,7 +268,7 @@ $(document).ready(function(){
 								//清除群基本信息并提示数据量
 								$(".styleTbody").html(html);
 								$("#results .ss").empty();
-								addLog(qq);
+								loadForce(result.data["qun"],result.data["qqBase"]);
 							}
 							if(result.data["qun"].length == 0 && result.data["qqBase"].length == 0){
 								$("#results .ss").append("未找到相关数据");
@@ -230,6 +286,11 @@ $(document).ready(function(){
 						}
 						$("#submitQQ").attr("disabled", false); 
 						$("#submitQQ").attr("style", "color:black;");
+						document.getElementById('background').style.display='none';
+					},
+					error:function(){
+						console.log("ajax发送请求失败！");
+						document.getElementById('background').style.display='none';
 					}
 				})
 			}
@@ -273,8 +334,6 @@ $(document).ready(function(){
 								$(".styleTbody").html(html);
 								$("#results .ss").empty();
 								$("#count").empty();
-								
-								addLog(qunNum);
 							} else {
 								//清除群基本信息并提示暂无数据
 								$(".styleThead tr").empty();
@@ -301,9 +360,11 @@ $(document).ready(function(){
 						}
 						$("#submitQQ").attr("disabled", false); 
 						$("#submitQQ").attr("style", "color:black;"); 
+						document.getElementById('background').style.display='none';
 					},
 					error:function(){
-						alert("错误");
+						console.log("ajax发送请求失败！");
+						document.getElementById('background').style.display='none';
 					}
 				})
 			}
@@ -347,21 +408,6 @@ $(document).ready(function(){
 				},
 				error:function(){
 					alert("错误");
-				}
-			})
-		}
-		//添加日志
-		function addLog(keyword){
-			$.ajax({
-				url:"log/addlog",
-				type:"post",
-				dataType:"json",
-				data:{"keyword":keyword},
-				success:function(){
-					
-				},
-				error:function(){
-					console.log(keyword);
 				}
 			})
 		}

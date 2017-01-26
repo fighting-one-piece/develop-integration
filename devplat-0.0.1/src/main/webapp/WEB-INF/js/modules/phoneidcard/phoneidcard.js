@@ -63,6 +63,7 @@ $(function(){
 						}
 					}
 					var ur=projectName+"/identity/"+phones+"/index/"+indexs+"/type/"+Englientype
+					document.getElementById('background').style.display='block';
 					$.ajax({
 					    type:"get",
 						url:ur,
@@ -73,7 +74,6 @@ $(function(){
 								$("#tbottomResults").empty();
 								
 							});
-							addLog(mobile);
 							if (result.code == 2) {
 								$("#bottomResults").append(result.failure);
 							}
@@ -100,6 +100,11 @@ $(function(){
 							  } else {
 								$("#bottomResults").append("未找到相关数据")
 							}							
+							document.getElementById('background').style.display='none';
+						},
+						error:function(){
+							console.log("ajax发送请求失败！");
+							document.getElementById('background').style.display='none';
 						}
 					});
 		            return true; 
@@ -115,6 +120,7 @@ $(function(){
 			mobile = $("#query").val(); 
 			var url=projectName+"/identity/"+mobile+"/labels"
 			console.log(url);
+			document.getElementById('background').style.display='block';
 			$.ajax({
 				type:"get",
 				url:url,
@@ -179,9 +185,11 @@ $(function(){
 						$("#topResults").append("未找到相关数据")
 					}
 					$("#submitt").attr("disabled", false); 
+					document.getElementById('background').style.display='none';
 				},
 				error:function(){
-					alert("查询出错");
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 					$("#submitt").attr("disabled", false);
 					$("#submits").attr("style", "color:black;"); 
 				}

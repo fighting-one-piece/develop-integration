@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 
-import org.cisiondata.utils.encryption.DESUtils;
+import org.cisiondata.utils.endecrypt.DESUtils;
 
 public class HongGuUtils {
 

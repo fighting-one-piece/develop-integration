@@ -9,13 +9,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>日志查询</title>
-<link rel="stylesheet" href="<%=basePath %>/css/modules/log/log.css"/>
-<link rel="stylesheet" href="<%=basePath %>/css/sweetalert2.min.css"/>
 <link rel="stylesheet" href="<%=basePath %>/css/bootstrap.css"/>
+<link rel="stylesheet" href="<%=basePath %>/css/sweetalert2.min.css"/>
+<link rel="stylesheet" href="<%=basePath %>/css/modules/log/log.css"/>
 
+<script type="text/javascript" src="<%=basePath %>/js/jquery-1.8.0.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/jquery.form.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/sweetalert2.min.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/jquery-1.8.0.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/log/log.js"></script>
 
 </head>
@@ -81,5 +81,6 @@
 	</div>
 	<!-- 点击进入群详情页面后的背景 -->
 	<div id="fadeone" class="black_overlay"></div>
+	<script type="text/javascript" src="<%=basePath %>/js/modules/log/time.js"></script>
 </body>
 </html>

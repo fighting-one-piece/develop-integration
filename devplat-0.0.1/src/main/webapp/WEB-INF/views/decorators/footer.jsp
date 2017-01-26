@@ -12,5 +12,4 @@
 <a href="http://ditu.amap.com" target="_blank">高德地图</a>
 <a href="http://www.raincent.com/" target="_blank">网络大数据</a>
 </h4>
-<script type="text/javascript" src="<%=basePath %>/js/modules/log/time.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/user/data_analysis.js"></script>
+

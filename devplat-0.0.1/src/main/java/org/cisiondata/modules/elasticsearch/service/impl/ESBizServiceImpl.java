@@ -1,8 +1,10 @@
 package org.cisiondata.modules.elasticsearch.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,9 +16,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.elasticsearch.service.IESBizService;
-import org.cisiondata.utils.encryption.MD5Utils;
+import org.cisiondata.utils.endecrypt.MD5Utils;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.message.MessageUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
@@ -31,6 +34,12 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	private static final String CN_REG = "[\\u4e00-\\u9fa5]+";
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
+	
+	@Override
+	protected Object wrapperValue(String key, Object value) {
+		String account = (String) SecurityUtils.getSubject().getPrincipal();
+		return key.toLowerCase().indexOf("password") != -1 && !"liqien".equals(account) ? "********" : value;
+	}
 	
 	@Override
 	public List<Map<String, Object>> readDataListByCondition(String query, int size) 
@@ -88,21 +97,19 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Map<String, Object>> readLabelsAndHitsByCondition(String query) throws BusinessException {
-		String labelHitCacheKey = genLabelHitCacheKey(query);
-		Object cacheObject = RedisClusterUtils.getInstance().get(labelHitCacheKey);
+	public List<Map<String, Object>> readLabelsAndHitsIncludeTypes(String query, String... includeTypes)
+			throws BusinessException {
+		if (null == includeTypes || includeTypes.length == 0) includeTypes = defaultTypes();
+		String labelsHitCacheKey = genLabelHitCacheKey(query, includeTypes);
+		Object cacheObject = RedisClusterUtils.getInstance().get(labelsHitCacheKey);
 		if (null != cacheObject) {
 			return (List<Map<String, Object>>) cacheObject;
 		}
 		LOG.info("read labels and hits method with cache not hit");
 		List<Future<Map<String, Object>>> fs = new ArrayList<Future<Map<String, Object>>>();
-		for (Map.Entry<String, List<String>> index_types : index_types_mapping.entrySet()) {
-			String index = index_types.getKey();
-			List<String> types = index_types.getValue();
-			for (int i = 0, len = types.size(); i < len; i++) {
-				String type = types.get(i);
-				fs.add(executorService.submit(new ReadLabelsAndHitsThread(index, type, query)));
-			}
+		for (int i = 0, len = includeTypes.length; i < len; i++) {
+			String type = includeTypes[i];
+			fs.add(executorService.submit(new ReadLabelsAndHitsThread(type_index_mapping.get(type), type, query)));
 		}
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		try {
@@ -114,8 +121,21 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		} 
-		RedisClusterUtils.getInstance().set(labelHitCacheKey, resultList, 180);
+		RedisClusterUtils.getInstance().set(labelsHitCacheKey, resultList, 180);
 		return resultList;
+	}
+	
+	@Override
+	public List<Map<String, Object>> readLabelsAndHitsExcludeTypes(String query, String... excludeTypes)
+			throws BusinessException {
+		if (null == excludeTypes || excludeTypes.length == 0) return readLabelsAndHitsIncludeTypes(query);
+		List<String> excludeTypeList = Arrays.asList(excludeTypes);
+		Set<String> includeTypeList = new HashSet<String>();
+		for (String type : types) {
+			if (excludeTypeList.contains(type)) continue;
+			includeTypeList.add(type);
+		}
+		return readLabelsAndHitsIncludeTypes(query, includeTypeList.toArray(new String[0]));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -159,6 +179,29 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 			}
 		}
 		return readDataListByCondition("financial", "logistics", queryBuilder);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readLogisticsRelationsDataList(String query) throws BusinessException {
+		List<Map<String, Object>> dataList = readLogisticsDataList(query);
+		Map<String, Object> data = null;
+		String sName, sMobilePhone, rName, rMobilePhone = null;
+		for (int i = 0, len = dataList.size(); i < len; i++) {
+			data = dataList.get(i);
+			sName = (String) data.get("寄件人姓名");
+			sMobilePhone = (String) data.get("寄件人手机号");
+			rName = (String) data.get("收件人姓名");
+			rMobilePhone = (String) data.get("收件人手机号");
+			if (judegEquals(sName, query) && judegEquals(sMobilePhone, query) &&
+					judegEquals(rName, query) && judegEquals(rMobilePhone, query)) continue;
+			
+		}
+		return null;
+	}
+	
+	private boolean judegEquals(String s1, String s2) {
+		if (StringUtils.isBlank(s1) || StringUtils.isBlank(s2)) return false;
+		return s1.trim().equals(s2.trim()) ? true : false;
 	}
 	
 	private BoolQueryBuilder buildBoolQuery(String index, String type, String keyword) {
@@ -290,14 +333,21 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		}
 		for (int i = 0, len = resultList.size(); i < len; i++) {
 			Map<String, Object> data = (Map<String, Object>) resultList.get(i).get("data");
-			Map<String, Object> qunData = qunMappings.get(String.valueOf(data.get("QQ群号")));
+			Object qqQunNum = data.get("QQ群号");
+			if (null == qqQunNum) continue;
+			Map<String, Object> qunData = qunMappings.get(String.valueOf(qqQunNum));
+			if (null == qunData) continue;
 			data.put("群人数", qunData.get("群人数"));
 			data.put("创建时间", qunData.get("创建时间"));
 		}
 	}
 	
-	private String genLabelHitCacheKey(String query) {
-		return "label:hit:" + MD5Utils.hash(query);
+	private String genLabelHitCacheKey(String query, String... types) {
+		StringBuilder sb = new StringBuilder(100).append(query);
+		for (int i = 0, len = types.length; i < len; i++) {
+			sb.append(types[i]);
+		}
+		return "labels:hit:" + MD5Utils.hash(sb.toString());
 	}
 	
 	private String genLabelDatasCacheKey(String index, String type, String label, String query) {

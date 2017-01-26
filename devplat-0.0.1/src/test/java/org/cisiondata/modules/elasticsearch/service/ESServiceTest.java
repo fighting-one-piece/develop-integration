@@ -1,17 +1,14 @@
 package org.cisiondata.modules.elasticsearch.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.cisiondata.modules.abstr.entity.QueryResult;
-import org.cisiondata.modules.datada.service.IDatadaService;
 import org.cisiondata.modules.elasticsearch.plugins.stconverter.analysis.STConvertType;
 import org.cisiondata.modules.elasticsearch.plugins.stconverter.analysis.STConverter;
-import org.cisiondata.modules.identity.service.IMobileIdCardService;
-import org.cisiondata.modules.identity.service.IMobileService;
-import org.cisiondata.utils.spring.SpringContext;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
@@ -25,20 +22,40 @@ import redis.clients.jedis.JedisCluster;
 @ContextConfiguration(locations = {"classpath:spring/applicationContext.xml"})
 public class ESServiceTest {
 	
-	@Resource(name = "datadaService")
-	private IDatadaService datadaService = null;
-	
-	@Resource(name = "mobileService")
-	private IMobileService mobileService = null;
-
-	@Resource(name = "mobileIdCardService")
-	private IMobileIdCardService mobileIdCardService = null;
-	
 	@Resource(name = "esService")
 	private IESService esService = null;
 	
 	@Resource(name = "esBizService")
 	private IESBizService esBizService = null;
+	
+	@Test
+	public void testReadDataListByAttributeValues() {
+		List<String> qqNumList = new ArrayList<String>();
+		long qqNum = 471246431L;
+		for (int i = 0; i < 100; i++) {
+			qqNumList.add(String.valueOf(qqNum + i));
+		}
+		List<Object> resultList = esService.readDataListByCondition("qq", "qqdata", "qqNum", qqNumList, 1);
+		for (Object result : resultList) {
+			System.out.println(result);
+		}
+	}
+	
+	@Test
+	public void testReadLabelsAndHits() {
+		String query = "13512345678";
+		String[] includeTypes = new String[]{"car","house","telecom","business","hotel"};
+		List<Map<String, Object>> r1 = esBizService.readLabelsAndHitsIncludeTypes(query, includeTypes);
+		for (Map<String, Object> r : r1) {
+			System.out.println(r);
+		}
+		System.out.println("#######");
+		String[] excludeTypes = new String[]{"account","accountjd","accountht","email","logistics"};
+		List<Map<String, Object>> r2 = esBizService.readLabelsAndHitsExcludeTypes(query, excludeTypes);
+		for (Map<String, Object> r : r2) {
+			System.out.println(r);
+		}
+	}
 	
 	@Test
 	public void testReadDataListByCondition() {
@@ -66,33 +83,6 @@ public class ESServiceTest {
 //		QueryResult<Map<String, Object>> qr = esBizService.readPaginationDataListByCondition(
 //				"account", "account", "15811024484", null, 100);
 		System.out.println(qr.getTotalRowNum());
-	}
-	
-	@Test
-	public void testReadClassifiedQuery() {
-		List<Map<String, Object>> resultList = mobileIdCardService.readClassifiedQuery(
-				"account", "account", "15811024484");
-		System.out.println("result list size: " + resultList.size());
-	}
-	
-	@Test
-	public void readDatadaData() {
-		QueryResult<Map<String, Object>> data = datadaService.readDatadaDatas("15809911987", null, null);
-		for (Map<String, Object> result : data.getResultList()) {
-			System.out.println(result);
-		}
-		String scrollId = data.getScrollId();
-		while (null != scrollId) {
-			data = datadaService.readDatadaDatas("15809911987", null, scrollId);
-			for (Map<String, Object> result : data.getResultList()) {
-				System.out.println(result);
-			}
-		}
-	}
-
-	@Test
-	public void testAspect() {
-		System.out.println(SpringContext.get("logAspect"));
 	}
 	
 	@Resource(name = "jedisCluster")

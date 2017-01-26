@@ -31,8 +31,8 @@
       <h1>CisionData</h1>
       <form id="loginForm" method="post">
       <div id="nav">
-        <p><input id="username" type="text" name="username" class="input-medium validate[required]" value="test" placeholder="账号" onkeydown="EnterPressLogin();"></p>
-        <p><input id="password" type="password" name="password" class="input-medium validate[required]" value="test123" placeholder="密码" onkeydown="EnterPressLogin();"></p>
+        <p><input id="username" type="text" name="username" class="input-medium validate[required]" value="" placeholder="账号" onkeydown="EnterPressLogin();"></p>
+        <p><input id="password" type="password" name="password" class="input-medium validate[required]" value="" placeholder="密码" onkeydown="EnterPressLogin();"></p>
         <p><input type="text" id="jcaptchaCode" name="jcaptchaCode" class="input-medium validate[required,ajax[ajaxJcaptchaCall]]" placeholder="验证码">
         	<img class="jcaptcha-btn jcaptcha-img" style="margin-left: 10px;" src="/devplat/jcaptcha.jpg" title="点击更换验证码">
             <a class="jcaptcha-btn btn btn-link">换一张</a>

@@ -5,7 +5,8 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.cisiondata.modules.auth.entity.User;
-import org.cisiondata.modules.datainterface.service.IAccessUserService;
+import org.cisiondata.utils.endecrypt.EndecryptUtils;
+import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,6 +37,15 @@ public class AuthServiceTest {
 	}
 	
 	@Test
+	public void testUserServiceReadUserByAccountAndPassword() {
+		String usernameText = "TeSt".toLowerCase().trim();
+        String passwordText = "@#test456";
+        String passwordCipherText = EndecryptUtils.encryptPassword(usernameText, passwordText);
+        User user = authService.readUserByAccountAndPassword(usernameText, passwordCipherText);
+        System.out.println(user.getId() + ":" + user.getIdentity());
+	}
+	
+	@Test
 	public void testRoleServiceReadIdentitiesByUserId() {
 		Set<String> identities = roleService.readRoleIdentitiesByUserId(1L);
 		System.out.println("identities length: " + identities.size());
@@ -57,6 +67,12 @@ public class AuthServiceTest {
 	public void testReadAccessKeyByAccessId() {
 		String accessKey = accessUserService.readAccessKeyByAccessId("Fc89A13022BfdD2f");
 		Assert.assertEquals("F0de5A94aEb07f3a6F0959060fc4B697", accessKey);
+	}
+	
+	@Test
+	public void testA() {
+		int status = (int) RedisClusterUtils.getInstance().get("BankQueryQuota");
+		System.out.println("status: " + status);
 	}
 	
 }

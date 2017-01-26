@@ -40,6 +40,7 @@ $(document).ready(function(){
 			if (! qq.match(new RegExp("[1-9][0-9]{4,10}"))) {
 				 $("#results .ss").append("不是QQ号码！"); 
 			}else {
+				document.getElementById('background').style.display='block';
 			$.ajax({
 				url:"honggu/qqtopyw",
 				type:"get",
@@ -60,6 +61,11 @@ $(document).ready(function(){
 					}
 					$("#submitQQ").attr("disabled", false); 
 					$("#submitQQ").attr("style", "color:black;"); 
+					document.getElementById('background').style.display='none';
+				},
+				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 			}
@@ -70,6 +76,7 @@ $(document).ready(function(){
 			if (! qq.match(new RegExp("[1-9][0-9]{4,10}"))) {
 				 $("#results .ss").append("不是QQ号码！"); 
 			}else {
+				document.getElementById('background').style.display='block';
 			$.ajax({
 				url:"honggu/qqtowb",
 				type:"get",
@@ -87,6 +94,11 @@ $(document).ready(function(){
 					}
 					$("#submitQQ").attr("disabled", false); 
 					$("#submitQQ").attr("style", "color:black;"); 
+					document.getElementById('background').style.display='none';
+				},
+				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 			}
@@ -97,6 +109,7 @@ $(document).ready(function(){
 			if (! qq.match(new RegExp("[1-9][0-9]{4,10}"))) {
 				 $("#results .ss").append("不是QQ号码！"); 
 			}else {
+				document.getElementById('background').style.display='block';
 			$.ajax({
 				url:"honggu/qqtosession",
 				type:"get",
@@ -111,6 +124,11 @@ $(document).ready(function(){
 					}
 					$("#submitQQ").attr("disabled", false); 
 					$("#submitQQ").attr("style", "color:black;"); 
+					document.getElementById('background').style.display='none';
+				},
+				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 			}
@@ -121,6 +139,7 @@ $(document).ready(function(){
 			if (! qq.match(new RegExp("[1-9][0-9]{4,10}"))) {
 				 $("#results .ss").append("不是QQ号码！"); 
 			}else {
+				document.getElementById('background').style.display='block';
 			$.ajax({
 				url:"honggu/qqtotalk",
 				type:"get",
@@ -135,6 +154,11 @@ $(document).ready(function(){
 					}
 					$("#submitQQ").attr("disabled", false); 
 					$("#submitQQ").attr("style", "color:black;"); 
+					document.getElementById('background').style.display='none';
+				},
+				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 			}
@@ -142,6 +166,7 @@ $(document).ready(function(){
 		
 		function pywtoqq() {
 			var url = $("#query").val().trim();
+			document.getElementById('background').style.display='block';
 			$.ajax({
 				url:"honggu/pywtoqq",
 				type:"get",
@@ -156,12 +181,18 @@ $(document).ready(function(){
 					}
 					$("#submitQQ").attr("disabled", false); 
 					$("#submitQQ").attr("style", "color:black;"); 
+					document.getElementById('background').style.display='none';
+				},
+				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		}
 		
 		function wbtoqq() {
 			var url = $("#query").val().trim();
+			document.getElementById('background').style.display='block';
 			$.ajax({
 				url:"honggu/wbtoqq",
 				type:"get",
@@ -176,6 +207,11 @@ $(document).ready(function(){
 					}
 					$("#submitQQ").attr("disabled", false); 
 					$("#submitQQ").attr("style", "color:black;"); 
+					document.getElementById('background').style.display='none';
+				},
+				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		}
@@ -185,6 +221,7 @@ $(document).ready(function(){
 			 if (! phone.match(new RegExp(/^1(3|4|5|7|8)\d{9}$/))) {  
 				 $("#results .ss").append("不是电话号码！"); 
 			    }else{
+			    	document.getElementById('background').style.display='block';
 			$.ajax({
 				url:"honggu/phonetoqq",
 				type:"get",
@@ -199,6 +236,11 @@ $(document).ready(function(){
 					}
 					$("#submitQQ").attr("disabled", false); 
 					$("#submitQQ").attr("style", "color:black;"); 
+					document.getElementById('background').style.display='none';
+				},
+				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 			}

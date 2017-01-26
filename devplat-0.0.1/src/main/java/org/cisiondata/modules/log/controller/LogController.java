@@ -1,14 +1,9 @@
 package org.cisiondata.modules.log.controller;
 
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.cisiondata.modules.log.entity.LogModel;
 import org.cisiondata.modules.log.service.ILogService;
@@ -45,44 +40,6 @@ public class LogController {
 		return map;
 	}
 	
-	//增加日志的方法
-	@RequestMapping("addlog")
-	@ResponseBody
-	public void getAdd(String keyword,HttpSession session,HttpServletRequest request){
-		//id
-		String id = UUID.randomUUID().toString();
-		//session_id
-		String aa = session.getId();
-		//IP
-		String ip = getIPAddress(request);
-		LogModel logModel = new LogModel();
-		logModel.setId(id);
-		logModel.setSessionId(aa);
-		logModel.setIp(ip);
-		logModel.setAccessTime(new Date());
-		logModel.setKeyword(keyword);
-		logService.addLog(logModel);
-	}
-	//获取IP的方法
-	public static String getIPAddress(HttpServletRequest request){
-		String ip = request.getHeader("x-forwarded-for");
-		if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-			ip = request.getHeader("Proxy-Client-IP");
-		}
-		if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-			ip = request.getHeader("WL-Proxy-Client-IP");
-		}
-		if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-			ip = request.getHeader("HTTP_CLIENT_IP");
-		}
-		if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-			ip = request.getHeader("HTTP_XFORWARDED_FOR");
-		}
-		if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-			ip = request.getRemoteAddr();
-		}
-		return ip;
-	}
 	//删除某条日志
 	@RequestMapping(value="dellog")
 	@ResponseBody

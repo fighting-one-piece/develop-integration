@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.datada.service.IDatadaService;
-import org.cisiondata.utils.encryption.SHAUtils;
+import org.cisiondata.utils.endecrypt.SHAUtils;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.http.HttpUtils;
 import org.slf4j.Logger;
@@ -38,9 +38,9 @@ public class DatadaServiceImpl implements IDatadaService {
 	private Gson gson = new Gson();
 
 	@Override
-	public Map<String, Object> readDatadaDatas(String query) throws BusinessException {
+	public List<Map<String, Object>> readDatadaDatas(String query) throws BusinessException {
 		String dateline = String.valueOf(Calendar.getInstance().getTime().getTime()).substring(0, 10);
-		return crawlDatada(query, "0", dateline).getResultList().get(0);
+		return crawlDatada(query, "0", dateline).getResultList();
 	}
 
 	@Override

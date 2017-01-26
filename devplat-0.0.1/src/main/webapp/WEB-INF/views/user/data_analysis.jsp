@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -44,5 +48,13 @@
 			</div>
 		</div>
 	</div>
+	<!-- 点击搜索后的背景显示 -->
+<div id="background" class="all_backgroundcolor" align="center">
+		<img class="background_img"  src="<%=basePath %>/img/backgroundcenter.gif">
+	</div>
+	<script type="text/javascript">
+	
+	</script>
+	<script type="text/javascript" src="<%=basePath %>/js/modules/user/data_analysis.js"></script>
 </body>
 </html>

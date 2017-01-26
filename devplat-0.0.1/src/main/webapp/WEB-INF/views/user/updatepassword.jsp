@@ -9,12 +9,9 @@
 <link rel="stylesheet" href="<%=basePath %>/css/bootstrap.css"/>
 <link rel="stylesheet" href="<%=basePath %>/css/modules/index/index.css"/>
 <link rel="stylesheet" href="<%=basePath %>/css/modules/log/log.css"/>
-<link rel="stylesheet" href="<%=basePath%>/css/modules/admin/resourceTree.css" />
 
 <script type="text/javascript" src="<%=basePath%>/js/sweetalert2.min.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/jquery-1.8.0.js"></script>
-<script type="text/javascript" src="<%=basePath%>/js/modules/admin/resourceTree.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/admin/auser.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/laydate.js"></script>
 <head>
 <meta charset="utf-8">
@@ -41,4 +38,8 @@
 			<button class="btn btn-sm btn-info" id="cancelbtn">取消</button>
 		</div>
 </div>
+<!-- 点击搜索后的背景显示 -->
+<div id="background" class="all_backgroundcolor" align="center">
+		<img class="background_img"  src="<%=basePath %>/img/backgroundcenter.gif">
+	</div>
 </html>

@@ -24,7 +24,6 @@ $(document).ready(function () {
 		var urlDatada = "datada/search?query=" + query + "&dateline=" + dateline + "&searchToken=" + searchToken;
 		search1(urlDatada);
 		search2(url);
-		addLog(query);
 	});
 	
 	//点击下一页
@@ -186,21 +185,6 @@ $(document).ready(function () {
 	}
 	
 	
-	//添加日志
-	function addLog(keyword){
-		$.ajax({
-			url:"log/addlog",
-			type:"post",
-			dataType:"json",
-			data:{"keyword":keyword},
-			success:function(){
-				
-			},
-			error:function(){
-				console.log(keyword);
-			}
-		})
-	}
 });
 
 

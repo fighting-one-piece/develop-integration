@@ -28,9 +28,15 @@ $(function(){
 								
 							})
 							$(".chooseClass").change();
+						},
+						error:function(){
+							console.log("ajax发送请求失败！");
 						}
 					})
 				})
+			},
+			error:function(){
+				console.log("ajax发送请求失败！");
 			}
 		});
 		
@@ -56,6 +62,9 @@ $(function(){
 						});
 						$(".attributeClass").html($select);
 						$("#term").find("input.qual").val("");
+					},
+					error:function(){
+						console.log("ajax发送请求失败！");
 					}
 				})
 			}
@@ -172,14 +181,18 @@ $(function(){
 					var key = $(option).val();
 					url += "&"+key+"="+value;
 				});
+				document.getElementById('background').style.display='block';
 				$.ajax({
 					type:"get",
 					url:url,
 					dataType:"json",
 					success:function(result){
 						showDatas(result);
+						document.getElementById('background').style.display='none';
 					},
 					error:function(){
+						console.log("ajax发送请求失败！");
+						document.getElementById('background').style.display='none';
 						$("#submitMulti").attr("disabled", false);
 						$("#submitMulti").attr("style", "color:black;width: 48px;"); 
 					}
@@ -191,7 +204,6 @@ $(function(){
 		
 		//下一页
 		$("#nextMulti").click(function(){
-			
 			$("#submitMulti").attr("disabled", true); 
 			$("#nextMulti").attr("disabled", true);
 			$("#submitMulti").attr("style", "color:gray;width: 48px;"); 
@@ -208,14 +220,18 @@ $(function(){
 					var key = $(option).val();
 					url += "&"+key+"="+value;
 				});
+				document.getElementById('background').style.display='block';
 				$.ajax({
 					type:"get",
 					url:url,
 					dataType:"json",
 					success:function(result){
 						showDatas(result);
+						document.getElementById('background').style.display='none';
 					},
 					error:function(){
+						console.log("ajax发送请求失败！");
+						document.getElementById('background').style.display='none';
 						$("#submitMulti").attr("disabled", false); 
 						$("#submitMulti").attr("style", "color:black;width: 48px;"); 
 					}
@@ -223,39 +239,98 @@ $(function(){
 			}
 		});
 		
-		/*显示到返回数据界面*/
+		//数组去重
+		Array.prototype.unique = function(){
+			var res = [];
+			var json = {};
+			for(var i = 0; i < this.length; i++){
+				if(!json[this[i]]){
+					res.push(this[i]);
+					json[this[i]] = 1;
+				}
+			}
+			return res;
+		}
+
+		
+		/*显示返回数据到界面*/
 		function showDatas(result){
 			$("#resultsMulti").empty();
-			if(result.data){
-				if (result.data.resultList && result.data.resultList.length > 0){
-					if (result.data.resultList.length < 10 || result.data.totalRowNum == 10) {
-						$("#nextMulti").hide();
-					}else {
-						$("#nextMulti").attr("disabled", false); 
-						$("#nextMulti").attr("style", "color:black;");
-					}
-					$.each(result.data.resultList,function(n,list){
-						var keytr = "<br><table style='width:100%;'><tr><td style='background: #EEE8AA;'>库</td><td style='background: #EEE8AA;'>表</td>";
-						var valuetr = "<tr><td style='background: white;'>"+list["index"]+"</td><td style='background: white;'>"+list["type"]+"</td>";
-						$.each(list.data, function(resultKey, resultValue){
-							keytr += "<td style='background: #EEE8AA;'>"+resultKey+"</td>";
-							valuetr += "<td style='background: white;'>"+resultValue+"</td>";
+			if(result.code == 1){
+				if(result.data){
+					if (result.data.resultList && result.data.resultList.length > 0){
+						if (result.data.resultList.length < 10 || result.data.totalRowNum == 10) {
+							$("#nextMulti").hide();
+						}else {
+							$("#nextMulti").attr("disabled", false); 
+							$("#nextMulti").attr("style", "color:black;");
+						}
+						var keyArr = new Array();
+						$.each(result.data.resultList,function(n,list){
+							$.each(list.data,function(key,value){
+								keyArr.push(key);
+							})
 						});
-						keytr += "</tr>";
-						valuetr += "</tr></table></br>";
-						$("#resultsMulti").append(keytr+valuetr);
-					});
-					$("#resultsMulti").append("<br align='center'>"+"搜索共" + result.data.totalRowNum + "结果</br>")
-				} else {
-					$("#resultsMulti").append("未找到相关数据")
+						keyArr = keyArr.unique();
+						var keyStr = "<br><table style='width:100%;'><tr>";
+						var flag = false;
+						for (var i = 0; i < keyArr.length; i++){
+							if (keyArr[i] == '源文件'){
+								flag = true;
+								continue;
+							}
+							keyStr += "<td style='background: #EEE8AA;'>"+keyArr[i]+"</td>";
+						}
+						if (flag)keyStr += "<td style='background: #EEE8AA;'>源文件</td>";
+						keyStr += "</tr>";
+						var valueStr = "";
+						$.each(result.data.resultList,function(n,list){
+							valueStr += "<tr>"
+								for (var i = 0; i < keyArr.length; i++){
+									if (keyArr[i] == '源文件'){
+										continue;
+									}
+									if (list.data[keyArr[i]]){
+										valueStr += "<td>"+list.data[keyArr[i]]+"</td>";
+									} else {
+										valueStr += "<td></td>";
+									}
+									
+								}
+							if (flag){
+								if(list.data['源文件']){
+									valueStr += "<td>"+list.data['源文件']+"</td>";
+								} else {
+									valueStr += "<td></td>";
+								}
+							}
+							valueStr += "</tr>"
+						});
+						valueStr += "</table>"
+							$("#resultsMulti").append(keyStr + valueStr);
+//					$.each(result.data.resultList,function(n,list){
+//						var keytr = "<br><table style='width:100%;'><tr><td style='background: #EEE8AA;'>库</td><td style='background: #EEE8AA;'>表</td>";
+//						var valuetr = "<tr><td style='background: white;'>"+list["index"]+"</td><td style='background: white;'>"+list["type"]+"</td>";
+//						$.each(list.data, function(resultKey, resultValue){
+//							keytr += "<td style='background: #EEE8AA;'>"+resultKey+"</td>";
+//							valuetr += "<td style='background: white;'>"+resultValue+"</td>";
+//						});
+//						keytr += "</tr>";
+//						valuetr += "</tr></table></br>";
+//						$("#resultsMulti").append(keytr+valuetr);
+//					});
+						$("#resultsMulti").append("<br align='center'>"+"搜索共" + result.data.totalRowNum + "结果</br>")
+						$("#nextMulti").data("scrollId",result.data.scrollId);
+					} else {
+						$("#nextMulti").data("scrollId","");
+						$("#resultsMulti").append("未找到相关数据")
+					}
 				}
 			} else{
-				$("#resultsMulti").append("未找到相关数据")
+				$("#resultsMulti").append(result.failure)
+				$("#nextMulti").data("scrollId","");
 			}
-			$("#nextMulti").data("scrollId",result.data.scrollId);
-			if (result.data.scrollId) {
 				
-			}
 			$("#submitMulti").attr("disabled", false); 
 			$("#submitMulti").attr("style", "color:black;width: 48px;"); 
 		}

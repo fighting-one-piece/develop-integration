@@ -32,10 +32,9 @@ $(document).ready(function(){
 								"</tr>";
 				$(".styleThead").html(styleThead);
 				$(".Tbody").html(html);
-				
 			},
 			error:function(){
-				console.log("错误");
+				console.log("ajax发送请求失败！");
 			}
 		});
 	}
@@ -57,7 +56,7 @@ $(document).ready(function(){
 					var date = new Date(array[i].accessTime);
 					html+='<tr id="'+j+'">'+
 								'<td><a>'+array[i].keyword+'</a></td>'+
-								'<td>'+date.toLocaleString()+'</td>'+
+								'<td>'+FormatDate(date)+'</td>'+
 								'<td>'+array[i].ip+'</td>'+
 //								'<td><button id="'+j+'" class="btn btn-warning" value="'+array[i].keyword+'">删除</button></td>'+
 							'</tr>'	
@@ -71,10 +70,9 @@ $(document).ready(function(){
 								"</tr>";
 				$(".styleThead").html(styleThead);
 				$(".Tbody").html(html);
-				
 			},
 			error:function(){
-				console.log("错误");
+				console.log("ajax发送请求失败！");
 			}
 		});	
 	}
@@ -262,14 +260,23 @@ $(document).ready(function(){
 					html+='<tr>'+
 								'<td>'+array[i].keyword+'</td>'+
 								'<td>'+array[i].ip+'</td>'+
-								'<td>'+date.toLocaleString()+'</td>'+
+								'<td>'+FormatDate(date)+'</td>'+
 							'</tr>'	
 				}
 				$(".styletb").html(html);
 			},
 			error:function(){
-				conlose.log("错误");
+				console.log("ajax发送请求失败！");
 			}
 		})
 	}
 });
+
+function FormatDate (strTime) {
+	var paddNum = function(num){
+        num += "";
+        return num.replace(/^(\d)$/,"0$1");
+     }
+    var date = new Date(strTime);
+    return date.getFullYear()+"-"+paddNum(date.getMonth() + 1)+"-"+paddNum(date.getDate())+" "+paddNum(date.getHours())+":"+paddNum(date.getMinutes())+":"+paddNum(date.getSeconds());
+}

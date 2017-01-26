@@ -18,6 +18,66 @@ public class LMContorller {
 
 	@Resource(name = "lmInternetService")
 	private ILMInternetService lmInternetService = null;
+	
+	//11-14接口整合
+	@ResponseBody
+	@RequestMapping(value="/query/phoneBank")
+	public WebResult readBankCard(String phone){
+		WebResult result = new WebResult();
+		try {
+			Map<String, Object> mapdata = lmInternetService.readBankPhone(phone);
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(mapdata);
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
+	
+	//40. 法院被执行人查询（B机构）
+	@ResponseBody
+	@RequestMapping(value = "/court/executedPeopleB")
+	public WebResult courtexecutedPeopleB(String idCard, String name, String phone) {
+		WebResult result = new WebResult();
+		try {
+			Map<String, String> data = lmInternetService.court_executedPeopleB(idCard, name, phone);
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(data);
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
+
+	@RequestMapping(value = "/ExecutedPeopleB", method = RequestMethod.GET)
+	public String ExecutedPeople() {
+		return "lemoncome/executedPeoleB";
+	}
+	//39、学历查询（F机构）
+	@ResponseBody
+	@RequestMapping(value = "/education/organizeF")
+	public WebResult organizeF(String idCard, String name) {
+		System.err.println(idCard+"----idCard--"+name+"--name--");
+		WebResult result = new WebResult();
+		try {
+			Map<String, String> data = lmInternetService.education_organizeF(idCard, name);
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(data);
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
+	
+	@RequestMapping(value = "/educationf", method = RequestMethod.GET)
+	public String lemonEducationf() {
+		return "lemoncome/lemoneducationf";
+	}
+	
+	
 	// 38、信贷综合信息查询
 	@ResponseBody
 	@RequestMapping(value = "/loan/info")
@@ -62,7 +122,7 @@ public class LMContorller {
 	// 37、学历查询（D机构）
 	@ResponseBody
 	@RequestMapping(value = "/education/organizeD")
-	public WebResult bbs(String idCard, String name) {
+	public WebResult educationorganizeD(String idCard, String name) {
 		WebResult result = new WebResult();
 		try {
 			Map<String, String> data = lmInternetService.education_organizeD(idCard, name);
@@ -479,7 +539,96 @@ public class LMContorller {
 		return "lemoncome/FraudulentInformation";
 	}
 
-	// 18 没做
+
+	// 18、 银行卡消费信息查询1
+		@ResponseBody
+		@RequestMapping(value = "/query/quota1")
+		public WebResult queryQuota1(String bankCard, String idCard, String phone, String name) {
+			WebResult result = new WebResult();
+			try {
+				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota1(bankCard, idCard, phone, name);
+				result.setCode(ResultCode.SUCCESS.getCode());
+				result.setData(data);
+				System.err.println(data + "---data" + "```");
+			} catch (Exception e) {
+				result.setCode(ResultCode.FAILURE.getCode());
+				result.setFailure(e.getMessage());
+			}
+			return result;
+		}
+		
+		// 18、 银行卡消费信息查询2
+		@ResponseBody
+		@RequestMapping(value = "/query/quota2")
+		public WebResult queryQuota2(String bankCard, String idCard, String phone, String name) {
+			WebResult result = new WebResult();
+			try {
+				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota2(bankCard, idCard, phone, name);
+				result.setCode(ResultCode.SUCCESS.getCode());
+				result.setData(data);
+				System.err.println(data + "---data" + "```");
+			} catch (Exception e) {
+				result.setCode(ResultCode.FAILURE.getCode());
+				result.setFailure(e.getMessage());
+			}
+			return result;
+		}
+		
+		// 18、 银行卡消费信息查询3
+		@ResponseBody
+		@RequestMapping(value = "/query/quota3")
+		public WebResult queryQuota3(String bankCard, String idCard, String phone, String name) {
+			WebResult result = new WebResult();
+			try {
+				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota3(bankCard, idCard, phone, name);
+				result.setCode(ResultCode.SUCCESS.getCode());
+				result.setData(data);
+				System.err.println(data + "---data" + "```");
+			} catch (Exception e) {
+				result.setCode(ResultCode.FAILURE.getCode());
+				result.setFailure(e.getMessage());
+			}
+			return result;
+		}
+		
+		// 18、 银行卡消费信息查询4
+		@ResponseBody
+		@RequestMapping(value = "/query/quota4")
+		public WebResult queryQuota4(String bankCard, String idCard, String phone, String name) {
+			WebResult result = new WebResult();
+			try {
+				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota4(bankCard, idCard, phone, name);
+				result.setCode(ResultCode.SUCCESS.getCode());
+				result.setData(data);
+				System.err.println(data + "---data" + "```");
+			} catch (Exception e) {
+				result.setCode(ResultCode.FAILURE.getCode());
+				result.setFailure(e.getMessage());
+			}
+			return result;
+		}
+		
+		// 18、 银行卡消费信息查询5
+		@ResponseBody
+		@RequestMapping(value = "/query/quota5")
+		public WebResult queryQuota5(String bankCard, String idCard, String phone, String name) {
+			WebResult result = new WebResult();
+			try {
+				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota5(bankCard, idCard, phone, name);
+				result.setCode(ResultCode.SUCCESS.getCode());
+				result.setData(data);
+				System.err.println(data + "---data" + "```");
+			} catch (Exception e) {
+				result.setCode(ResultCode.FAILURE.getCode());
+				result.setFailure(e.getMessage());
+			}
+			return result;
+		}
+		
+		@RequestMapping(value = "queryQuota")
+		public String queryquota() {
+			return "lemoncome/queryQuota";
+		}
 
 	// 17、逾期短信信息查询
 	@ResponseBody
@@ -901,6 +1050,11 @@ public class LMContorller {
 	@RequestMapping(value="RelationalQuery",method=RequestMethod.GET)
 	public String RelationalQuery() {
 		return "lemoncome/RelationalQuery";
+	}
+	//银行数据分析页面
+	@RequestMapping(value="lemonBank",method=RequestMethod.GET)
+	public String LemonBankCard(){
+		return "lemoncome/lemonBankCard";
 	}
 	
 }

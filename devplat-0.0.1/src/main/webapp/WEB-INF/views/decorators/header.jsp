@@ -11,45 +11,37 @@
 %>
 <link rel="stylesheet" href="<%=basePath %>/css/sweetalert2.min.css"/>
 <link rel="stylesheet" href="<%=basePath %>/css/bootstrap.css"/>
-<link rel="stylesheet" href="<%=basePath %>/css/modules/index/index.css"/>
 <link rel="stylesheet" href="<%=basePath %>/css/modules/header/header.css"/>
+<link rel="stylesheet" href="<%=basePath %>/css/modules/index/index.css"/>
 <link rel="stylesheet" href="<%=basePath %>/css/modules/phoneuser/phoneuser.css"/>
 <link rel="stylesheet" href="<%=basePath %>/css/modules/qq/qq.css"/>
 <link rel="stylesheet" href="<%=basePath %>/css/modules/user/data_analysis.css"/>
 <link rel="stylesheet" href="<%=basePath %>/css/fileinput.css"/>
 <link rel="stylesheet" href="<%=basePath %>/css/fileinput.min.css"/>
+<link rel="stylesheet" href="<%=basePath %>/css/modules/header/backgroundcolor.css"/>
 
 <%-- <link rel="stylesheet" href="<%=basePath %>/css/modules/log/log.css"/> --%>
 <%-- <script type="text/javascript" src="<%=basePath %>/js/modules/log/log.js"></script> --%>
 
+<script type="text/javascript" src="<%=basePath %>/js/jquery-1.8.0.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/jquery.form.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/sweetalert2.min.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/jquery-1.8.0.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/laydate.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/fileinput.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/fileinput_locale_zh.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/menu/menu.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/index/index.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/qq/qqQuery.js"></script>
 
-<script type="text/javascript" src="<%=basePath %>/js/modules/user/userIdCard.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/multi/multi.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/mobile/mobile.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/phoneuser/phoneuser.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/user/group.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/phoneidcard/phoneidcard.js"></script>
 <%-- <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/fb_lemon.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/NameIdcheck.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/NameIDCardBankcard.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/NamePhoneID.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/NameIdPhoneBank.js"></script> --%>
+<script type="text/javascript" src="<%=basePath %>/js/modules/user/updatepassword.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/NameIDPhoto3D.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/LMall.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/user/updatepassword.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/qq/honggu.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/LMTwice.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/LMThird.js"></script>
-<script type="text/javascript" src="<%=basePath %>/js/modules/appsearch/appsearch.js"></script>
+
 <script type="text/javascript">
 	//处理键盘事件 禁止后退键（Backspace）密码或单行、多行文本框除外 
 	function banBackSpace(e){ 

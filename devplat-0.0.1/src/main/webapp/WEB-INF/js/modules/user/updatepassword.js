@@ -22,6 +22,7 @@ $(document).ready(function () {
 		}else {
 			$("#waring").empty();
 			 $("#waring").append("正在全速处理中····");
+			 document.getElementById('background').style.display='block';
 			 $.ajax({
 				url:"password",
 				type:"post",
@@ -38,6 +39,11 @@ $(document).ready(function () {
 						$("#waring").empty();
 						$("#waring").append("请重试！");
 					}
+					document.getElementById('background').style.display='none';
+				},
+				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			 });
 		}

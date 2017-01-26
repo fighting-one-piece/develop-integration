@@ -1,5 +1,6 @@
 package org.cisiondata.modules.datada.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.cisiondata.modules.abstr.entity.QueryResult;
@@ -13,7 +14,7 @@ public interface IDatadaService {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public Map<String, Object> readDatadaDatas(String query) throws BusinessException;
+	public List<Map<String, Object>> readDatadaDatas(String query) throws BusinessException;
 	
 	/**
 	 * 查询Datada数据

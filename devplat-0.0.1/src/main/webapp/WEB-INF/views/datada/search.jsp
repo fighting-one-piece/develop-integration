@@ -17,7 +17,10 @@
 <div id="buttonArea" align="center">
 <input id="nextDatada" style="display: none;" value="下一页" type="button"/>
 </div>
-
+<!-- 点击搜索后的背景显示 -->
+<div id="background" class="all_backgroundcolor" align="center">
+		<img class="background_img"  src="<%=basePath %>/img/backgroundcenter.gif">
+	</div>
 <!-- 
 <div class="digg"> 
 <span class="disabled"> &lt; </span>

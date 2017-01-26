@@ -1,5 +1,6 @@
 $(function() {
 	var url = "statistics/show";
+	document.getElementById('background').style.display='block';
 	$.ajax({
 		type : "get",
 		url : url,
@@ -49,13 +50,20 @@ $(function() {
 			else {
 				alert("系统故障");
 			}
+			document.getElementById('background').style.display='none';
+		},
+		error:function(){
+			console.log("ajax发送请求失败！");
+			document.getElementById('background').style.display='none';
 		}
+
 	});
 	
 	$('#GridView td').click(function() {
 		var type = $(this).parent().find('td').eq(1).html();
 		console.log(type)
 		$("#results").empty();
+		document.getElementById('background').style.display='block';
 			$.ajax({
 			type : "get",
 			url : "dataType",
@@ -66,7 +74,13 @@ $(function() {
 					var keyStr = "<tr id="+i+"><td style='display:none;'>"+result.data[i].id+"</td><td class='col-md-1'>"+result.data[i].indexs+"</td><td class='col-md-1'>"+result.data[i].type+"</td><td class='col-md-1'>"+result.data[i].attribute_en+"</td><td class='col-md-2'>"+result.data[i].attribute_ch+"</td><td class='col-md-3'><button class='updataBtn btn btn-default' data-dismiss='modal' style='color:red;margin-right:5px;'data-toggle='modal' data-target='#updata'>修改</button><button  class='deleteBtn btn btn-default' style='color:red' data-dismiss='modal'>删除</button></td></tr>";
 					$("#results").append(keyStr);
 				}
-				}
+				document.getElementById('background').style.display='none';
+			},
+			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
+			}
+
 			})
 	})
 	
@@ -87,6 +101,7 @@ $(function() {
 		}).then(function(isConfirm){
 			if(isConfirm == true){
 				console.log("删除OK")
+				document.getElementById('background').style.display='block';
 				$.ajax({
 					url:"dataTypeId",
 					type:"post",
@@ -99,10 +114,13 @@ $(function() {
 						}else{
 							swal("操作失败!");
 						}
+						document.getElementById('background').style.display='none';
 					},
 					error:function(){
-						swal("操作失败!");
+						console.log("ajax发送请求失败！");
+						document.getElementById('background').style.display='none';
 					}
+
 				})
 			}
 		})
@@ -135,6 +153,7 @@ $(function() {
 			animation:"slide-from-top"  
 		}).then(function(isConfirm){
 			if(isConfirm == true){
+				document.getElementById('background').style.display='block';
 				$.ajax({
 					type:"post",
 					url:"saveData",
@@ -146,10 +165,13 @@ $(function() {
 						}else{
 							swal("操作失败!");
 						}
+						document.getElementById('background').style.display='none';
 					},
 					error:function(){
-						swal("操作失败!");
+						console.log("ajax发送请求失败！");
+						document.getElementById('background').style.display='none';
 					}
+
 				})
 			}
 		})
@@ -186,6 +208,7 @@ $(function() {
 				animation:"slide-from-top"  
 			}).then(function(isConfirm){
 				if(isConfirm == true){
+					document.getElementById('background').style.display='block';
 					$.ajax({
 						url:"updateDate",
 						type:"post",
@@ -197,10 +220,13 @@ $(function() {
 							}else{
 								swal("操作失败!");
 							}
+							document.getElementById('background').style.display='none';
 						},
 						error:function(){
-							swal("操作失败!");
+							console.log("ajax发送请求失败！");
+							document.getElementById('background').style.display='none';
 						}
+
 					})
 				}
 			})

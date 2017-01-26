@@ -1,10 +1,155 @@
 $(document).ready(function () {
-
+	
+	//40  法院被执行人查询（B机构）
+	$("#courtB").click(function(){
+		var idCard=$("#idCard").val();
+		var name=$("#name").val();
+		var phone=$("#phone").val();
+//		$("#resultCourtB").empty();
+		document.getElementById('background').style.display='block';
+			$.ajax({
+				url:"court/executedPeopleB",
+				type:"post",
+				dataType:"json",
+				data:{"idCard":idCard,"name":name,"phone":phone},
+				success:function(result){
+					console.log(result);
+					if (result.code == 1) {
+						var tab = "<table style='margin: 5px;'>";
+						var keyStr = "<tr>";
+						var valueStr = "<tr>";
+						var tabs = "<table style='margin: 5px;float:left;'>";
+						var keyStrs = "<tr>";
+						var valueStrs = "<tr>";
+						var ta = "<table style='margin: 5px;float:left;'>";
+						var keys = "<tr>";
+						var values = "<tr>";
+						var tas = "<table style='margin: 5px;float:left;'>";
+						var kes = "<tr>";
+						var vas = "<tr>";
+						$.each(result.data.content,function(key,value){
+							$.each(value,function(k,v){
+								if(k=="Execution"){
+									$.each(v,function(kk,vv){
+	//									console.log(kk)
+										if(kk=="court_bad1"){
+											$.each(vv,function(ks,vs){
+												keyStr += "<td style='background: #EEE8AA;'>"+ks+"</td>";
+												valueStr += "<td>"+vs+"</td>";
+											})
+										}else if (kk=="court_executed2") {
+											$.each(vv,function(ks,vs){
+												keyStrs += "<td style='background: #EEE8AA;'>"+ks+"</td>";
+												valueStrs += "<td>"+vs+"</td>";
+											})
+										}else if (kk=="court_executed1"||kk=="execution") {
+											$.each(vv,function(ks,vs){
+												keys += "<td style='background: #EEE8AA;'>"+ks+"</td>";
+												values += "<td>"+vs+"</td>";
+											})
+										}
+									});
+								}else if (k=="Flag") {
+									$.each(v,function(kk,vv){
+										kes += "<td style='background: #EEE8AA;'>"+kk+"</td>";
+										vas += "<td>"+vv+"</td>";
+									})
+								}
+							});
+						});
+						keyStr += "</tr>";
+						valueStr += "</tr>";
+						tab += keyStr + valueStr +"</table>"
+						keyStrs += "</tr>";
+						valueStrs += "</tr>";
+						tabs += keyStrs + valueStrs +"</table>"
+						keys += "</tr>";
+						values += "</tr>";
+						ta += keys + values +"</table>"
+						kes += "</tr>";
+						vas += "</tr>";
+						tas += kes + vas +"</table>"
+						$("#resultCourtB").append(tab+tabs+ta+tas);
+					}else {
+						tab = "未找到相关信息";
+						$("#resultCourtB").append(tab);
+					}
+					document.getElementById('background').style.display='none';
+				},
+				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
+				}
+			});
+		})
+	
+	//39 学历查询（F机构）
+	$("#lemonSubmit39").click(function(){
+		var name = $("#name").val();
+		var idCard=$("#idCard").val();
+		$("#result39").empty();
+		var url="education/organizeF"
+			document.getElementById('background').style.display='block';
+		$.ajax({
+			url:url,
+			type:"post",
+			dataType:"json",
+			data:{"name":name,"idCard":idCard},
+			success:function(result){
+				var tab;
+				if (result.code == 1) {
+					if (result.data.checkStatus == "S") {
+						
+					
+					tab = "<table style='width:100%;margin: 5px;'><tr>";
+					$.each(result.data.checkResult.college,function(key,value){
+						tab += "<td style='background: #EEE8AA;'>"+key+"</td>";
+					});
+					tab +=	"</tr><tr>";
+					$.each(result.data.checkResult.college,function(key,value){
+						tab += "<td>"+value+"</td>";
+					});
+					tab +=	"<table style='width:100%;margin: 5px;margin-top:15px'><tr>";
+					$.each(result.data.checkResult.degree,function(key,value){
+						tab += "<td style='background: #EEE8AA;'>"+key+"</td>";
+					});
+					tab +=	"</tr><tr>";
+					$.each(result.data.checkResult.degree,function(key,value){
+						tab += "<td>"+value+"</td>";
+					});
+					tab +=	"<table style='width:100%;margin: 5px;margin-top:15px'><tr>";
+					$.each(result.data.checkResult.personBase,function(key,value){
+						tab += "<td style='background: #EEE8AA;'>"+key+"</td>";
+					});
+					tab +=	"</tr><tr>";
+					$.each(result.data.checkResult.personBase,function(key,value){
+						tab += "<td>"+value+"</td>";
+					});
+					tab +=	"</tr></table>";
+				}else {
+					tab = "未找到相关信息";
+				}
+				}else {
+					tab = "未找到相关信息";
+				}
+				$("#result39").append(tab);
+				document.getElementById('background').style.display='none';
+			},
+			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
+			}
+		});
+	});	
+	
+	
+	
 	//37 学历查询（D机构）
 	$("#lemonSubmit37").click(function(){
 		var name = $("#name").val();
 		var idCard=$("#idCard").val();
 		$("#result37").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"education/organizeD",
 			type:"post",
@@ -42,9 +187,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#result37").append(tab);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
-				console.log("系统错误");
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -56,6 +203,7 @@ $(document).ready(function () {
 		var phone = $("#phone").val();
 		console.log(idCard)
 		$("#resultSearch").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"blacklist/search",
 			type:"post",
@@ -185,6 +333,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#resultSearch").append(tab);
+				document.getElementById('background').style.display='none';
+			},
+			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -195,6 +348,7 @@ $(document).ready(function () {
 		var name = $("#name").val();
 		var phone = $("#phone").val();
 		$("#resultBlackList").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"lemonblacklist/blacklistdata",
 			type:"post",
@@ -244,6 +398,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#resultBlackList").append(tab);
+				document.getElementById('background').style.display='none';
+			},
+			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});
@@ -252,6 +411,7 @@ $(document).ready(function () {
 	$("#multiSubmit").click(function(){
 		var phone = $("#phone").val();
 		$("#multiplatfrom").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"multiplatfrom/multi",
 			type:"post",
@@ -274,6 +434,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#multiplatfrom").append(tab);
+				document.getElementById('background').style.display='none';
+			},
+			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -283,6 +448,7 @@ $(document).ready(function () {
 		var idCard = $("#idCard").val();
 		var phone = $("#phone").val();
 		$("#loanOverdue").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"loanOverdue/blackList",
 			type:"post",
@@ -312,6 +478,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#loanOverdue").append(tab);
+				document.getElementById('background').style.display='none';
+			},
+			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -324,6 +495,7 @@ $(document).ready(function () {
 		var name = $("#name").val();
 		var phone = $("#phone").val();
 		$("#blackListCheat").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"blackListCheat/cheat",
 			type:"post",
@@ -353,6 +525,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#blackListCheat").append(tab);
+				document.getElementById('background').style.display='none';
+			},
+			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -362,7 +539,8 @@ $(document).ready(function () {
 		var phone=$("#phone").val();
 		console.log(phone)
 		$("#resultActive").empty();
-			$.ajax({
+		document.getElementById('background').style.display='block';
+		$.ajax({
 				url:"internet/negative",
 				type:"post",
 				dataType:"json",
@@ -391,8 +569,11 @@ $(document).ready(function () {
 						tab = "未找到相关信息";
 					}
 					$("#resultActive").append(tab);
+					document.getElementById('background').style.display='none';
 				},
 				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 		});
 	})
@@ -401,6 +582,7 @@ $(document).ready(function () {
 		$("#GambingDrug").click(function(){
 		var phone=$("#phone").val();
 		$("#resultGamble").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"gambing/dru",
 			type:"post",
@@ -409,6 +591,7 @@ $(document).ready(function () {
 			success:function(result){
 				var tab = "";
 				if (result.code == 1) {
+					if (result.data.content) {
 					$.each(result.data.content,function(index,content){
 						var tab1 = "<table style='width:100%;text-align: center;'>";
 						var keyStr = "<tr>";
@@ -419,12 +602,18 @@ $(document).ready(function () {
 						})
 						tab += tab1+keyStr+valueStr+"</table>";
 					})
+					}else {
+						tab = "未找到相关信息";
+					}
 				}else {
 					tab = "未找到相关信息";
 				}
 				$("#resultGamble").append(tab);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -436,7 +625,8 @@ $(document).ready(function () {
 		var phone=$("#phone").val();
 //		console.log(idCard+"---"+name+"---"+phone)
 		$("#resultInquire").empty();
-			$.ajax({
+		document.getElementById('background').style.display='block';
+		$.ajax({
 				url:"select/recording",
 				type:"post",
 				dataType:"json",
@@ -458,9 +648,11 @@ $(document).ready(function () {
 						tab = "未找到相关信息";
 					}
 					$("#resultInquire").append(tab);
+					document.getElementById('background').style.display='none';
 				},
 				error:function(){
-					alert("系统错误！")
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		})
@@ -472,7 +664,8 @@ $(document).ready(function () {
 		var phone=$("#phone").val();
 //		console.log(idCard+"---"+name+"---"+phone)
 		$("#resultInquireA").empty();
-			$.ajax({
+		document.getElementById('background').style.display='block';
+		$.ajax({
 				url:"select/recordingA",
 				type:"post",
 				dataType:"json",
@@ -494,9 +687,11 @@ $(document).ready(function () {
 						tab = "未找到相关信息";
 					}
 					$("#resultInquireA").append(tab);
+					document.getElementById('background').style.display='none';
 				},
 				error:function(){
-					alert("系统错误！")
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		})
@@ -507,7 +702,8 @@ $(document).ready(function () {
 		var name=$("#name").val();
 		var phone=$("#phone").val();
 		$("#resultP2P").empty();
-			$.ajax({
+		document.getElementById('background').style.display='block';
+		$.ajax({
 				url:"p2p/overdue",
 				type:"post",
 				dataType:"json",
@@ -572,9 +768,11 @@ $(document).ready(function () {
 						tab = "未找到相关信息";
 					}
 					$("#resultP2P").append(tab);
+					document.getElementById('background').style.display='none';
 				},
 				error:function(){
-					alert("系统错误！")
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		})
@@ -587,7 +785,8 @@ $(document).ready(function () {
 		var idType=$("#idType").val();
 		var gender=$("#gender").val();
 		$("#resultCourt").empty();
-			$.ajax({
+		document.getElementById('background').style.display='block';
+		$.ajax({
 				url:"court/execute",
 				type:"post",
 				dataType:"json",
@@ -627,9 +826,11 @@ $(document).ready(function () {
 						tab = "未找到相关信息";
 					}
 					$("#resultCourt").append(tab);
+					document.getElementById('background').style.display='none';
 				},
 				error:function(){
-					alert("系统错误！")
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		})
@@ -639,12 +840,14 @@ $(document).ready(function () {
 		var phone=$("#phone").val();
 		$("#resultTagQuery").empty();
 //		console.log(111)
-			$.ajax({
+		document.getElementById('background').style.display='block';
+		$.ajax({
 				url:"phone/query",
 				type:"post",
 				dataType:"json",
 				data:{"phone":phone},
 				success:function(result){
+					console.log(result);
 					var tab;
 					if (result.code == 1) {
 						$.each(result.data.content,function(index,content){
@@ -681,9 +884,11 @@ $(document).ready(function () {
 						tab = "未找到相关信息";
 					}
 					$("#resultTagQuery").append(tab);
+					document.getElementById('background').style.display='none';
 				},
 				error:function(){
-					alert("系统错误！")
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		})
@@ -699,7 +904,8 @@ $(document).ready(function () {
 		var homeAddress =$("#homeAddress").val();
 		var companyCity =$("#companyCity").val();
 		var companyAddress =$("#companyAddress").val();
-			$.ajax({
+		document.getElementById('background').style.display='block';
+		$.ajax({
 				url:"address/verification",
 				type:"post",
 				dataType:"json",
@@ -795,9 +1001,11 @@ $(document).ready(function () {
 						tab = "未找到相关信息";
 					}
 					$("#resultAddress").append(tab);
+					document.getElementById('background').style.display='none';
 				},
 				error:function(){
-					alert("系统错误！")
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		})
@@ -812,7 +1020,8 @@ $(document).ready(function () {
 		var homeAddress =$("#homeAddress").val();
 		var companyAddress =$("#companyAddress").val();
 		$("#resultBaiduQuery").empty();
-			$.ajax({
+		document.getElementById('background').style.display='block';
+		$.ajax({
 				url:"baidu/integralQuery",
 				type:"post",
 				dataType:"json",
@@ -836,9 +1045,11 @@ $(document).ready(function () {
 						tab = "未找到相关信息";
 					}
 					$("#resultBaiduQuery").append(tab);
+					document.getElementById('background').style.display='none';
 				},
 				error:function(){
-					alert("系统错误！")
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		})
@@ -852,6 +1063,7 @@ $(document).ready(function () {
 			var bankCard = $("#bankCard").val();
 			console.log(name+"--"+idCard+"--"+phone+"--"+bankCard)
 			$("#resultEducations").empty();
+			document.getElementById('background').style.display='block';
 			$.ajax({
 				url:"query/apply",
 				type:"post",
@@ -871,9 +1083,11 @@ $(document).ready(function () {
 						tab = "未找到相关信息";
 					}
 					$("#resultEducations").append(tab);
+					document.getElementById('background').style.display='none';
 				},
 				error:function(){
-					alert("系统错误！")
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		});	
@@ -885,7 +1099,8 @@ $(document).ready(function () {
 	var bankCard = $("#bankCard").val();
 	var name=$("#name").val();
 	$("#blackListCheats").empty();
-		$.ajax({
+	document.getElementById('background').style.display='block';
+	$.ajax({
 			url:"Blacklist/Blacklistcation",
 			type:"post",
 			dataType:"json",
@@ -900,8 +1115,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#blackListCheats").append(tab);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -912,6 +1130,7 @@ $(document).ready(function () {
 		var staffType = $("#staffType").val();
 		var phone=$("#phone").val();
 		$("#resultEducation").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"suspiciousPersonscation",
 			type:"post",
@@ -930,8 +1149,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#resultEducation").append(tab);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -942,6 +1164,7 @@ $(document).ready(function () {
 		var idCard = $("#idCard").val();
 		var caseType=$("#caseType").val();
 		$("#resultCation").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"FraudulentInformation/InformationCation",
 			type:"post",
@@ -960,8 +1183,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#resultCation").append(tab);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -973,6 +1199,7 @@ $(document).ready(function () {
 		var phone = $("#phone").val();
 		$("#resultVerify").empty();
 		console.log(phone)
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"verify/phoneIsInBlacklist",
 			type:"post",
@@ -991,9 +1218,11 @@ $(document).ready(function () {
 				} else {
 					$("#resultVerify").html("未找到相关信息");
 				}
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
-				console.log("错误");
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		}) 
 	});
@@ -1005,6 +1234,7 @@ $(document).ready(function () {
 		var phone = $("#phone").val();
 		console.log(phone+"--15")
 		$("#resultNameQuery").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"phone/OperatorNameQuery",
 			type:"post",
@@ -1021,8 +1251,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#resultNameQuery").append(tab);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});
@@ -1032,6 +1265,7 @@ $(document).ready(function () {
 		console.log(14)
 		var phone = $("#phone").val();
 		console.log(phone)
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"mobile/operatorNameQuery",
 			type:"post",
@@ -1075,9 +1309,11 @@ $(document).ready(function () {
 				} else {
 					$("#resultBindInfo").append("未找到相关信息");
 				}
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
-				console.log("错误");
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		}) 
 	});
@@ -1085,6 +1321,7 @@ $(document).ready(function () {
 	//13、手机号绑定银行卡账动信息查询(只支持移动)
 	$("#SubmitPhoneActive").click(function(){
 		var phone = $("#phone").val();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"phoneactivecation",
 			type:"post",
@@ -1105,9 +1342,11 @@ $(document).ready(function () {
 				} else {
 					$("#resultBindInfo").append("未找到相关信息");
 				}
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
-				console.log("错误");
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		}) 
 	});
@@ -1116,6 +1355,7 @@ $(document).ready(function () {
 	// 根据手机号查询银行卡还款情况
 	$("#SubmitPhoneInfo").click(function(){
 		var phone = $("#phone").val();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"phoneinfocation",
 			type:"post",
@@ -1151,9 +1391,11 @@ $(document).ready(function () {
 				}else{
 					$("#resultInfo").html("未找到相关信息");
 				}
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
-				console.log("错误");
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		}) 
 	});
@@ -1161,6 +1403,7 @@ $(document).ready(function () {
 	//11、手机号绑定银行卡出入账查询(只支持移动) 
 	$("#SubmitPhoneLines").click(function(){
 		var phone = $("#phone").val();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"phoneinfocation/query",
 			type:"post",
@@ -1277,9 +1520,11 @@ $(document).ready(function () {
 				}else{
 					$("#resultLines").html("未找到相关信息");
 				}
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
-				console.log("错误");
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		})
 	});
@@ -1287,12 +1532,14 @@ $(document).ready(function () {
 	//10、手机号当前状态查询(只支持移动)
 	$("#SubmitMoble").click(function(){
 		var phone = $("#phone").val();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"phonecation/query",
 			type:"post",
 			dataType:"json",
 			data:{"phone":phone},
 			success:function(result){
+				console.log(result);
 				if(result.code == 1){				
 					var html="<table>" +
 					"<tr><td>是否存在</td><td>当前状态</td></tr>" +
@@ -1302,9 +1549,11 @@ $(document).ready(function () {
 				}else{
 					$("#resultphone").html("未找到相关信息");
 				}
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
-				console.log("错误");
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});
@@ -1312,12 +1561,14 @@ $(document).ready(function () {
 	//9、手机号在网时长查
 	$("#SubmitMoble1").click(function(){
 		var phone = $("#phone").val();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"mobile/OnlineIntervalQuery",
 			type:"post",
 			dataType:"json",
 			data:{"phone":phone},
 			success:function(result){
+				console.log(result);
 				if(result.code == 1){				
 					var html="<table>" +
 					"<tr><td>是否存在</td><td>在网时长</td></tr>" +
@@ -1327,9 +1578,11 @@ $(document).ready(function () {
 				}else{
 					$("#resultPhone").html("未找到相关信息");
 				}
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
-				console.log("错误");
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});
@@ -1339,6 +1592,7 @@ $(document).ready(function () {
 		var idCard = $("#idCard").val();
 		var name = $("#name").val();
 		$("#resultphoto").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"idphotocation",
 			type:"post",
@@ -1352,27 +1606,29 @@ $(document).ready(function () {
 				}else{					
 					$("#resultphoto").html("未找到相关信息");
 				}
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
-				console.log("错误");
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
 	
 	//7、学历查询 
-	$("#lemonSubmit").click(function(){
+	$("#lemonSubmit7").click(function(){
 		var idCard = $("#query").val();
 		var name = $("#name").val();
 		var levelNo = $("#levelNo").val();
 		$("#resultVerifyEeducation").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
-			url:"lemoneducation",
+			url:"lemoneducation7",
 			type:"post",
 			dataType:"json",
 			data:{"idCard":idCard,"name":name,"levelNo":levelNo},
 			success:function(result){
-				console.log(result.code)
-				console.log(result.data)
+				console.log(result);
 				var tab;
 				if (result.code == 1) {
 					tab =	"<p>degree</p>";
@@ -1414,6 +1670,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#resultVerifyEeducation").append(tab);
+				document.getElementById('background').style.display='none';
+			},
+			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -1424,6 +1685,7 @@ $(document).ready(function () {
 		var name = $("#name").val();
 		console.log(6)
 		$("#resultBankcard2item").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"bankcard/item",
 			type:"post",
@@ -1439,8 +1701,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#resultBankcard2item").append(html);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});
@@ -1452,6 +1717,7 @@ $(document).ready(function () {
 		var s=images.split(',');
 		var image=s[1];
 		$("#result3D").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"nameIDPhoto3Dcation",
 			type:"post",
@@ -1470,8 +1736,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#result3D").append(html);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});
@@ -1483,6 +1752,7 @@ $(document).ready(function () {
 		var idCard=$("#idCard").val();
 		var bankCard=$("#bankCard").val();
 		$("#resultBankcard4item").empty();
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"bankcard/4item",
 			type:"post",
@@ -1500,8 +1770,11 @@ $(document).ready(function () {
 					tab = "未找到相关信息";
 				}
 				$("#resultBankcard4item").append(html);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -1513,6 +1786,7 @@ $(document).ready(function () {
 		var idCard=$("#idCard").val();
 		$("#resultNamePhoneCheck").empty();
 		console.log(name+"--"+idCard+"--"+phone+"--")
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"idNamePhoneCheck",
 			type:"post",
@@ -1532,8 +1806,11 @@ $(document).ready(function () {
 					html = "未找到相关信息";
 				}
 				$("#resultNamePhoneCheck").append(html);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -1545,6 +1822,7 @@ $(document).ready(function () {
 		var idCard=$("#idCard").val();
 		$("#resultAccountVerify").empty();
 		console.log(name+"--"+idCard+"--"+bankCard+"--")
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"nameIdCard/AccountVerify",
 			type:"post",
@@ -1562,8 +1840,11 @@ $(document).ready(function () {
 					html = "未找到相关信息";
 				}
 				$("#resultAccountVerify").append(html);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -1574,6 +1855,7 @@ $(document).ready(function () {
 		var idCard=$("#idCard").val();
 		$("#resultAccountVerifyM").empty();
 		console.log(name+"--"+idCard+"--"+bankCard+"--")
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"nameIdCard/AccountVerifyM",
 			type:"post",
@@ -1591,8 +1873,11 @@ $(document).ready(function () {
 					html = "未找到相关信息";
 				}
 				$("#resultAccountVerifyM").append(html);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -1604,6 +1889,7 @@ $(document).ready(function () {
 		$("#resultIdNameCheck").empty();
 		console.log(name+"--"+idCard+"--")
 		console.log(1)
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:"idName/Check",
 			type:"post",
@@ -1621,8 +1907,11 @@ $(document).ready(function () {
 					html = "未找到相关信息";
 				}
 				$("#resultIdNameCheck").append(html);
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});	
@@ -1632,6 +1921,7 @@ $(document).ready(function () {
 		var type=  $("input[name='searchType']:checked").val()
 		var index = $("input[name='searchContent']").val()
 		$("#pvalue").html("查询中......").css("color","red");
+		document.getElementById('background').style.display='block';
 		$.ajax({
 			url:'relational/query',
 			type:'get',
@@ -1643,9 +1933,11 @@ $(document).ready(function () {
 				}else{
 					$("#pvalue").html("查询失败").css("color","black");
 				}
+				document.getElementById('background').style.display='none';
 			},
 			error:function(){
-				alert("系统故障")
+				console.log("ajax发送请求失败！");
+				document.getElementById('background').style.display='none';
 			}
 		});
 	});

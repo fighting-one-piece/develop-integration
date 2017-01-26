@@ -67,5 +67,6 @@
 				<a href="<%=basePath %>/excludeUtils">Data Show</a>
 			</h3>
 </div>
+<script type="text/javascript" src="<%=basePath %>/js/modules/user/group.js"></script>
 </body>
 </html>

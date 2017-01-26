@@ -12,5 +12,9 @@
 </div>
 <div id="multiplatfrom" align="center" style="top: 15%;position: absolute;left: 33%;">
 </div>
+<!-- 点击搜索后的背景显示 -->
+<div id="background" class="all_backgroundcolor" align="center">
+		<img class="background_img"  src="<%=basePath %>/img/backgroundcenter.gif">
+	</div>
 </body>
 </html>

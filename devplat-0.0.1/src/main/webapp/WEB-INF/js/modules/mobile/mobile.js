@@ -1,6 +1,6 @@
 
 function checkContactNumber() { 
-    var phone = $("#query").val(); 
+    var phone = $("#query").val().trim();; 
     var isMobile = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1})|(17[0-9]{1})|(14[0-9]{1}))+\d{8})$/;  
     var isPhone = /^(?:(?:0\d{2,3})-)?(?:\d{7,8})(-(?:\d{3,}))?$/;;  
     var error = "<label>请正确填写电话号码，例如:13511111111或010-11111111</label>";  
@@ -13,8 +13,8 @@ function checkContactNumber() {
         }  
     }  
     //如果为0开头则验证固定电话号码  
-    else if (mobile.substring(0, 1) == 0) {  
-        if (!isPhone.test(mobile)) {  
+    else if (phone.substring(0, 1) == 0) {  
+        if (!isPhone.test(phone)) {  
         	$("#error").css("display", "block"); 
         	$("#error").html(error);    
             return false;  
@@ -30,21 +30,6 @@ function checkContactNumber() {
     $("#error").css("display", "none");
     return true;  
 }
-//添加日志
-function addLog(keyword){
-	$.ajax({
-		url:"log/addlog",
-		type:"post",
-		dataType:"json",
-		data:{"keyword":keyword},
-		success:function(){
-			
-		},
-		error:function(){
-			console.log(keyword);
-		}
-	})
-}
 
 	$(function(){
 		$("#submits").click(function(){
@@ -53,6 +38,7 @@ function addLog(keyword){
 				$("#submits").attr("style", "color:gray;"); 
 				var moblie = $("#query").val();
 				var url = "mobile/" + moblie;
+				document.getElementById('background').style.display='block';
 				$.ajax({
 					type:"get",
 					url:url,
@@ -80,20 +66,19 @@ function addLog(keyword){
 						});
 						$("#results").append(str+"</table>");
 						console.log(str);
-					addLog(moblie);
 					$("#submits").attr("disabled", false); 
 					$("#submits").attr("style", "color:black;"); 
+					document.getElementById('background').style.display='none';
 					},
 					error:function(){
-						alert("查询出错");
+						console.log("ajax发送请求失败！");
+						document.getElementById('background').style.display='none';
 						$("#submits").attr("disabled", false); 
 						$("#submits").attr("style", "color:black;"); 
 					}
 				});
 			} else {			
 				alert("请重新输出电话号码！");
-				checkContactNumber()==false;
-				
 			}
 		
 		});

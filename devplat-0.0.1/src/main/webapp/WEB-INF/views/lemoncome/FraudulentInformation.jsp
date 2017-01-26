@@ -1,6 +1,9 @@
 <html>
-<%@ page language="java" contentType="text/html; charset=utf-8"
-    pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%
+	String path = request.getContextPath(); 
+ 	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path;
+%>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
@@ -14,5 +17,9 @@
 	<p><input id="lemonSubmitone" type="button" value="确定"/></p>
 </div>
 <div id="resultCation" align="center" style="top: 30%;position: absolute;"></div>
+<!-- 点击搜索后的背景显示 -->
+<div id="background" class="all_backgroundcolor" align="center">
+		<img class="background_img"  src="<%=basePath %>/img/backgroundcenter.gif">
+	</div>
 </body>
 </html>

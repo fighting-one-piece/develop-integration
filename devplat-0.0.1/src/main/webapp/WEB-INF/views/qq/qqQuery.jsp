@@ -1,9 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%
-	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://" + request.getServerName() + "//" + request.getServerPort()
-			+ path + "/";
+	String path = request.getContextPath(); 
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path;
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -16,15 +15,17 @@
 </head>
 <body>
 	<div>
-		<div class="row" align="center" style="margin-top: 20px;">
+		<div class="row" align="center" style="margin-top: 20px;width: 98%;">
 			<div class="input-group" style="width: 300px;">
 				<input id="query" type="text" class="form-control" onkeydown="EnterPressQuery()" 
 				style="width: 280px"  placeholder="输入QQ号或者QQ群号或者QQ昵称"/> 
 				<span class="input-group-btn" >
 					<input class="btn btn-default" type="button" id="submitQQ" value="搜索"/>
 				</span>
+			<button class="btn btn-warning" style="position: absolute;visibility: hidden;" id="toShowForceDiv">查看关系图</button>
+			<button class="btn btn-warning" style="position: absolute;visibility: hidden;" id="toShowQQresult">查看数据</button>
 			</div>
-			<div class="input-group" style="width: 100%; position: absolute; padding-top: 0.3%;">
+			<div class="input-group" style="width: 98%; position: absolute; padding-top: 0.3%;">
 				<!-- <input id="queryQQ" type="text" class="form-control"
 					 onkeydown="EnterPressQun()" 
 	value="输入QQ群号" onfocus="if(value=='输入QQ群号'){value=''}" 
@@ -75,6 +76,8 @@
 				</table>
 				<label class="ss"></label>
 			</div>
+			<!-- 关系图div -->
+			<div id="QQforceDiv" style="width: 97%;height: 89%;visibility: hidden;"></div>
 			<!-- 显示群信息 -->
 			<div id="results" align="center">
 				<table  style="width: 100%;">
@@ -116,5 +119,14 @@
 	</div>
 	<!-- 点击进入群详情页面后的背景 -->
 	<div id="fade" class="black_overlay"></div>
+	<!-- 点击搜索后的背景显示 -->
+	<div id="background" class="all_backgroundcolor" align="center">
+		<img class="background_img"  src="<%=basePath %>/img/backgroundcenter.gif">
+	</div>
+	<!-- 请不要更改这些js的导入顺序和位置 -->
+	<script type="text/javascript" src="<%=basePath%>/js/modules/user/map/force/echarts.js"></script>
+	<script type="text/javascript" src="<%=basePath%>/js/modules/qq/qqForce.js"></script>
+	<script type="text/javascript" src="<%=basePath %>/js/modules/qq/qqQuery.js"></script>
+	<script type="text/javascript" src="<%=basePath %>/js/modules/qq/honggu.js"></script>
 </body>
 </html>

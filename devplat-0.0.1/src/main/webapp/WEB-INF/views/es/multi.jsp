@@ -1,12 +1,13 @@
 <html>
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-
+<%
+	String path = request.getContextPath(); 
+ 	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path;
+%>
 
 <html>
 <head>
-<style type="text/css">
 
-</style>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>高级查询</title>
 </head>
@@ -34,6 +35,10 @@
 	<div id="buttonArea" align="center">
 		<input id="nextMulti" style="display: none;" value="下一页" type="button"/>
 	</div>
-	
+<!-- 点击搜索后的背景显示 -->
+<div id="background" class="all_backgroundcolor" align="center">
+		<img class="background_img"  src="<%=basePath %>/img/backgroundcenter.gif">
+	</div>	
+<script type="text/javascript" src="<%=basePath %>/js/modules/multi/multi.js"></script>
 </body>
 </html>

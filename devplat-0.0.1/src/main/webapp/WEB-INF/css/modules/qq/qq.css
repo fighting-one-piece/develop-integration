@@ -3,7 +3,16 @@
 #results{
 	margin-left: 20px;
 }
-#resultsQQ{
+#resultsQQ {
+	margin-left: 20px;
+	margin-top: 10px;
+}
+#QQforceDiv {
+	position: absolute;
+	top: 9%;
+	left: 0;
+	right: 0;
+	bottom: 0;
 	margin-left: 20px;
 	margin-top: 10px;
 }

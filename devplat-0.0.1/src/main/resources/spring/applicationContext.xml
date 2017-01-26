@@ -19,7 +19,6 @@
 	<!-- 加载文件配置 -->
 	<context:property-placeholder location="classpath*:database/jdbc.properties" ignore-unresolvable="true"/>
 	<context:property-placeholder location="classpath*:database/redis.properties" ignore-unresolvable="true"/>
-	<context:property-placeholder location="classpath*:shiro/shiro.properties" ignore-unresolvable="true"/>
 		
 	<!-- DBCP数据源配置 -->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -89,7 +88,6 @@
     <!-- Import Resource -->
     <import resource="classpath:spring/applicationContext-task.xml"/>
     <import resource="classpath:spring/applicationContext-redis.xml"/>
-    <import resource="classpath:spring/applicationContext-shiro.xml"/>
     <import resource="classpath:spring/applicationContext-mybatis.xml"/>
     
 </beans>

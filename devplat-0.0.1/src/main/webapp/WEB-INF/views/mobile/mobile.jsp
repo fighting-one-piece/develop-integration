@@ -17,5 +17,10 @@ onkeydown="EnterPressMobile()" placeholder="请输入手机号码" />
 <div id="results" align="center">
 	
 </div>
+<!-- 点击搜索后的背景显示 -->
+<div id="background" class="all_backgroundcolor" align="center">
+	<img class="background_img"  src="<%=basePath %>/img/backgroundcenter.gif">
+</div>
+<script type="text/javascript" src="<%=basePath %>/js/modules/mobile/mobile.js"></script>
 </body>
 </html>

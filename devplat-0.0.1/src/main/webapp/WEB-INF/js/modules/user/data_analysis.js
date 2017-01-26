@@ -4,7 +4,8 @@ $(document).ready(function() {
 		$('#photoCover').val($(this).val());
 	});
 	$('#btn').click(function(){
-		if(checkData()){	
+		if(checkData()){
+			document.getElementById('background').style.display='block';
 			$.ajax({
 				url : "data_analy/uploadexcel",
 				type : "post",
@@ -50,9 +51,11 @@ $(document).ready(function() {
 						
 						$(".ExcelTbody").html(ExcelTbody);
 					}
+					document.getElementById('background').style.display='none';
 				},
-				error : function() {
-					console.log("出错");
+				error:function(){
+					console.log("ajax发送请求失败！");
+					document.getElementById('background').style.display='none';
 				}
 			});
 		}

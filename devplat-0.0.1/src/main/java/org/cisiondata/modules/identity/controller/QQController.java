@@ -1,4 +1,5 @@
 package org.cisiondata.modules.identity.controller;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import javax.annotation.Resource;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.elasticsearch.service.IESBizService;
+import org.cisiondata.modules.elasticsearch.service.IESService;
 import org.cisiondata.modules.identity.service.IQQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,9 @@ public class QQController {
 	
 	@Autowired
 	private IQQService qqService = null;
+	
+	@Resource(name = "esService")
+	private IESService esService = null;
 	
 	@Resource(name = "esBizService")
 	private IESBizService esBizService = null;
@@ -120,12 +125,16 @@ public class QQController {
 		WebResult result = new WebResult();
 		try {
 			List<Map<String, Object>> list = qqService.readQQqunDatas(qunNum);
+			Map<String, Object> map = qqService.readQQqun(qunNum);
 			for (int i = 0; i < list.size(); i++) {
 				list.get(i).remove("更新时间");
 				list.get(i).remove("源文件");
 				list.get(i).remove("录入时间");
 				list.get(i).remove("index");
 				list.get(i).remove("type");
+				for (Map.Entry<String, Object> entry:map.entrySet()) {
+					list.get(i).put(entry.getKey(), entry.getValue());
+				}
 			}
 			result.setData(list);
 			result.setCode(ResultCode.SUCCESS.getCode());
@@ -135,6 +144,24 @@ public class QQController {
 		}
 		return result;
 	}
+	
+	@ResponseBody
+	@RequestMapping(value="/quns/search")
+	//得到群信息
+	public WebResult readQQqunsDatas(String[] qunNumList){
+		WebResult result = new WebResult();
+		try {
+			System.out.println(qunNumList);
+			
+			result.setData(esService.readDataListByCondition("qq", "qqqunrelation", "qunNum", Arrays.asList(qunNumList), 200));
+			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
+	
 	//QQ查询页面
 	@RequestMapping(method=RequestMethod.GET)
 	public ModelAndView toMoblie(){

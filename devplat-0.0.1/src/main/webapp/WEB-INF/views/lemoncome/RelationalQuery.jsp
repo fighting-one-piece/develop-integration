@@ -45,6 +45,9 @@
 				<p id="pvalue" style="font-size: 16px;float: left;" align="center">返回结果:</p>
 			</div>
 	</div>
-	
+	<!-- 点击搜索后的背景显示 -->
+<div id="background" class="all_backgroundcolor" align="center">
+		<img class="background_img"  src="<%=basePath %>/img/backgroundcenter.gif">
+	</div>
 </body>
 </html>

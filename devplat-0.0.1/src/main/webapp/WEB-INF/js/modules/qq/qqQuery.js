@@ -42,7 +42,6 @@ $(document).ready(function(){
 		});
 		//关系图与数据间切换
 		$("#toShowForceDiv").click(function(){
-			console.log(123213)
 			$("#resultsQQ").css("visibility","hidden");
 			$("#results").css("visibility","hidden");
 			$("#toShowForceDiv").css("visibility","hidden");
@@ -224,7 +223,6 @@ $(document).ready(function(){
 					dataType:"json",
 					data:{"qqNum":qq},
 					success:function(result){
-						console.log(!result.data)
 						if(result.data){
 							$("#results .ss").empty();
 							$("#resultsQQ .ss").empty();
@@ -268,7 +266,7 @@ $(document).ready(function(){
 								//清除群基本信息并提示数据量
 								$(".styleTbody").html(html);
 								$("#results .ss").empty();
-								loadForce(result.data["qun"],result.data["qqBase"]);
+								loadForce(qq,result.data["qun"],result.data["qqBase"]);
 							}
 							if(result.data["qun"].length == 0 && result.data["qqBase"].length == 0){
 								$("#results .ss").append("未找到相关数据");

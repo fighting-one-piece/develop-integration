@@ -4,7 +4,9 @@
 	String path = request.getContextPath(); 
  	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path;
 %>
-
+<head>
+	<title>数据接口</title>
+</head>
 <body>
 <h5 align="center">&nbsp;</h5>
 <div align="left" style="left: 40%;position: absolute;font-size: large;">

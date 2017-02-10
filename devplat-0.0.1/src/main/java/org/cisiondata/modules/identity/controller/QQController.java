@@ -44,13 +44,6 @@ public class QQController {
 		try {
 			//得到基本信息
 			List<Map<String, Object>> listBase = qqService.readQQData(qqNum);
-			for (int i = 0; i < listBase.size(); i++) {
-				listBase.get(i).remove("更新时间");
-				listBase.get(i).remove("源文件");
-				listBase.get(i).remove("录入时间");
-				listBase.get(i).remove("index");
-				listBase.get(i).remove("type");
-			}
 			//得到群信息
 			List<Map<String, Object>> qun = qqService.readQQDatas(qqNum);
 			map.put("qqBase", listBase);
@@ -67,7 +60,7 @@ public class QQController {
 	
 //	//根据QQ号码查询对应的群信息
 //	@ResponseBody
-//	@RequestMapping(value="/qun/search")
+//	@RequestMapping(value="/qq/search")
 //	public WebResult readQQDatas(@RequestParam String qqNum){
 //		WebResult result = new WebResult();
 //		try {
@@ -101,15 +94,7 @@ public class QQController {
 	public WebResult readQQData(@RequestParam String qqNum){
 		WebResult result = new WebResult();
 		try {
-			List<Map<String, Object>> list = qqService.readQQData(qqNum);
-			for (int i = 0; i < list.size(); i++) {
-				list.get(i).remove("更新时间");
-				list.get(i).remove("源文件");
-				list.get(i).remove("录入时间");
-				list.get(i).remove("index");
-				list.get(i).remove("type");
-			}
-			result.setData(list);
+			result.setData(qqService.readQQData(qqNum));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
@@ -124,19 +109,7 @@ public class QQController {
 	public WebResult readQQqunDatas(@RequestParam String qunNum){
 		WebResult result = new WebResult();
 		try {
-			List<Map<String, Object>> list = qqService.readQQqunDatas(qunNum);
-			Map<String, Object> map = qqService.readQQqun(qunNum);
-			for (int i = 0; i < list.size(); i++) {
-				list.get(i).remove("更新时间");
-				list.get(i).remove("源文件");
-				list.get(i).remove("录入时间");
-				list.get(i).remove("index");
-				list.get(i).remove("type");
-				for (Map.Entry<String, Object> entry:map.entrySet()) {
-					list.get(i).put(entry.getKey(), entry.getValue());
-				}
-			}
-			result.setData(list);
+			result.setData(qqService.readQQqunDatas(qunNum));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
@@ -151,9 +124,22 @@ public class QQController {
 	public WebResult readQQqunsDatas(String[] qunNumList){
 		WebResult result = new WebResult();
 		try {
-			System.out.println(qunNumList);
-			
 			result.setData(esService.readDataListByCondition("qq", "qqqunrelation", "qunNum", Arrays.asList(qunNumList), 200));
+			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
+	
+	//根据QQ号码查询对应的群全部信息
+	@ResponseBody
+	@RequestMapping(value="/qq/quns/search")
+	public WebResult readQQDatas(String qqNum){
+		WebResult result = new WebResult();
+		try {
+			result.setData(qqService.readQQAndQunDatas(qqNum));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());

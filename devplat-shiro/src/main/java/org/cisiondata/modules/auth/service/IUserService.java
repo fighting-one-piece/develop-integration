@@ -24,10 +24,13 @@ public interface IUserService extends IGenericService<User, Long> {
 	public User readUserByAccountAndPassword(String account, String password) throws BusinessException;
 	
 	/**
-	 * 修改用户
-	 * @param user
+	 * 修改用户密码
+	 * @param account
+	 * @param originalPassword
+	 * @param newPassword
 	 * @throws BusinessException
 	 */
-	public void updateUserPassword(User user) throws BusinessException;
+	public void updateUserPassword(String account, String originalPassword, String newPassword) 
+			throws BusinessException;
 	
 }

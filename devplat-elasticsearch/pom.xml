@@ -4,7 +4,7 @@
 
 	<groupId>org.cisiondata</groupId>
 	<artifactId>devplat-elasticsearch</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>DevPlat ElasticSearch Project</name>
@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-common</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<!-- Elastic Search依赖包 -->

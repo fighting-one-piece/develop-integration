@@ -29,6 +29,17 @@ public class ESServiceTest {
 	private IESBizService esBizService = null;
 	
 	@Test
+	public void testReadDataListByQQ() {
+		List<Map<String, Object>> listMap = esService.readDataListByCondition(
+				"qq", "qqqunrelation", QueryBuilders.termQuery("qqNum", "445385318"));
+		List<String> list = new ArrayList<String>();
+		for (int i = 0, len = listMap.size(); i < len; i++) {
+			System.out.println(listMap.get(i));
+//			list.add(listMap.get(i).get("QQ群号").toString());
+		}
+	}
+	
+	@Test
 	public void testReadDataListByAttributeValues() {
 		List<String> qqNumList = new ArrayList<String>();
 		long qqNum = 471246431L;

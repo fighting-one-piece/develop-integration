@@ -1,5 +1,6 @@
 package org.cisiondata.modules.auth.entity;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -121,5 +122,13 @@ public class User extends PKAutoEntity<Long> {
 	public boolean hasDeleted() {
 		return deleteFlag;
 	}
-
+	
+	public boolean hasExpired() {
+		return expireTime.before(Calendar.getInstance().getTime());
+	}
+	
+	public boolean isValid() {
+		return hasDeleted() || hasExpired() ? false : true;
+	}
+	
 }

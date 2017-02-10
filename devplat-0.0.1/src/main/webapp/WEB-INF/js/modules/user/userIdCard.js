@@ -11,7 +11,6 @@ $(document).ready(function(){
 		var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
 		var idCard = $("#query").val();
 		var name = $("#queryname").val();
-		console.log(name == "");
 		if(reg.test(idCard)){
 			if(name == "" || name == null){
 				document.getElementById('background').style.display='block';
@@ -21,7 +20,6 @@ $(document).ready(function(){
 					dataType:"json",
 					data:{"idCard":idCard},
 					success:function(result){
-						console.log(result);
 						$("#results").empty();
 						if(result.data){
 							if (result.data.length > 0){
@@ -85,7 +83,21 @@ $(document).ready(function(){
 									}
 									resutable += "</table>"
 								}
-								$("#results").append(stutable+resutable);
+								//datada的数据显示
+								var datadatable = "";
+								$.each(result.data,function(key,value){
+									datadatable += "<br><table class='table table-striped table-bordered'><tr>";
+									$.each(value.fields,function(i,j){
+										datadatable += "<td>"+j+"</td>";
+									});
+									datadatable += "</tr><tr>";
+									$.each(value.data,function(keydata,valuedata){
+										datadatable += "<td>"+valuedata+"</td>";
+									});
+									datadatable += "</tr>";
+									datadatable += "</table>";
+								});
+								$("#results").append(stutable+resutable+datadatable);
 //							var keytr;
 //							var valuetr;
 //							$.each(result.data,function(n,list){

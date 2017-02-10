@@ -4,6 +4,9 @@
 	String path = request.getContextPath(); 
  	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path;
 %>
+<head>
+	<title>银行数据查询</title>
+</head>
 <body>
 	<div class="row" style="margin-top: 5px; width: 100%; height: 100%;">
 		<div style="width: 16%; float: left; padding-left: 20px;">

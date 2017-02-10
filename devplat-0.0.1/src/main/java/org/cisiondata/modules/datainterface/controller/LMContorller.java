@@ -52,8 +52,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/ExecutedPeopleB", method = RequestMethod.GET)
-	public String ExecutedPeople() {
-		return "lemoncome/executedPeoleB";
+	public ModelAndView ExecutedPeople() {
+		return new ModelAndView("lemoncome/executedPeoleB");
 	}
 	//39、学历查询（F机构）
 	@ResponseBody
@@ -73,8 +73,8 @@ public class LMContorller {
 	}
 	
 	@RequestMapping(value = "/educationf", method = RequestMethod.GET)
-	public String lemonEducationf() {
-		return "lemoncome/lemoneducationf";
+	public ModelAndView lemonEducationf() {
+		return new ModelAndView("lemoncome/lemoneducationf");
 	}
 	
 	
@@ -94,8 +94,8 @@ public class LMContorller {
 		return result;
 	}
 	@RequestMapping(value = "/loanInfo",method = RequestMethod.GET)
-	public String lemonLoanInfo(){
-		return "lemoncome/loanInfo";
+	public ModelAndView lemonLoanInfo(){
+		return new ModelAndView("lemoncome/loanInfo");
 	}
 	
 	//46、反欺诈黑名单验证
@@ -115,8 +115,8 @@ public class LMContorller {
 	}
 	
 	@RequestMapping(value = "/audit", method = RequestMethod.GET)
-	public String lemonaudit() {
-		return "lemoncome/auditphone";
+	public ModelAndView lemonaudit() {
+		return new ModelAndView("lemoncome/auditphone");
 	}
 
 	// 37、学历查询（D机构）
@@ -136,8 +136,8 @@ public class LMContorller {
 	}
 	
 	@RequestMapping(value = "/education", method = RequestMethod.GET)
-	public String lemonEducation() {
-		return "lemoncome/lemoneducation";
+	public ModelAndView lemonEducation() {
+		return new ModelAndView("lemoncome/lemoneducation");
 	}
 
 	//36、搜索黑名单
@@ -200,8 +200,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/plat", method = RequestMethod.GET)
-	public String multPlatfrom() {
-		return "lemoncome/multiplatfrom";
+	public ModelAndView multPlatfrom() {
+		return new ModelAndView("lemoncome/multiplatfrom");
 	}
 
 	// 33网络公开逾期信息
@@ -221,8 +221,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "overdue", method = RequestMethod.GET)
-	public String loanOverdue() {
-		return "lemoncome/loanoverdue";
+	public ModelAndView loanOverdue() {
+		return new ModelAndView("lemoncome/loanoverdue");
 	}
 
 	// 32 合作机构共享黑名单
@@ -242,8 +242,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "blacklist", method = RequestMethod.GET)
-	public String blackListCheat() {
-		return "lemoncome/blacklistcheat";
+	public ModelAndView blackListCheat() {
+		return new ModelAndView("lemoncome/blacklistcheat");
 	}
 
 	// 31网络负面信息
@@ -255,7 +255,6 @@ public class LMContorller {
 			Map<String, String> data = lmInternetService.readInternetNegative(phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -264,8 +263,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/internetNegative", method = RequestMethod.GET)
-	public String lemonNegative() {
-		return "lemoncome/internetNegative";
+	public ModelAndView lemonNegative() {
+		return new ModelAndView("lemoncome/internetNegative");
 	}
 
 	// 30赌博吸毒名单
@@ -277,7 +276,6 @@ public class LMContorller {
 			Map<String, String> data = lmInternetService.blacklistGamble(phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -286,8 +284,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/lemonGamblingDrug")
-	public String nameidcheck() {
-		return "lemoncome/lemonGamblingDrug";
+	public ModelAndView nameidcheck() {
+		return new ModelAndView("lemoncome/lemonGamblingDrug");
 	}
 
 	// 29 多次申请记录查询 B
@@ -299,7 +297,6 @@ public class LMContorller {
 			Map<String, String> data = lmInternetService.repeatedlyInquireB(idCard, name, phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -308,8 +305,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/repeatedlyInquire", method = RequestMethod.GET)
-	public String lemonInquire() {
-		return "lemoncome/repeatedlyInquire";
+	public ModelAndView lemonInquire() {
+		return new ModelAndView("lemoncome/repeatedlyInquire");
 	}
 
 	// 28 多次申请记录查询 A
@@ -321,7 +318,6 @@ public class LMContorller {
 			Map<String, String> data = lmInternetService.repeatedlyInquireA(idCard, name, phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -330,8 +326,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/repeatedlyInquireA", method = RequestMethod.GET)
-	public String lemonInquireA() {
-		return "lemoncome/repeatedlyInquireA";
+	public ModelAndView lemonInquireA() {
+		return new ModelAndView("lemoncome/repeatedlyInquireA");
 	}
 
 	// 27 银行、 P2P 逾期记录
@@ -343,7 +339,6 @@ public class LMContorller {
 			Map<String, String> data = lmInternetService.bankP2P(idCard, name, phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -352,8 +347,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/P2POverdue", method = RequestMethod.GET)
-	public String P2P() {
-		return "lemoncome/P2POverdue";
+	public ModelAndView P2P() {
+		return new ModelAndView("lemoncome/P2POverdue");
 	}
 
 	// 26法院被执行人记录
@@ -365,7 +360,6 @@ public class LMContorller {
 			Map<String, String> data = lmInternetService.CourtExecutePeople(idCard, name, phone, idType, gender);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -374,8 +368,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/CourtEnforce", method = RequestMethod.GET)
-	public String CourtEnforce() {
-		return "lemoncome/CourtEnforce";
+	public ModelAndView CourtEnforce() {
+		return new ModelAndView("lemoncome/CourtEnforce");
 	}
 
 	// 25 手机号标签查询
@@ -387,7 +381,6 @@ public class LMContorller {
 			Map<String, String> data = lmInternetService.phoneTagQuery(phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -396,8 +389,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/phoneTagQuery", method = RequestMethod.GET)
-	public String phoneTagQuery() {
-		return "lemoncome/phoneTagQuery";
+	public ModelAndView phoneTagQuery() {
+		return new ModelAndView("lemoncome/phoneTagQuery");
 	}
 
 	// 24地址验证
@@ -411,7 +404,6 @@ public class LMContorller {
 					homeAddress, companyCity, companyAddress);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -420,8 +412,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/addressProve", method = RequestMethod.GET)
-	public String address() {
-		return "lemoncome/addressProve";
+	public ModelAndView address() {
+		return new ModelAndView("lemoncome/addressProve");
 	}
 
 	// 23 百度消费金融评分查询
@@ -435,7 +427,6 @@ public class LMContorller {
 					degree, homeAddress, companyAddress);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -444,21 +435,19 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/baiduQuery", method = RequestMethod.GET)
-	public String baiduIntegralQuery() {
-		return "lemoncome/baiduFinancialQuery";
+	public ModelAndView baiduIntegralQuery() {
+		return new ModelAndView("lemoncome/baiduFinancialQuery");
 	}
 
 	// 22申请数据查询
 	@ResponseBody
 	@RequestMapping(value = "/query/apply")
 	public WebResult dataFind(String phone, String idCard, String name, String bankCard) {
-		System.err.println("进入22");
 		WebResult result = new WebResult();
 		try {
 			Map<String, String> data = lmInternetService.readappKeys(phone, idCard, name, bankCard);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data" + "```");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -467,8 +456,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/dataApply")
-	public String applyDatascats() {
-		return "lemoncome/ApplyDatas";
+	public ModelAndView applyDatascats() {
+		return new ModelAndView("lemoncome/ApplyDatas");
 	}
 
 	// 21柠檬黑名单查询
@@ -480,7 +469,6 @@ public class LMContorller {
 			Map<String, String> data = lmInternetService.readCardUtil(phone, idCard, name, bankCard);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data" + "```");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -489,21 +477,19 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/Blacklistcat")
-	public String blacklistcat() {
-		return "lemoncome/blacklistion";
+	public ModelAndView blacklistcat() {
+		return new ModelAndView("lemoncome/blacklistion");
 	}
 
 	// 20可疑人员信息查询
 	@ResponseBody
 	@RequestMapping(value = "/suspiciousPersonscation")
 	public WebResult SuspiciousPerson(String phone, String idCard, String staffType) {
-		System.err.println(20);
 		WebResult result = new WebResult();
 		try {
 			Map<String, Map<String, String>> data = lmInternetService.readCardUtil(phone, idCard, staffType);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data" + "```");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -512,21 +498,19 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "suspiciouscat")
-	public String SuspiciousPersons() {
-		return "lemoncome/suspiciousPersons";
+	public ModelAndView SuspiciousPersons() {
+		return new ModelAndView("lemoncome/suspiciousPersons");
 	}
 
 	// 19欺诈案件信息查询
 	@ResponseBody
 	@RequestMapping(value = "/FraudulentInformation/InformationCation")
 	public WebResult reportInfoQuery(String phone, String idCard, String caseType) {
-		System.err.println(19);
 		WebResult result = new WebResult();
 		try {
 			Map<String, Map<String, String>> data = lmInternetService.readCaseReportInfo(phone, idCard, caseType);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data" + "```");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -535,8 +519,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "Fraudulentcat")
-	public String fraudulentInFormation() {
-		return "lemoncome/FraudulentInformation";
+	public ModelAndView fraudulentInFormation() {
+		return new ModelAndView("lemoncome/FraudulentInformation");
 	}
 
 
@@ -549,7 +533,6 @@ public class LMContorller {
 				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota1(bankCard, idCard, phone, name);
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
-				System.err.println(data + "---data" + "```");
 			} catch (Exception e) {
 				result.setCode(ResultCode.FAILURE.getCode());
 				result.setFailure(e.getMessage());
@@ -566,7 +549,6 @@ public class LMContorller {
 				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota2(bankCard, idCard, phone, name);
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
-				System.err.println(data + "---data" + "```");
 			} catch (Exception e) {
 				result.setCode(ResultCode.FAILURE.getCode());
 				result.setFailure(e.getMessage());
@@ -583,7 +565,6 @@ public class LMContorller {
 				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota3(bankCard, idCard, phone, name);
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
-				System.err.println(data + "---data" + "```");
 			} catch (Exception e) {
 				result.setCode(ResultCode.FAILURE.getCode());
 				result.setFailure(e.getMessage());
@@ -600,7 +581,6 @@ public class LMContorller {
 				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota4(bankCard, idCard, phone, name);
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
-				System.err.println(data + "---data" + "```");
 			} catch (Exception e) {
 				result.setCode(ResultCode.FAILURE.getCode());
 				result.setFailure(e.getMessage());
@@ -617,7 +597,6 @@ public class LMContorller {
 				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota5(bankCard, idCard, phone, name);
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
-				System.err.println(data + "---data" + "```");
 			} catch (Exception e) {
 				result.setCode(ResultCode.FAILURE.getCode());
 				result.setFailure(e.getMessage());
@@ -634,13 +613,11 @@ public class LMContorller {
 	@ResponseBody
 	@RequestMapping(value = "/verify/phoneIsInBlacklist")
 	public WebResult verifyPhoneIsInBlacklist(String phone) {
-		System.err.println(phone + "--19");
 		WebResult result = new WebResult();
 		try {
 			Map<String, Map<String, String>> data = lmInternetService.phoneIsInBlacklist(phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data" + "```");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -649,8 +626,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "verify")
-	public String phoneIsInBlacklist() {
-		return "lemoncome/PhoneIsInBlacklist";
+	public ModelAndView phoneIsInBlacklist() {
+		return new ModelAndView("lemoncome/PhoneIsInBlacklist");
 	}
 
 	// 16、通信小号
@@ -659,13 +636,11 @@ public class LMContorller {
 	@ResponseBody
 	@RequestMapping(value = "/phone/OperatorNameQuery")
 	public WebResult mobileNameQuery(String phone) {
-		System.err.println(1111);
 		WebResult result = new WebResult();
 		try {
 			Map<String, Map<String, String>> data = lmInternetService.readIdPhoto(phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data" + "```");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -674,21 +649,19 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/NameQueryinfo", method = RequestMethod.GET)
-	public String lemonPhone() {
-		return "lemoncome/mobileOperatorNameQuery";
+	public ModelAndView lemonPhone() {
+		return new ModelAndView("lemoncome/mobileOperatorNameQuery");
 	}
 
 	// 14、手机号绑定银行卡信息查询
 	@ResponseBody
 	@RequestMapping(value = "/mobile/operatorNameQuery")
 	public WebResult queryPhoneCardBindInfo(String phone) {
-		System.err.println(1111);
 		WebResult result = new WebResult();
 		try {
 			Map<String, Map<String, String>> data = lmInternetService.readPhoto(phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data" + "```");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -697,21 +670,19 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/phoneBankCardinfo", method = RequestMethod.GET)
-	public String queryPhoneBankCardBindInfo() {
-		return "lemoncome/phoneBankCardBindInfo";
+	public ModelAndView queryPhoneBankCardBindInfo() {
+		return new ModelAndView("lemoncome/phoneBankCardBindInfo");
 	}
 
 	// 13、手机号绑定银行卡账动信息查询(只支持移动)
 	@ResponseBody
 	@RequestMapping(value = "/phoneactivecation")
 	public WebResult photoQuery(String phone) {
-		System.err.println(13);
 		WebResult result = new WebResult();
 		try {
 			Map<String, String> data = lmInternetService.readPhotoQuery(phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data" + "```");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -720,8 +691,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/lemonphoneactive", method = RequestMethod.GET)
-	public String lemonPhoneActive() {
-		return "lemoncome/lemonPhoneActive";
+	public ModelAndView lemonPhoneActive() {
+		return new ModelAndView("lemoncome/lemonPhoneActive");
 	}
 
 	// 12、手机号绑定银行卡还款情况查询(只支持移动)
@@ -733,7 +704,6 @@ public class LMContorller {
 			Map<String, String> data = lmInternetService.readQueryLoadInfo(phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
-			System.err.println(data + "---data" + "```");
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -742,15 +712,14 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/lemonphoneinfo", method = RequestMethod.GET)
-	public String readQueryLoadInfo() {
-		return "lemoncome/lemonPhoneLoadInfo";
+	public ModelAndView readQueryLoadInfo() {
+		return new ModelAndView("lemoncome/lemonPhoneLoadInfo");
 	}
 
 	// 11、手机号绑定银行卡出入账查询(只支持移动)
 	@ResponseBody
 	@RequestMapping(value = "/phoneinfocation/query")
 	public WebResult photoQuery1(String phone) {
-		System.err.println(11);
 		WebResult result = new WebResult();
 		try {
 			Map<String, String> data = lmInternetService.readIdPhotoAccount(phone);
@@ -764,8 +733,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/lemonphonelines", method = RequestMethod.GET)
-	public String photoQuery1() {
-		return "lemoncome/lemonPhoneLines";
+	public ModelAndView photoQuery1() {
+		return new ModelAndView("lemoncome/lemonPhoneLines");
 	}
 
 	// 10、手机号当前状态查询(只支持移动)
@@ -785,8 +754,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/lemonphonetime", method = RequestMethod.GET)
-	public String lemonPhone1() {
-		return "lemoncome/lemonPhoneTime";
+	public ModelAndView lemonPhone1() {
+		return new ModelAndView("lemoncome/lemonPhoneTime");
 	}
 
 	// 9、手机号在网时长查
@@ -806,15 +775,14 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/lemonphone", method = RequestMethod.GET)
-	public String lemonPhone2() {
-		return "lemoncome/lemonPhone";
+	public ModelAndView lemonPhone2() {
+		return new ModelAndView("lemoncome/lemonPhone");
 	}
 
 	// 8、身份证照片查询
 	@ResponseBody
 	@RequestMapping(value = "/idphotocation")
 	public WebResult getIdPhoto(String name, String idCard) {
-		System.err.println(8);
 		WebResult result = new WebResult();
 		try {
 			Map<String, String> data = lmInternetService.getIdPhoto(name, idCard);
@@ -828,8 +796,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/idphoto", method = RequestMethod.GET)
-	public String lemonIdPhoto() {
-		return "lemoncome/lemonIdPhoto";
+	public ModelAndView lemonIdPhoto() {
+		return new ModelAndView("lemoncome/lemonIdPhoto");
 	}
 
 	// 7、学历查询
@@ -858,7 +826,6 @@ public class LMContorller {
 	@ResponseBody
 	@RequestMapping(value = "/bankcard/item")
 	public WebResult bankcardItem(String bankCard, String phone) {
-		System.err.println(6);
 		WebResult result = new WebResult();
 		try {
 			Map<String, String> data = lmInternetService.bankcard2item(bankCard, phone);
@@ -872,15 +839,14 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "nameidcat")
-	public String bankcard2item() {
-		return "lemoncome/namePhoneId";
+	public ModelAndView bankcard2item() {
+		return new ModelAndView("lemoncome/namePhoneId");
 	}
 
 	// 5、姓名-身份证号-照片三维校验
 	@ResponseBody
 	@RequestMapping(value = "/nameIDPhoto3Dcation")
 	public WebResult photo3Dcation(String idCard, String name, String image) {
-		System.err.println(5);
 		WebResult result = new WebResult();
 		try {
 			Map<String, String> data = lmInternetService.idNameImageCheck(idCard, name, image);
@@ -894,8 +860,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "nameIDPhoto3Dcat")
-	public String idNameImageCheck() {
-		return "lemoncome/nameIDphoto3D";
+	public ModelAndView idNameImageCheck() {
+		return new ModelAndView("lemoncome/nameIDphoto3D");
 	}
 
 	// 4、姓名-身份证号-手机号-银行卡号一致性校验
@@ -915,8 +881,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "nameidphonebankcat")
-	public String nameIdphone() {
-		return "lemoncome/nameIdphoneBanks";
+	public ModelAndView nameIdphone() {
+		return new ModelAndView("lemoncome/nameIdphoneBanks");
 	}
 
 	// 3、姓名-身份证号-手机号一致性校验
@@ -936,8 +902,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "namephonection")
-	public String idNamePhoneCheck() {
-		return "lemoncome/nameIDs";
+	public ModelAndView idNamePhoneCheck() {
+		return new ModelAndView("lemoncome/nameIDs");
 	}
 
 	// 2、姓名-身份证号-银行卡号一致性校验
@@ -958,8 +924,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "nameIdCardAccountVerify")
-	public String nameIdCardAccountVerify() {
-		return "lemoncome/nameIdCardAccountVerify";
+	public ModelAndView nameIdCardAccountVerify() {
+		return new ModelAndView("lemoncome/nameIdCardAccountVerify");
 	}
 
 	// 2、M姓名-身份证号-银行卡号一致性校验
@@ -979,8 +945,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "accountVerifyM")
-	public String AccountVerifyM() {
-		return "lemoncome/nameIdCardAccountVerifyM";
+	public ModelAndView AccountVerifyM() {
+		return new ModelAndView("lemoncome/nameIdCardAccountVerifyM");
 	}
 
 	// 2、F姓名-身份证号-银行卡号一致性校验
@@ -1000,8 +966,8 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "accountVerifyF")
-	public String AccountVerifyF() {
-		return "lemoncome/nameIdCardAccountVerifyF";
+	public ModelAndView AccountVerifyF() {
+		return new ModelAndView("lemoncome/nameIdCardAccountVerifyF");
 	}
 	// 1、姓名-身份证号一致性校验
 	@ResponseBody
@@ -1020,13 +986,13 @@ public class LMContorller {
 	}
 
 	@RequestMapping(value = "/checknameid")
-	public String idNameCheck() {
-		return "lemoncome/NameIdCheck";
+	public ModelAndView idNameCheck() {
+		return new ModelAndView("lemoncome/NameIdCheck");
 	}
 	
 	@RequestMapping(value="lemoncome",method=RequestMethod.GET)
-	public String lemon() {
-		return "lemoncome/lemon";
+	public ModelAndView lemon() {
+		return new ModelAndView("lemoncome/lemon");
 	}
 	
 	
@@ -1034,7 +1000,6 @@ public class LMContorller {
 	@ResponseBody
 	@RequestMapping(value = "/relational/query")
 	public WebResult relationalQquery(String type, String index) {
-		System.out.println(type+"---type"+index+"----index");
 		WebResult result = new WebResult();
 		try {
 			Object data = lmInternetService.relational_query(type, index);
@@ -1048,13 +1013,13 @@ public class LMContorller {
 	}
 	//众多接口
 	@RequestMapping(value="RelationalQuery",method=RequestMethod.GET)
-	public String RelationalQuery() {
-		return "lemoncome/RelationalQuery";
+	public ModelAndView RelationalQuery() {
+		return new ModelAndView("lemoncome/RelationalQuery");
 	}
 	//银行数据分析页面
 	@RequestMapping(value="lemonBank",method=RequestMethod.GET)
-	public String LemonBankCard(){
-		return "lemoncome/lemonBankCard";
+	public ModelAndView LemonBankCard(){
+		return new ModelAndView("lemoncome/lemonBankCard");
 	}
 	
 }

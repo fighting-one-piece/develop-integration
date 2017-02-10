@@ -17,8 +17,12 @@
 	</context:component-scan>
 	
 	<!-- 加载文件配置 -->
+	<!--  
 	<context:property-placeholder location="classpath*:database/jdbc.properties" ignore-unresolvable="true"/>
 	<context:property-placeholder location="classpath*:database/redis.properties" ignore-unresolvable="true"/>
+	-->
+	<context:property-placeholder location="classpath*:spring/applicationContext-config.properties" ignore-unresolvable="true"/>
+		
 		
 	<!-- DBCP数据源配置 -->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">

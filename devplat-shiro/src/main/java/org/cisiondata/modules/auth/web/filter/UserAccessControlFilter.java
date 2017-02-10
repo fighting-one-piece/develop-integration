@@ -53,6 +53,10 @@ public class UserAccessControlFilter extends AccessControlFilter {
         if (null != subject) {
             String account = (String) subject.getPrincipal();
             User user = authService.readUserByAccount(account);
+            if (null != user && !user.isValid()) {
+            	request.setAttribute(Constants.ERROR, "该账户已过期或已删除");
+				saveRequestAndRedirectToLogin(request, response);
+            }
             //把当前用户放到session中
             request.setAttribute(Constants.CURRENT_USER, user);
             ((HttpServletRequest)request).getSession().setAttribute(Constants.CURRENT_USER, user);
@@ -78,13 +82,14 @@ public class UserAccessControlFilter extends AccessControlFilter {
 				saveRequestAndRedirectToLogin(request, response);
 			}
 		}
+		/**
         User user = (User) request.getAttribute(Constants.CURRENT_USER);
-        if (user == null) return true;
-        if (Boolean.TRUE.equals(user.getDeleteFlag())) {
+        if (null != user && !user.isValid()) {
             getSubject(request, response).logout();
             saveRequestAndRedirectToLogin(request, response);
             return false;
         }
+        */
         return true;
     }
 
@@ -97,7 +102,7 @@ public class UserAccessControlFilter extends AccessControlFilter {
 
     protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
     	User user = (User) request.getAttribute(Constants.CURRENT_USER);
-        String url = null == user || user.hasDeleted() ? this.userNotFoundUrl : this.userUnknownErrorUrl;
+        String url = null == user || !user.isValid() ? this.userNotFoundUrl : this.userUnknownErrorUrl;
     	WebUtils.getAndClearSavedRequest(request);
     	WebUtils.redirectToSavedRequest(request, response, url);
     	/**

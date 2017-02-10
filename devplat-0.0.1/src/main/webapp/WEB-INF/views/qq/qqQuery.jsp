@@ -123,7 +123,6 @@
 	<div id="background" class="all_backgroundcolor" align="center">
 		<img class="background_img"  src="<%=basePath %>/img/backgroundcenter.gif">
 	</div>
-	<!-- 请不要更改这些js的导入顺序和位置 -->
 	<script type="text/javascript" src="<%=basePath%>/js/modules/user/map/force/echarts.js"></script>
 	<script type="text/javascript" src="<%=basePath%>/js/modules/qq/qqForce.js"></script>
 	<script type="text/javascript" src="<%=basePath %>/js/modules/qq/qqQuery.js"></script>

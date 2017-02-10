@@ -4,6 +4,9 @@
 	String path = request.getContextPath(); 
  	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path;
 %>
+<head>
+	<title>超级查询</title>
+</head>
 <body>
 <a id="anchor"></a>
 <h5 align="center">&nbsp;</h5>

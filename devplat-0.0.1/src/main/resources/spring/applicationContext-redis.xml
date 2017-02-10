@@ -35,7 +35,7 @@
     <!-- Jedis Cluster Configuration -->
     <bean id="jedisCluster" class="org.cisiondata.utils.redis.JedisClusterFactory">
 		<property name="addressConfig">
-			<value>classpath:database/redis.properties</value>
+			<value>classpath:filter-${target-env}.properties</value>
 		</property>
 		<property name="addressKeyPrefix" value="redis.cluster.address" /> 
 		<property name="timeout" value="${redis.cluster.timeout}" />

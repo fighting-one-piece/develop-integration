@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.identity.dao.MobileAttributionDao">
+
+	<resultMap type="org.cisiondata.modules.identity.entity.MobileAttributionModel" id="attributionMap">
+		<result column="PROVINCE" property="province"/>
+		<result column="CITY" property="city"/>
+		<result column="DNSEG" property="dnseg"/>
+		<result column="REGION_DNSEG" property="regionDnseg"/>
+	</resultMap>
+	<!-- 查询号码归属地 -->
+	<select id="selByDnseg" parameterType="String" resultMap="attributionMap">
+		SELECT PROVINCE,CITY,DNSEG,REGION_DNSEG FROM T_PHONE_CODE WHERE REGION_DNSEG = #{0}
+	</select>
+</mapper>

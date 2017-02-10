@@ -47,6 +47,9 @@ public class DBAuthorizingServiceImpl extends AuthorizingRealm {
         if (null == user) {
         	throw new AuthenticationException("用户名密码错误");
         }
+        if (!user.isValid()) {
+        	throw new AuthenticationException("该账户已过期或已删除");
+        }
         return new SimpleAuthenticationInfo(username, password, getName());
     }
 

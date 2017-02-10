@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/resource")
 public class ResourceController {
+	
 	private Logger LOG = LoggerFactory.getLogger(ResourceController.class);
 
 	@Resource(name="resourceService")
 	private IResourceService resourceServie = null;
-	
 	
 	@RequestMapping("/menuResource")
 	@ResponseBody

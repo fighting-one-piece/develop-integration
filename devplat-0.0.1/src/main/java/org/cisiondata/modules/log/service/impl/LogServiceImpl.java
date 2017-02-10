@@ -1,7 +1,9 @@
 package org.cisiondata.modules.log.service.impl;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.cisiondata.modules.log.dao.LogMapper;
 import org.cisiondata.modules.log.entity.LogModel;
@@ -13,6 +15,10 @@ public class LogServiceImpl implements ILogService{
 	
 	@Autowired
 	private LogMapper logMapper;
+	//分页
+	int pageCount = 0; //总页数
+	int count = 10;  //每页显示的条数
+	int page = 0; //计算每页从哪里开始读取数据
 	
 	public void addLog(LogModel log) {
 		
@@ -43,9 +49,18 @@ public class LogServiceImpl implements ILogService{
 	}
 
 	@Override
-	public List<LogModel> countPage(int startPos, int pageSize) {
-		List<LogModel> countPage = logMapper.countPage(startPos, pageSize);
-		return countPage;
+	public Map<String, Object> countPage(int index) {
+		Map<String, Object> map = new HashMap<String,Object>();
+		List<LogModel> list = count();
+		if(list != null && list.size() > 0){
+			pageCount =  list.size() % 10 == 0 ? list.size() / 10 : list.size() / 10 + 1;
+		}
+		//计算当前页数数据量
+		page= (index -1) * 10;
+		List<LogModel> countPage = logMapper.countPage(page, count);
+		map.put("data", countPage);
+		map.put("pageCount", pageCount);
+		return map;
 	}
 
 	@Override
@@ -55,9 +70,18 @@ public class LogServiceImpl implements ILogService{
 	}
 
 	@Override
-	public List<LogModel> keyByPage(String keyword, int startPos, int pageSize) {
-		List<LogModel> keyPage = logMapper.keyByPage(keyword, startPos, pageSize);
-		return keyPage;
+	public Map<String, Object> keyByPage(int index,String keyword) {
+		Map<String, Object> map = new HashMap<String,Object>();
+		List<LogModel> list = selectByKey(keyword);
+		if(list != null && list.size() > 0){
+			pageCount = list.size() % 10 == 0? list.size() / 10 : list.size() /10 + 1;
+		}
+		//计算当前页数数据量
+		page = (index -1) * 10;
+		List<LogModel> keyPage = logMapper.keyByPage(keyword, page, count);
+		map.put("data", keyPage);
+		map.put("pageCount", pageCount);
+		return map;
 	}
 
 	@Override

@@ -31,13 +31,11 @@ $(document).ready(function () {
 				success:function(result){
 					if (result.code == 1) {
 						$("#waring").empty();
-						$("#waring").append(result.data);
-						if (result.data == "密码已修改！") {
-							$("#btnlogout").click();
-						}
+						$("#waring").append("密码修改成功！");
+						$("#btnlogout").click();
 					}else {
 						$("#waring").empty();
-						$("#waring").append("请重试！");
+						$("#waring").append("密码修改失败！");
 					}
 					document.getElementById('background').style.display='none';
 				},

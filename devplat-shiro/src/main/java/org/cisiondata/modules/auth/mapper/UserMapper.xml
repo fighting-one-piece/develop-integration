@@ -70,12 +70,15 @@
             SELECT * FROM T_USER
         ]]>   
     </select>
+    
     <!-- 根据账号查询 -->
 	<select id="findUserByAccount" resultMap="userResultMap">
 		select ID,ACCOUNT,PASSWORD,IDENTITY,NICK_NAME,EMAIL,STATUS,CREATE_TIME,EXPIRE_TIME,DELETE_FLAG  from T_USER WHERE ACCOUNT = #{account}
 	</select> 
+	
 	<!-- 根据ID更新-->
-	<update id="updateUserPassword" parameterType="org.cisiondata.modules.auth.entity.User"> 
-		update  T_USER SET ACCOUNT=#{account},PASSWORD=#{password},IDENTITY=#{identity},NICK_NAME=#{nickname},EMAIL=#{email},STATUS=#{status},EXPIRE_TIME=#{expireTime} WHERE ID=#{id}
+	<update id="updateUserPassword" parameterType="User"> 
+		update T_USER SET ACCOUNT=#{account},PASSWORD=#{password},IDENTITY=#{identity},NICK_NAME=#{nickname},EMAIL=#{email},STATUS=#{status},EXPIRE_TIME=#{expireTime} WHERE ID=#{id}
 	</update> 
+	
 </mapper>

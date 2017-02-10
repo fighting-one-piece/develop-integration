@@ -4,7 +4,7 @@
 
 	<groupId>org.cisiondata</groupId>
 	<artifactId>devplat-shiro</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>DevPlat Shiro Project</name>
@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-common</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<!-- SHIRO依赖包 -->

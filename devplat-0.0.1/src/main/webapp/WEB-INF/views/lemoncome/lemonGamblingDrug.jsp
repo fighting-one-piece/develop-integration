@@ -4,6 +4,9 @@
 	String path = request.getContextPath(); 
  	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path;
 %>
+<head>
+	<title>赌博吸毒名单</title>
+</head>
 <body>
 <h5 align="center">&nbsp;</h5>
 <div align="center">

@@ -1,0 +1,90 @@
+#a{
+	 width:200px;
+	 height:10px;
+	 text-align: center;
+}
+#whole{
+	margin:0 auto;   
+    width:1000px;   
+    height:600px;   
+}
+
+#role{
+	text-align: center;
+}
+/* #butn{
+	padding: 3px 5px;
+    background: #13ACF8;  
+    width:120px;
+    color: #fff;
+    border: 3px solid #6CD6FF;
+    font-weight: bold;
+    font-family: "微软雅黑", "Microsoft Yahei", "黑体", sans-serif;
+
+	
+} */
+.result{
+	width:200px;
+	 height:10px;
+	 text-align: center;
+	
+}
+.role_result_updata{
+	display: none;
+	position: absolute;
+	top: 12%;
+	left: 21%;
+	width: 58%;
+	height: 40%;
+	padding: 16px;
+	border: 1px solid orange;
+	border-radius: 10px;
+	background-color: white;
+	z-index: 1002;
+	overflow-y: auto; 
+}
+#centers{
+	margin:0 auto;   
+    width:400px;   
+}
+.User_Peresentation{
+	display: none;
+	position: absolute;
+	top: 12%;
+	left: 21%;
+	width: 58%;
+	height: 53%;
+	padding: 16px;
+	border: 1px solid orange;
+	border-radius: 10px;
+	background-color: white;
+	z-index: 1002;
+	overflow-y: auto; 
+}
+#role{
+	text-align: center;
+	color: blue;
+}
+/* #butns{
+	padding: 3px 5px;
+    background: #13ACF8;  
+    width:120px;
+    color: #fff;
+    border: 3px solid #6CD6FF;
+    font-weight: bold;
+    font-family: "微软雅黑", "Microsoft Yahei", "黑体", sans-serif;
+} */
+.black_overlay {
+	display: none;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	z-index: 1001;
+	-moz-opacity: 0.8;
+	opacity: .80;
+	filter: alpha(opacity = 80);
+}
+

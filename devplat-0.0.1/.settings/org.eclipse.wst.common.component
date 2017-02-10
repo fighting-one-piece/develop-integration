@@ -6,13 +6,15 @@
         <wb-resource deploy-path="/" source-path="src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/resources"/>
-        <dependent-module archiveName="devplat-common-0.0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-common/devplat-common">
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/config"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/filters"/>
+        <dependent-module archiveName="devplat-common-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-common/devplat-common">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="devplat-elasticsearch-0.0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-elasticsearch/devplat-elasticsearch">
+        <dependent-module archiveName="devplat-elasticsearch-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-elasticsearch/devplat-elasticsearch">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="devplat-shiro-0.0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-shiro/devplat-shiro">
+        <dependent-module archiveName="devplat-shiro-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-shiro/devplat-shiro">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="java-output-path" value="/devplat/target/classes"/>

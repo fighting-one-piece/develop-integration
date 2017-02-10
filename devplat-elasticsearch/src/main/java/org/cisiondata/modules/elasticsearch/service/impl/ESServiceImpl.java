@@ -513,7 +513,7 @@ public class ESServiceImpl implements IESService {
 	}
 	
 	protected Object wrapperValue(String key, Object value) {
-		return null;
+		return value;
 	}
 	
 }

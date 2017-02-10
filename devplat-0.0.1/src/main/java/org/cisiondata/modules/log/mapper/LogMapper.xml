@@ -10,11 +10,12 @@
 		<result column="ip" property="ip"/>
 		<result column="access_time" property="accessTime" javaType="java.util.Date"/>
 		<result column="keyword" property="keyword"/>
+		<result column="account" property="account"/>
 		<result column="c" property="count"/>
 	</resultMap>
 	<!-- 增加 -->
 	<insert id="addLog" parameterType="LogModel">
-		insert into T_LOG(id,session_id,ip,access_time,keyword) value (#{id},#{sessionId},#{ip},#{accessTime},#{keyword})
+		insert into T_LOG(id,session_id,ip,access_time,keyword,account) value (#{id},#{sessionId},#{ip},#{accessTime},#{keyword},#{account})
 	</insert>
 	<!-- 查询全部 -->
 	<select id="findAll" resultMap="LogModelMap">

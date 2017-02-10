@@ -1,0 +1,41 @@
+	#header {
+		width: 98%;
+		height: 7%;
+    	position: absolute; 
+    	top: 0%;
+	}
+	
+	#footer {
+		width: 98%;
+		height: 4.7%;
+    	position: absolute;
+    	bottom: 0;
+	}
+	
+	#body {
+		width: 98%;
+		height: 82%;
+		top: 13.4%;
+		left: 2%;
+		position: absolute;
+		overflow: scroll; 
+	}
+	#menu {
+		width: 98%;
+		height: 5%;
+    	position: absolute; 
+    	top: 8.4%;
+    	overflow: scroll;
+	}
+	.ce{
+		float: right;
+		padding-right: 1%;
+		padding-top: 0.4%;
+	}
+	.username{
+		margin-right: 10px;
+	}
+	.nav #title{
+		position: relative;
+		left: 4%;
+	}

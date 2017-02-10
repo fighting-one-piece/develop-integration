@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			classpath:/org/springframework/beans/factory/xml/spring-beans-4.2.xsd
+			http://www.springframework.org/schema/context 
+			http://www.springframework.org/schema/context/spring-context-4.2.xsd
+			http://www.springframework.org/schema/aop 
+			http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+			http://www.springframework.org/schema/mvc 
+			http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
+
+	<!-- 注解配置 -->
+	<context:component-scan base-package="org.cisiondata.modules">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+	
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="stringHttpMessageConverter" />
+                <ref bean="jsonHttpMessageConverter" />
+            </list>
+        </property>
+    </bean>
+	
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="stringHttpMessageConverter" />
+                <ref bean="jsonHttpMessageConverter" />
+			</list>
+		</property>
+        <property name="webBindingInitializer">  
+		    <bean class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">  
+		        <property name="conversionService">  
+		            <bean class="org.springframework.format.support.FormattingConversionServiceFactoryBean"></bean>  
+		        </property>  
+		    </bean>  
+		</property>  
+	</bean>
+	
+	<!-- 实现@AspectJ注解的 -->
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
+	
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" enable-matrix-variables="true">
+        <!-- 异步支持 默认30秒超时 -->
+        <mvc:async-support default-timeout="30000" task-executor="executor"/>
+
+        <mvc:message-converters register-defaults="true">
+            <!-- StringHttpMessageConverter编码为UTF-8，防止乱码 -->
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8"/>
+                <property name = "supportedMediaTypes">
+                    <list>
+                        <bean class="org.springframework.http.MediaType">
+                            <constructor-arg index="0" value="text"/>
+                            <constructor-arg index="1" value="plain"/>
+                            <constructor-arg index="2" value="UTF-8"/>
+                        </bean>
+                        <bean class="org.springframework.http.MediaType">
+                            <constructor-arg index="0" value="*"/>
+                            <constructor-arg index="1" value="*"/>
+                            <constructor-arg index="2" value="UTF-8"/>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+
+            <!-- 避免IE执行AJAX时,返回JSON出现下载文件 -->
+            <bean id="fastJsonHttpMessageConverter" class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+                <!--<property name="serializerFeature">-->
+                <!--能自己配置一些东西，比如时间的格式化，null输出""等等-->
+                <!--</property>-->
+            </bean>
+        </mvc:message-converters>
+
+    </mvc:annotation-driven>
+	
+	<bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter" /> 
+
+	<!--
+	<bean id="jsonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+	-->
+	<bean id="jsonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="supportedMediaTypes">  
+        	<list>  
+            	<value>application/json;charset=UTF-8</value>  
+        	</list>  
+    	</property>  	
+	</bean>
+	
+	<!-- 内容协商管理器  -->
+    <!--1、首先检查路径扩展名（如my.pdf）；2、其次检查Parameter（如my?format=pdf）；3、检查Accept Header-->
+    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <!-- 扩展名至mimeType的映射,即 /user.json => application/json -->
+        <property name="favorPathExtension" value="true"/>
+        <!-- 用于开启 /userinfo/123?format=json 的支持 -->
+        <property name="favorParameter" value="true"/>
+        <property name="parameterName" value="format"/>
+        <!-- 是否忽略Accept Header -->
+        <property name="ignoreAcceptHeader" value="false"/>
+
+        <property name="mediaTypes"> <!--扩展名到MIME的映射；favorPathExtension, favorParameter是true时起作用  -->
+            <value>
+                json=application/json
+                xml=application/xml
+                html=text/html
+            </value>
+        </property>
+        <!-- 默认的content type -->
+        <property name="defaultContentType" value="text/html"/>
+    </bean>
+    
+    <!-- ========================= VIEW定义 ========================= -->
+    <!-- 内容协商视图解析器；根据客户端的不同的请求决定不同的 view进行响应, 如 /blog/1.json /blog/1.xml -->
+    <!-- 会自动根据解析的contentType来决定使用哪个视图解析器（默认使用整个web应用中的viewResolver） -->
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver" p:order="0">
+        <!-- 内容协商管理器 用于决定media type -->
+        <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
+        <!-- 默认视图放在解析链最后 -->
+        <property name="defaultViews">
+            <list>
+                <!--<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"/>-->
+                <bean class="com.alibaba.fastjson.support.spring.FastJsonJsonView" />
+                <!--<bean class="org.springframework.web.servlet.view.xml.MarshallingView"/>-->
+            </list>
+        </property>
+    </bean>
+	
+	<!--定义Jsp配置-->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+		<property name="order" value="1" />
+	</bean>
+	
+	<!-- 文件上传表单的视图解析器 -->  
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">    
+        <property name="defaultEncoding" value="utf-8"/>  
+        <property name="maxUploadSize" value="104857600" />    
+    </bean> 
+
+	<!-- Mapping exception to the handler view -->
+	<bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="warnLogCategory" value="WARN"></property>
+        <property name="defaultStatusCode" value="500"></property>
+		<property name="defaultErrorView" value="errors/500" />
+		<!-- 定义异常处理页面用来获取异常信息的变量名，默认名为exception -->  
+    	<property name="exceptionAttribute" value="error" />  
+    	<!-- 定义需要特殊处理的异常，用类名或完全路径名作为key，异常也页名作为值 -->  
+		<property name="exceptionMappings">
+			<props>
+                <prop key="java.lang.Throwable">errors/500</prop>
+				<prop key="org.cisiondata.utils.exception.DataException">errors/data</prop>  
+				<prop key="org.cisiondata.utils.exception.BusinessException">errors/business</prop>  
+			</props>
+		</property>
+		<property name="statusCodes">
+            <props>
+                <prop key="errors/400">400</prop>
+                <prop key="errors/404">404</prop>
+                <prop key="errors/500">500</prop>
+                <prop key="errors/503">503</prop>
+            </props>
+        </property>
+	</bean>
+	
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+		<property name="cookieName" value="clientlanguage"/>
+		<property name="cookieMaxAge" value="-1"/>
+	</bean>
+	
+	<mvc:interceptors>
+    	<bean class="org.cisiondata.modules.auth.web.interceptor.CommonDataInterceptor">
+            <property name="excludeUrlPatterns">
+                <value>
+                    /app
+                </value>
+            </property>
+        </bean>
+    </mvc:interceptors>
+    
+    <bean id="frontContextInterceptor" class="org.cisiondata.modules.auth.web.interceptor.FrontContextInterceptor"/>
+	<bean id="frontLocaleInterceptor" class="org.cisiondata.modules.auth.web.interceptor.FrontLocaleInterceptor"/>
+    
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<ref bean="frontContextInterceptor"/>
+				<ref bean="frontLocaleInterceptor"/>
+			</list>
+		</property>
+	</bean>
+	
+	<mvc:view-controller path="/" view-name="redirect:/front/login"/>
+	
+    <mvc:default-servlet-handler/>
+	
+	<mvc:resources mapping="/js/**" location="/WEB-INF/js/" />
+    <mvc:resources mapping="/css/**" location="/WEB-INF/css/" />
+    <mvc:resources mapping="/img/**" location="/WEB-INF/img/" />
+    <mvc:resources mapping="/images/**" location="/WEB-INF/images/" />
+	<mvc:resources mapping="/fonts/**" location="/WEB-INF/fonts/"/>
+	
+	<import resource="spring-mvc-shiro.xml"/>
+    
+</beans>

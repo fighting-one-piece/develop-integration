@@ -46,31 +46,29 @@ public class JedisClusterFactory implements FactoryBean<JedisCluster>, Initializ
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Set<HostAndPort> haps = this.parseHostAndPort();
-		jedisCluster = new JedisCluster(haps, timeout, maxRedirections, genericObjectPoolConfig);
+		Set<HostAndPort> hostAndPorts = this.parseHostAndPort();
+		jedisCluster = new JedisCluster(hostAndPorts, timeout, maxRedirections, genericObjectPoolConfig);
 	}
 	
 	private Set<HostAndPort> parseHostAndPort() {
 		try {
 			Properties properties = new Properties();
 			properties.load(this.addressConfig.getInputStream());
-			Set<HostAndPort> haps = new HashSet<HostAndPort>();
+			Set<HostAndPort> hostAndPorts = new HashSet<HostAndPort>();
 			for (Object key : properties.keySet()) {
-				if (!((String) key).startsWith(addressKeyPrefix)) {
-					continue;
-				}
+				if (!((String) key).startsWith(addressKeyPrefix)) continue;
 				String value = (String) properties.get(key);
 				boolean isIpPort = pattern.matcher(value).matches();
 				if (!isIpPort) {
 					throw new IllegalArgumentException("ip 或  port 不合法");
 				}
 				String[] ipAndPort = value.split(":");
-				HostAndPort hap = new HostAndPort(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
-				haps.add(hap);
+				HostAndPort hostAndPort = new HostAndPort(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
+				hostAndPorts.add(hostAndPort);
 			}
-			return haps;
+			return hostAndPorts;
 		} catch (Exception e) {
-			LOG.error("解析 redis配置文件失败", e);
+			LOG.error("解析redis配置文件失败", e);
 		}
 		return null;
 	}

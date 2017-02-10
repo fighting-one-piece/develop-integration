@@ -1,0 +1,7 @@
+@CHARSET "UTF-8";
+
+.one-td { 
+	text-decoration:underline;
+	color:#00F;
+	cursor: pointer;
+} 

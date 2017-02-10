@@ -17,6 +17,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.SecurityUtils;
 import org.cisiondata.modules.log.dao.LogMapper;
 import org.cisiondata.modules.log.entity.LogModel;
 import org.cisiondata.utils.spring.SpringBeanFactory;
@@ -73,14 +74,18 @@ public class AccessLogFilter implements Filter {
     			String session = httpServletRequest.getSession().getId();
     			String IP = getIPAddress(httpServletRequest);
     			String keyword = url.substring(url.lastIndexOf("/")+1, url.length());
-    			Matcher m = p.matcher(keyword);  
-    			logModel.setId(id);
-    			logModel.setSessionId(session);
-    			logModel.setIp(IP);
-    			logModel.setAccessTime(new Date());
-    			logModel.setKeyword(keyword);
-    			if(m.matches()){
-    				logMapper.addLog(logModel);
+    			String account = (String) SecurityUtils.getSubject().getPrincipal();
+    			Matcher m = p.matcher(keyword);
+    			if(!IP.equals("0:0:0:0:0:0:0:1")){
+    				logModel.setId(id);
+    				logModel.setSessionId(session);
+    				logModel.setIp(IP);
+    				logModel.setAccessTime(new Date());
+    				logModel.setKeyword(keyword);
+    				logModel.setAccount(account);
+    				if(m.matches()){
+    					logMapper.addLog(logModel);
+    				}
     			}
         	}else{
         		Gson gson = new Gson();
@@ -89,18 +94,27 @@ public class AccessLogFilter implements Filter {
         		map.remove("searchToken");
         		map.remove("scrollId");
         		map.remove("rowNumPerPage");
+        		map.remove("accessId");
+        		map.remove("token");
+        		map.remove("pageSize");
+        		map.remove("esindex");
+        		map.remove("estype");
         		for (Map.Entry<String, Object> entry: map.entrySet()) {
         			LogModel logModel = new LogModel();
         			String id = UUID.randomUUID().toString();
         			String session = httpServletRequest.getSession().getId();
         			String keyword = entry.getValue().toString();
         			String IP = getIPAddress(httpServletRequest);
-        			logModel.setId(id);
-        			logModel.setSessionId(session);
-        			logModel.setIp(IP);
-        			logModel.setAccessTime(new Date());
-        			logModel.setKeyword(keyword.substring(1,keyword.length()-1));
-        			logMapper.addLog(logModel);
+        			String account = (String) SecurityUtils.getSubject().getPrincipal();
+        			if(!IP.equals("0:0:0:0:0:0:0:1")){
+        				logModel.setId(id);
+        				logModel.setSessionId(session);
+        				logModel.setIp(IP);
+        				logModel.setAccessTime(new Date());
+        				logModel.setKeyword(keyword.substring(1,keyword.length()-1));
+        				logModel.setAccount(account);
+        				logMapper.addLog(logModel);
+        			}
         		}
         	}
         }

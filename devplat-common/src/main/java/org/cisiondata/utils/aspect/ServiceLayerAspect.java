@@ -47,9 +47,9 @@ public class ServiceLayerAspect {
 		long startTime = System.currentTimeMillis();
 		String className = proceedingJoinPoint.getTarget().getClass().getSimpleName();
 		String methodName = proceedingJoinPoint.getSignature().getName();
-		LOG.info("------{} {} Log Start", className, methodName);
+		LOG.info("------Class {} Method {} Log Start", className, methodName);
 		Object result = proceedingJoinPoint.proceed();
-		LOG.info("------{} {} Log End ! Spend Time: {} s", className, methodName, 
+		LOG.info("------Class {} Method {} Log End ! Spend Time: {} s", className, methodName, 
 				(System.currentTimeMillis() - startTime) / 1000);
 		return result;
 	}

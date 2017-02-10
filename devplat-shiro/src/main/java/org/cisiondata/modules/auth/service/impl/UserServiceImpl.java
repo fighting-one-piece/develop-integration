@@ -38,18 +38,22 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements I
 	}
 	
 	@Override
-	public User readUserByAccountAndPassword(String account, String password)
-			throws BusinessException {
+	public User readUserByAccountAndPassword(String account, String password) throws BusinessException {
 		Query query = new Query();
 		query.addCondition("account", account);
 		query.addCondition("password", password);
 		return userDAO.readDataByCondition(query);
 	}
-
+	
 	@Override
-	public void updateUserPassword(User user) throws BusinessException {
-		String password = EndecryptUtils.encryptPassword(user.getAccount(), user.getPassword());
-		user.setPassword(password);
+	public void updateUserPassword(String account, String originalPassword, String newPassword)
+			throws BusinessException {
+		User user = readUserByAccount(account);
+		String password = EndecryptUtils.encryptPassword(account, originalPassword);
+		if (!password.equals(user.getPassword())) {
+			throw new BusinessException("原密码不正确！");
+		}
+		user.setPassword(EndecryptUtils.encryptPassword(account, newPassword));
 		userDAO.updateUserPassword(user);
 	}
 

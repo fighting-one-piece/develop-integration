@@ -6,7 +6,7 @@ import java.util.Map;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.utils.exception.BusinessException;
 
-public interface IESBizService {
+public interface IESBizService extends IESService {
 	
 	
 	/**

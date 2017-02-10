@@ -14,8 +14,8 @@ $(document).ready(function(){
 			dataType:"json",
 			data:{"index":index},
 			success:function(result){
-				var array = eval(result.data);
-				$("#endpage").val(result.pageCount);
+				var array = eval(result.data.data);
+				$("#endpage").val(result.data.pageCount);
 				var html="";
 				for(var i=0;i<array.length;i++){
 					html+='<tr id="'+j+'">'+
@@ -49,8 +49,8 @@ $(document).ready(function(){
 			data:{"index":index},
 			success:function(result){
 				console.log(result);
-				var array = eval(result.data);
-				$("#endpage").val(result.pageCount);
+				var array = eval(result.data.data);
+				$("#endpage").val(result.data.pageCount);
 				var html="";
 				for(var i=0;i<array.length;i++){
 					var date = new Date(array[i].accessTime);
@@ -252,8 +252,8 @@ $(document).ready(function(){
 			dataType:"json",
 			data:{"index":index,"keyword":keyword},
 			success:function(result){
-				var array = eval(result.data);
-				$("#end").val(result.pageCount);
+				var array = eval(result.data.data);
+				$("#end").val(result.data.pageCount);
 				var html="";
 				for(var i=0;i<array.length;i++){
 					var date = new Date(array[i].accessTime);

@@ -9,12 +9,14 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
@@ -25,6 +27,7 @@ import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.ModelAndView;
 
 @Aspect
 @Component
@@ -59,12 +62,19 @@ public class WebLayerAspect {
 
 	@Around(EXECUTION)
 	public Object around(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+		Signature signature = proceedingJoinPoint.getSignature();
+		if (signature instanceof MethodSignature) {
+			MethodSignature methodSignature = (MethodSignature) signature;
+			Class<?> returnType = methodSignature.getReturnType();
+			if (ModelAndView.class.isAssignableFrom(returnType)) {
+				return proceedingJoinPoint.proceed();
+			}
+		}
 		long startTime = System.currentTimeMillis();
 		try {
 			judgeSensitiveWord(proceedingJoinPoint.getArgs());
 			String className = proceedingJoinPoint.getTarget().getClass().getSimpleName();
-			String methodName = proceedingJoinPoint.getSignature().getName();
-			LOG.info("------{} {} Log Start", className, methodName);
+			LOG.info("------Class {} Method {} Log Start", className, signature.getName());
 			Subject subject = SecurityUtils.getSubject();
 			if (null != subject) {
 				String account = (String) subject.getPrincipal();
@@ -77,7 +87,7 @@ public class WebLayerAspect {
 				accessUserService.updateRemainingCount(account, remainingCount, -incOrDec);
 				return result;
 			}
-			LOG.info("------{} {} Log End ! Spend Time: {} s", className, methodName, 
+			LOG.info("------Class {} Method {} Log End ! Spend Time: {} s", className, signature.getName(), 
 					(System.currentTimeMillis() - startTime) / 1000);
 		} catch (BusinessException be) {
 			WebResult webResult = new WebResult();

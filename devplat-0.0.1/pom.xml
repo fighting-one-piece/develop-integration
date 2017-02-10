@@ -9,6 +9,33 @@
 	
 	<name>DevPlat Maven Project</name>
 	<url>http://maven.apache.org</url>
+	
+	<profiles>
+		<!-- 开发环境 -->
+		<profile>
+			<id>development</id>
+			<properties>
+				<target-env>development</target-env>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<!-- 测试环境 -->
+		<profile>
+			<id>test</id>
+			<properties>
+				<target-env>test</target-env>
+			</properties>
+		</profile>
+		<!-- 生产环境 -->
+		<profile>
+			<id>production</id>
+			<properties>
+				<target-env>production</target-env>
+			</properties>
+		</profile>
+	</profiles>
 
 	<repositories>
 		<repository>
@@ -47,21 +74,21 @@
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-common</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<!--DevPlat ElasticSearch依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-elasticsearch</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<!--DevPlat Shiro依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-shiro</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	
 		<!--JUnit依赖包 -->
@@ -96,12 +123,17 @@
 		<outputDirectory>src/main/webapp/WEB-INF/classes</outputDirectory>
 		<testOutputDirectory>src/main/webapp/WEB-INF/test-classes</testOutputDirectory>
 		<defaultGoal>install</defaultGoal>
+		<filters>
+			<filter>src/main/filters/filter-default.properties</filter>
+			<filter>src/main/filters/filter-${target-env}.properties</filter>
+		</filters>
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
 			</resource>
 		</resources>
 		<testResources>
@@ -162,7 +194,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		
 	</build>
 	
 	<distributionManagement>

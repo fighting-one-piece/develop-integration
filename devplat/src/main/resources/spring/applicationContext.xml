@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:/org/springframework/beans/factory/xml/spring-beans-4.2.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+	
+	<!-- 注解配置  -->
+	<context:component-scan base-package="org.cisiondata">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>  
+	</context:component-scan>
+	
+	<!-- 加载文件配置 -->
+	<context:property-placeholder location="classpath*:database/jdbc.properties" ignore-unresolvable="true"/>
+	<context:property-placeholder location="classpath*:database/redis.properties" ignore-unresolvable="true"/>
+	<context:property-placeholder location="classpath*:shiro/shiro.properties" ignore-unresolvable="true"/>
+		
+	<!-- DBCP数据源配置 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${driverClassName}"></property> 
+		<property name="url" value="${url}"></property> 
+		<property name="username" value="${username}"></property> 
+		<property name="password" value="${password}"></property> 
+		<property name="initialSize" value="10"></property> 
+		<property name="maxActive" value="${dbcp.maxActive}"></property> 
+		<property name="maxIdle" value="${dbcp.maxIdle}"></property> 
+		<property name="minIdle" value="${dbcp.minIdle}"></property> 
+		<property name="maxWait" value="${dbcp.maxWait}"></property> 
+		<property name="removeAbandoned" value="${dbcp.removeAbandoned}"></property> 
+		<property name="defaultAutoCommit" value="${dbcp.defaultAutoCommit}"></property> 
+		<property name="removeAbandonedTimeout" value="${dbcp.removeAbandonedTimeout}"></property> 
+	</bean> 
+	
+	<!-- Spring JDBC 配置 -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"> 
+		 <property name="dataSource"> 
+		 	<ref bean="dataSource" /> 
+	 	 </property> 
+	</bean> 
+	
+	<!-- 事务配置 -->
+	<!-- TX标签事务配置 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />  
+	</bean>
+	
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="get*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="find*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="load*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="read*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="select*" propagation="REQUIRED" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>  
+       <aop:pointcut id="interceptorPointCuts"  
+           expression="(execution(* org.cisiondata.modules.*.biz.impl.*.*(..))) or
+           			   (execution(* org.cisiondata.modules.*.service.impl.*.*(..)))" />  
+       <aop:advisor advice-ref="txAdvice" pointcut-ref="interceptorPointCuts" />          
+    </aop:config>  
+    
+    <!-- 注解事务配置 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+    
+	<!-- 国际化资源 -->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">  
+        <property name="basenames">  
+            <list>  
+                <value>classpath:locale/messages</value>  
+                <value>classpath:locale/exception</value>  
+            </list>  
+        </property>  
+        <property name="defaultEncoding" value="UTF-8"/>  
+        <property name="cacheSeconds" value="60"/>  
+    </bean>
+    
+    <!-- Import Resource -->
+    <import resource="classpath:spring/applicationContext-task.xml"/>
+    <import resource="classpath:spring/applicationContext-redis.xml"/>
+    <import resource="classpath:spring/applicationContext-shiro.xml"/>
+    <import resource="classpath:spring/applicationContext-mybatis.xml"/>
+    
+</beans>

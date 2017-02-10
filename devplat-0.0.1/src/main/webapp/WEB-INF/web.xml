@@ -18,17 +18,17 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath*:spring/applicationContext.xml</param-value>
 	</context-param>
+	
+	<context-param> 
+	     <param-name>webAppRootKey</param-name> 
+	     <param-value>app.root</param-value> 
+    </context-param>
 
 	<!-- Listener -->
 	<listener>  
          <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>  
 	</listener>
 
-	 <context-param> 
-		     <param-name>webAppRootKey</param-name> 
-		     <param-value>app.root</param-value> 
-	   </context-param>
-	   
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
@@ -154,7 +154,7 @@
 	</servlet-mapping>
 	
 	<session-config>
-  		<session-timeout>10</session-timeout>
+  		<session-timeout>30</session-timeout>
  	</session-config>
 	
 	<!-- Error -->

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.analysis.dao.EventBaseDAO">
+	<!-- EventBase实体映射 -->
+	<resultMap type="EventBase" id="eventBaseMap">
+		<result column="event_id" property="eventId" />
+		<result column="event_name" property="eventName" />
+		<result column="event_time" property="eventTime" javaType="java.util.Date" />
+		<result column="event_info" property="eventInfo" />
+	</resultMap>
+	<!-- EventExtend实体映射 -->
+	<resultMap type="EventExtend" id="eventExtendMap">
+		<result column="event_extend_id" property="eventId" />
+		<result column="extend_info1" property="extendInfo1" />
+		<result column="extend_info2" property="extendInfo2" />
+		<result column="extend_info3" property="extendInfo3" />
+		<result column="extend_info4" property="extendInfo4" />
+		<result column="extend_info5" property="extendInfo5" />
+		<result column="extend_base_id" property="eventBaseid" />
+	</resultMap>
+	<!-- 增加 -->
+	<insert id="addEvent" parameterType="EventBase" useGeneratedKeys="false" keyProperty="eventId">
+		insert into T_EVENT_BASE(event_name,event_time,event_info)
+		value(#{eventName},#{eventTime},#{eventInfo})
+		<selectKey resultType="java.lang.Integer" order="AFTER"
+			keyProperty="eventId">
+			SELECT LAST_INSERT_ID()   
+		</selectKey>
+	</insert>
+	<!-- 查询是否存在该名称 -->
+	<select id="selEvent" parameterType="String" resultType="int">
+		select count(*) from T_EVENT_BASE where event_name = #{0}
+	</select>
+	<!-- 增加事件详情 -->
+	<insert id="addExtend" parameterType="EventExtend">
+		insert into T_EVENT_EXTEND(extend_info1,extend_base_id) value(#{extendInfo1},#{eventBaseid})
+	</insert>
+	<!-- 查询当前分析的数据 -->
+	<select id="selExtend" resultMap="eventExtendMap">
+		SELECT extend_info1,extend_info2  FROM T_EVENT_EXTEND WHERE extend_base_id = (SELECT event_id FROM T_EVENT_BASE WHERE event_name = #{0})
+	</select>
+	<!-- 分页 -->
+	<select id="selExtendPage" resultMap="eventExtendMap">
+		SELECT extend_info1,extend_info2  FROM T_EVENT_EXTEND WHERE extend_base_id = (SELECT event_id FROM T_EVENT_BASE WHERE event_name = #{0}) LIMIT #{1},#{2}
+	</select>
+	<!-- 分页 -->
+	<select id="selEventBase" resultMap="eventBaseMap">
+		SELECT event_name FROM T_EVENT_BASE LIMIT #{0},#{1}
+	</select>
+	<!-- 查询已导入的文件数据 -->
+	<select id="findAll" resultMap="eventBaseMap">
+		SELECT event_name FROM T_EVENT_BASE
+	</select>
+	<!-- 删除数据 -->
+	<delete id="delEventBase" >
+		DELETE FROM T_EVENT_BASE WHERE event_name = #{0}
+	</delete>
+	<delete id="delExtend">
+		DELETE FROM T_EVENT_EXTEND WHERE extend_base_id = (SELECT event_id FROM T_EVENT_BASE WHERE event_name = #{0});
+	</delete>
+</mapper>

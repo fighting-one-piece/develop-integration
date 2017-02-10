@@ -4,10 +4,13 @@
 	String path = request.getContextPath(); 
  	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path;
 %>
+<head>
+	<title>手机号当前状态查</title>
+</head>
 <body>
 <h5 align="center">&nbsp;</h5>
 <div align="center">
-	<p><input id="phone" type="text"  style="width: 220px;" placeholder="请输入手机号10"/></p>
+	<p><input id="phone" type="text"  style="width: 220px;" placeholder="请输入手机号"/></p>
 	<p><input id="SubmitMoble" type="button" value="确定"/></p>
 </div>
 <div id="resultphone" align="center" style="top: 30%;position: absolute;">

@@ -1,0 +1,24 @@
+.styleThead{
+	text-align: center;
+	font-weight: bolder;
+}
+.styleTbody{
+	text-align: center;
+}
+#startData{
+	width: 150px;
+}
+.styleTop{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+#endData{
+	width: 150px;
+}
+.styleTopLeft{
+	padding-left: 60px;
+}
+.styleBtn{
+	height: 30px;
+	text-align: center;
+}

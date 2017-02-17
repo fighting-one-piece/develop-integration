@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.log.dao.UserAccessLogDAO">
+
+	<resultMap type="UserAccessLog" id="UserAccessLogMap">
+		<result column="id" property="id" jdbcType="INTEGER"/>
+		<result column="session_id" property="sessionId"/>
+		<result column="ip" property="ip"/>
+		<result column="access_time" property="accessTime" javaType="java.util.Date"/>
+		<result column="keyword" property="keyword"/>
+		<result column="account" property="account"/>
+		<result column="keyword_Count" property="count"/>
+	</resultMap>
+	<!-- 增加 -->
+	<insert id="addLog" parameterType="UserAccessLog">
+		insert into T_LOG(id,session_id,ip,access_time,keyword,account) value (#{id},#{sessionId},#{ip},#{accessTime},#{keyword},#{account})
+	</insert>
+	<!-- 查询全部 -->
+	<select id="findAll" resultMap="UserAccessLogMap">
+		select id,session_id,ip,access_time,keyword from T_LOG
+	</select>
+	<!-- 分页SQL语句 -->
+	<select id="selectByPage" resultMap="UserAccessLogMap">
+		SELECT c.* FROM T_LOG c LEFT JOIN (SELECT a.*, count(1) as kn FROM T_LOG a GROUP BY a.keyword ORDER BY kn DESC) b ON c.keyword = b.keyword ORDER BY b.kn DESC limit #{0},#{1}
+	</select>
+	<!-- 删除 -->
+	<delete id="delLog" parameterType="string">
+		delete from T_LOG where keyword = #{keyword}
+	</delete>
+	<!-- 统计关键字 -->
+	<select id="count" resultMap="UserAccessLogMap">
+		SELECT keyword,keyword_Count AS Count FROM T_LOG_COUNT 
+	</select>
+	<!-- 统计关键字分页 -->
+	<select id="countPage" resultMap="UserAccessLogMap">
+		SELECT keyword,keyword_Count AS Count FROM T_LOG_COUNT ORDER BY Count DESC LIMIT #{0},#{1}
+	</select>
+	<!-- 查询某个关键字 -->
+	<select id="selectByKey" resultMap="UserAccessLogMap">
+		SELECT id,session_id,ip,access_time,keyword FROM T_LOG WHERE keyword = #{0}
+	</select>
+	<!-- 查询到某个关键字进行分页 -->
+	<select id="keyByPage" resultMap="UserAccessLogMap">
+		SELECT id,session_id,ip,access_time,keyword FROM T_LOG WHERE keyword = #{0} LIMIT #{1},#{2}
+	</select>
+	<!-- 分页SQL语句 -->
+	<select id="selectByorderTime" resultMap="UserAccessLogMap">
+		SELECT * FROM T_LOG  ORDER BY access_time DESC limit #{0},#{1}
+	</select>
+	
+	<!-- 查询统计关键字的表 -->
+	<select id="selLogCount" resultType="int">
+		SELECT COUNT(*) FROM T_LOG_COUNT WHERE keyword = #{0}
+	</select>
+	<!-- 统计关键字存入另一张表 -->
+	<insert id="addLogCount" parameterType="UserAccessLog">
+		INSERT INTO T_LOG_COUNT(keyword,keyword_Count,access_time) value(#{keyword},#{count},#{accessTime})
+	</insert>
+	<!-- 修改已存在的关键字统计个数 -->
+	<update id="upLogCount" parameterType="UserAccessLog">
+		UPDATE T_LOG_COUNT SET keyword_Count = #{count} ,access_time = #{accessTime} WHERE keyword = #{keyword}
+	</update>
+</mapper>

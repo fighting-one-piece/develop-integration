@@ -261,10 +261,15 @@ $(document).ready(function() {
         						var value="<tr>";
         						set=set+"<td>"+"数据结果展示:"+"</td>"
         						$.each(result.data,function(n,x){
-        							value=value+"<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis;'>"+x.extendInfo2+"</td><tr>"    						
+        							var str = "[]";
+        							if(x){
+        								str = x.extendInfo2
+        							}
+        							value=value+"<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis;'>"+str+"</td><tr>"    						
         						})
         						set=set+"</tr>";
         						$(".col-xs-7").append(set+value);
+        						$("#resultShow").empty();
         					}   			
         				})	    		
         			}else{
@@ -371,6 +376,7 @@ $(document).ready(function() {
   							})
   							set=set+"</tr>";
   							$(".col-xs-7").append(set+value);
+  							$("#resultShow").empty();
   						}
     			  })
     		  }

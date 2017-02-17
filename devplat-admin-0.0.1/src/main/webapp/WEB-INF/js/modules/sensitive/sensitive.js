@@ -38,8 +38,6 @@ $(function(){
 		$("#main_sernsitive").on("click",".sensitive_updata",function(){
 			var ID=$(this).parent().parent().find("td").eq(0).html();
 			updateInitialCount=$(this).parent().parent().find("td").eq(1).html();
-			console.log(updateInitialCount);
-			console.log(ID);
 			//发送请求
 			$.ajax({
 				type:"get",
@@ -64,9 +62,7 @@ $(function(){
 		//接收修改请求
 			$("#Suerbtn").click(function(){
 				var updateid =document.getElementById("r_ID").value;
-				var updateCount=document.getElementById("r_Sensitive").value;
-				alert(updateCount);
-				alert(updateInitialCount);
+				var updateCount=document.getElementById("r_Sensitive").value;	
 				$.ajax({
 					type:"get",
 					url:projectName+"/updataID/"+updateid+"/"+updateCount+"/"+updateInitialCount,    

@@ -23,16 +23,17 @@ public class LogModel {
 	//关键字
 	private String keyword = null;
 	//统计
-	private String count = null;
+	private int count = 0;
 	
-	public String getCount() {
+	
+	public int getCount() {
 		return count;
 	}
-	
-	public void setCount(String count) {
+
+	public void setCount(int count) {
 		this.count = count;
 	}
-	
+
 	public String getId() {
 		return id;
 	}

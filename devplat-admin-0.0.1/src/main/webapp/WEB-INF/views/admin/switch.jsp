@@ -36,7 +36,8 @@
 				data-click-to-select="false">
 				<thead>
 					<tr>
-						<th data-field="id" data-align="center">序号</th>
+						<th data-align="center" data-checkbox="true"></th>
+						<!-- <th data-field="id" data-align="center">序号</th> -->
 						<th data-field="switch_identity" data-align="center">标识</th>
 						<th data-field="switch_name" data-align="center">名称</th>
 						<th data-field="swith_desc" data-align="center">描述</th>
@@ -45,6 +46,9 @@
 					</tr>
 				</thead>
 			</table>
+			<button class="btn btn-primary" id="batchOpen">批量开</button>
+			<button class="btn btn-primary" id="batchClose">批量关</button>
+			<button class="btn btn-primary" id="batchTest">批量测试</button>
 		</div>
 	</div>
 	
@@ -81,7 +85,7 @@
 <!-- 修改  -->
 <div class="modal fade" id="updata" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">今日热点
+    <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
         <h4 class="modal-title" id="myModalLabel" style="font-weight: bold;">修改</h4>

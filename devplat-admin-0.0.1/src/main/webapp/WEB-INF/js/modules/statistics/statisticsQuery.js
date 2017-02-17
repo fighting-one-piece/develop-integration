@@ -61,7 +61,6 @@ $(function() {
 	
 	$('#GridView td').click(function() {
 		var type = $(this).parent().find('td').eq(1).html();
-		console.log(type)
 		$("#results").empty();
 			$.ajax({
 			type : "get",
@@ -93,7 +92,6 @@ $(function() {
 			animation:"slide-from-top"  
 		}).then(function(isConfirm){
 			if(isConfirm == true){
-				console.log("删除OK")
 				$.ajax({
 					url:"dataTypeId",
 					type:"post",
@@ -129,7 +127,6 @@ $(function() {
 		var type= $("#typeA").val();
 		var attribute_en= $("#attribute_enA").val();
 		var attribute_ch= $("#attribute_chA").val();
-		console.log(indexs+"--"+type+"--"+attribute_en+"--"+attribute_ch)
 		swal({
 			title:"",  
 			text:"确定添加？",  
@@ -176,7 +173,6 @@ $(function() {
 		
 		//修改
 		$('#updataType').click(function() {
-			console.log(id+"------------")
 			var indexs= $("#indexB").val();
 			var type= $("#typeB").val();
 			var attribute_en= $("#attribute_enB").val();

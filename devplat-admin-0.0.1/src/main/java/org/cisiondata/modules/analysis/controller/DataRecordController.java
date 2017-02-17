@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping(value = "/excludeUtils")
@@ -25,8 +26,8 @@ public class DataRecordController {
 	private IDataRecordService dataRecordService;
 	
 	@RequestMapping(value = "/insert", method = RequestMethod.GET)
-	public String insertDataRecordView() {
-		return "/user/user_data";
+	public ModelAndView insertDataRecordView() {
+		return new ModelAndView("/user/user_data");
 	}
 	
 	@ResponseBody
@@ -83,7 +84,7 @@ public class DataRecordController {
 	}
 
 	@RequestMapping(value="",method=RequestMethod.GET)
-	public String dataShow() {
-		return "/user/datashow";
+	public ModelAndView dataShow() {
+		return new ModelAndView("/user/datashow");
 	}
 }

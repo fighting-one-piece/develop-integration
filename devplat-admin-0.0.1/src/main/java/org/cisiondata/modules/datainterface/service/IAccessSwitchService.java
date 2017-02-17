@@ -11,11 +11,14 @@ public interface IAccessSwitchService{
 	public List<AccessSwitch> findAll(); 
 	
 	/*添加*/
-	public void saveSwitch(AccessSwitch sSwitch) throws IOException;
+	public void saveSwitch(AccessSwitch accessSwitch) throws IOException;
 	
 	/*删除*/
 	public void deleteIdentity(String identity) throws IOException;
 	
 	/*修改*/
-	public int updateId(AccessSwitch sSwitch) throws IOException, Exception;
+	public int updateId(AccessSwitch accessSwitch) throws IOException, Exception;
+	
+	/*批量修改*/
+	public void updateIdStatus(AccessSwitch accessSwitch) throws IOException;
 }

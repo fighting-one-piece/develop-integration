@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.auth.dao.AccessUserDAO">
+
+	<resultMap type="AccessUser" id="accessUserResultMap">  
+        <result property="accessId" column="ACCESS_ID"/>
+        <result property="accessKey" column="ACCESS_KEY"/>
+        <result property="deleteFlag" column="DELETE_FLAG"/> 
+    </resultMap>
+    
+    <sql id="columnClause">ACCESS_ID, ACCESS_KEY, DELETE_FLAG</sql>
+    
+    <sql id="whereClause">
+    	<where>
+    		<if test="condition.accessId != null and condition.accessId != ''">
+    			AND ACCESS_ID = #{condition.accessId}
+    		</if>
+    		<if test="condition.accessKey != null and condition.accessKey != ''">
+    			AND ACCESS_KEY = #{condition.accessKey}
+    		</if>
+    		<if test="condition.deleteFlag != null">
+    			AND DELETE_FLAG = #{condition.deleteFlag}
+    		</if>
+    	</where>
+    </sql>
+    
+    <insert id="insert" parameterType="AccessUser">
+            INSERT INTO T_ACCESS_USER(ACCESS_ID, ACCESS_KEY, DELETE_FLAG) 
+            VALUES(#{accessId},#{accessKey},#{deleteFlag}) 
+    </insert>
+    
+    <select id="readDataByPK" resultMap="accessUserResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_ACCESS_USER WHERE ID = #{id}
+    </select>
+    
+    <select id="readDataByCondition" resultMap="accessUserResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_ACCESS_USER
+            <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataListByCondition" resultMap="accessUserResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_ACCESS_USER
+            <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataPaginationByCondition" resultMap="accessUserResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_ACCESS_USER
+        ]]>   
+    </select>
+   
+</mapper>

@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.cisiondata.utils.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -48,7 +49,13 @@ public class ServiceLayerAspect {
 		String className = proceedingJoinPoint.getTarget().getClass().getSimpleName();
 		String methodName = proceedingJoinPoint.getSignature().getName();
 		LOG.info("------Class {} Method {} Log Start", className, methodName);
-		Object result = proceedingJoinPoint.proceed();
+		Object result = null;
+		try {
+			result = proceedingJoinPoint.proceed();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			throw new BusinessException(e.getMessage());
+		}
 		LOG.info("------Class {} Method {} Log End ! Spend Time: {} s", className, methodName, 
 				(System.currentTimeMillis() - startTime) / 1000);
 		return result;

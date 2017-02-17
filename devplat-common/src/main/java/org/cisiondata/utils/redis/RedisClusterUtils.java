@@ -30,13 +30,26 @@ public class RedisClusterUtils {
 	public JedisCluster getJedisCluster() {
 		return jedisCluster;
 	}
-
+	
 	/**
 	 * 缓存数据
 	 * @param key
 	 * @param value
 	 */
 	public void set(String key, Object value) {
+		try {
+			jedisCluster.set(SerializerUtils.write(key), SerializerUtils.write(value));
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * 缓存数据
+	 * @param key
+	 * @param value
+	 */
+	public void set(Object key, Object value) {
 		try {
 			jedisCluster.set(SerializerUtils.write(key), SerializerUtils.write(value));
 		} catch (IOException e) {
@@ -51,6 +64,22 @@ public class RedisClusterUtils {
 	 * @param expireTime
 	 */
 	public void set(String key, Object value, int expireTime) {
+		try {
+			byte[] cache_key = SerializerUtils.write(key);
+			jedisCluster.set(cache_key, SerializerUtils.write(value));
+			jedisCluster.expire(cache_key, expireTime);
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * 缓存数据并设置过期时间
+	 * @param key
+	 * @param value
+	 * @param expireTime
+	 */
+	public void set(Object key, Object value, int expireTime) {
 		try {
 			byte[] cache_key = SerializerUtils.write(key);
 			jedisCluster.set(cache_key, SerializerUtils.write(value));
@@ -78,12 +107,48 @@ public class RedisClusterUtils {
 	}
 	
 	/**
+	 * 读取数据
+	 * @param key
+	 * @return
+	 */
+	public Object get(Object key) {
+		try {
+			byte[] value = jedisCluster.get(SerializerUtils.write(key));
+			if (null != value && value.length != 0) {
+				return SerializerUtils.read(value);
+			}
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	/**
 	 * 刪除KEY
 	 * @param key
 	 * @return
 	 */
 	public Long delete(String key) {
-		return jedisCluster.del(key);
+		try {
+			return jedisCluster.del(SerializerUtils.write(key));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 刪除KEY
+	 * @param key
+	 * @return
+	 */
+	public Long delete(Object key) {
+		try {
+			return jedisCluster.del(SerializerUtils.write(key));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	/**
@@ -124,5 +189,51 @@ public class RedisClusterUtils {
 	public long scard(String key) {
 		return jedisCluster.scard(key);
 	}
-
+	
+	/**
+	 * 队列插入数据
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public long listPush(String key, Object value) {
+		try {
+			return jedisCluster.lpush(SerializerUtils.write(key), SerializerUtils.write(value));
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	/**
+	 * 队列取出数据
+	 * @param key
+	 * @return
+	 */
+	public Object listPop(String key) {
+		try {
+			byte[] returnObject = jedisCluster.rpop(SerializerUtils.write(key));
+			if (null != returnObject && returnObject.length != 0) {
+				return SerializerUtils.read(returnObject);
+			}
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	/**
+	 * 队列数据长度
+	 * @param key
+	 * @return
+	 */
+	public long listLength(String key) {
+		try {
+			return jedisCluster.llen(SerializerUtils.write(key));
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
 }

@@ -25,4 +25,10 @@ public interface ISensitiveWordService {
 	//删除操作
 	public int Sendelete(long deleteId, String deleteCount) throws IOException;
 	
+	//修改唯一验证
+	public int SoleJudgment(long updateid,String word,String updateInitialCount)throws IOException;
+	
+	//新增的唯一验证
+	public int AddJudgment(String sitive)throws IOException;
+	
 }

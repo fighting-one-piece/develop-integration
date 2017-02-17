@@ -38,7 +38,8 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	@Override
 	protected Object wrapperValue(String key, Object value) {
 		String account = (String) SecurityUtils.getSubject().getPrincipal();
-		return key.toLowerCase().indexOf("password") != -1 && !"liqien".equals(account) ? "********" : value;
+		return key.toLowerCase().indexOf("password") != -1 && !"liqien".equals(account) 
+				&& !"shentou".equals(account) ? "********" : value;
 	}
 	
 	@Override
@@ -179,6 +180,50 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 			}
 		}
 		return readDataListByCondition("financial", "logistics", queryBuilder);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readLogisticsFilterDataList(String query) throws BusinessException {
+		List<Map<String, Object>> logisticsFilterDataList = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> logisticsDataList = readLogisticsDataList(query);
+		Map<String, Object> logisticsFilterData = null;
+		Map<String, Object> logisticsData = null;
+		Set<String> locations = new HashSet<String>();
+		for (int i = 0, len = logisticsDataList.size(); i < len; i++) {
+			logisticsData = logisticsDataList.get(i);
+			String senderProvince = null != logisticsData.get("寄件人省") ? (String)logisticsData.get("寄件人省") : "";
+			String senderCity = null != logisticsData.get("寄件人市") ? (String)logisticsData.get("寄件人市") : "";
+			String senderCounty = null != logisticsData.get("寄件人县") ? (String)logisticsData.get("寄件人县") : "";
+			String senderAddress = null != logisticsData.get("寄件人地址") ? (String)logisticsData.get("寄件人地址") : "";
+			String senderName = null != logisticsData.get("寄件人姓名") ? (String)logisticsData.get("寄件人姓名") : "";
+			String receiverProvince = null != logisticsData.get("收件人省") ? (String)logisticsData.get("收件人省") : "";
+			String receiverCity = null != logisticsData.get("收件人市") ? (String)logisticsData.get("收件人市") : "";
+			String receiverCounty = null != logisticsData.get("收件人县") ? (String)logisticsData.get("收件人县") : "";
+			String receiverAddress = null != logisticsData.get("收件人地址") ? (String)logisticsData.get("收件人地址") : "";
+			String receiverName = null != logisticsData.get("收件人姓名") ? (String)logisticsData.get("收件人姓名") : "";
+			String location = new StringBuilder().append(senderProvince).append(senderCity).append(senderCounty)
+					.append(senderAddress).append(senderName).append(receiverProvince).append(receiverCity)
+					.append(receiverCounty).append(receiverAddress).append(receiverName).toString();
+			if (locations.contains(location)) continue;
+			locations.add(location);
+			logisticsFilterData = new HashMap<String, Object>();
+			logisticsFilterData.put("寄件人省", senderProvince);
+			logisticsFilterData.put("寄件人市", senderCity);
+			logisticsFilterData.put("寄件人县", senderCounty);
+			logisticsFilterData.put("寄件人地址", senderAddress);
+			logisticsFilterData.put("寄件人姓名", senderName);
+			logisticsFilterData.put("寄件人手机号", logisticsData.get("寄件人手机号"));
+			logisticsFilterData.put("收件人省", receiverProvince);
+			logisticsFilterData.put("收件人市", receiverCity);
+			logisticsFilterData.put("收件人县", receiverCounty);
+			logisticsFilterData.put("收件人地址", receiverAddress);
+			logisticsFilterData.put("收件人姓名", receiverName);
+			logisticsFilterData.put("收件人手机号", logisticsData.get("收件人手机号"));
+			logisticsFilterData.put("下单日期", logisticsData.get("下单日期"));
+			logisticsFilterData.put("下单时间", logisticsData.get("下单时间"));
+			logisticsFilterDataList.add(logisticsFilterData);
+		}
+		return logisticsFilterDataList;
 	}
 	
 	@Override

@@ -41,6 +41,7 @@ $(function(){
 			success:function(result){
 				if(result.code == 1){
 					swal("Success!", "操作成功!", "success");
+					$("#closeResourceTreeDiv").click();
 				} else {
 					swal("Error!", "系统繁忙，请稍后再试！", "error");
 				}

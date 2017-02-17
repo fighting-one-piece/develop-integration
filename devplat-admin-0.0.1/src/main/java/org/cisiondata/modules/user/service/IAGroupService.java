@@ -1,6 +1,7 @@
 package org.cisiondata.modules.user.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.cisiondata.modules.user.entity.AGroup;
 
@@ -36,4 +37,7 @@ public interface IAGroupService {
 	public List<AGroup> getByIdNotUser(Long id);
 	//新增用户或者移除用户
 	public void addGUser(String user_id,Long group_id);
+	
+	//根据ID查询
+	public Map<String, Object> getById(Long id);
 }

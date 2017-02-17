@@ -1,10 +1,5 @@
 package org.cisiondata.modules.user.controller;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.user.entity.AGroup;
@@ -14,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @description：部门管理
@@ -39,11 +35,7 @@ public class OrganizationController {
 	@ResponseBody
 	@RequestMapping(value = "/addGroup")
 	public WebResult addGroup(AGroup group){
-		String name = group.getName();
 		WebResult result = new WebResult();
-		group.setCreateTime(new Date());
-		int code = groupService.selGroup(name);
-		if(code <= 0){
 			try {
 				result.setData(groupService.addGroup(group));
 				result.setCode(ResultCode.SUCCESS.getCode());
@@ -51,7 +43,6 @@ public class OrganizationController {
 				result.setCode(ResultCode.FAILURE.getCode());
 				result.setFailure(e.getMessage());
 			}
-		}
 		return result;
 	}
 	@ResponseBody
@@ -85,15 +76,8 @@ public class OrganizationController {
 	public WebResult delGroup(Long id){
 		WebResult result = new WebResult();
 		try {
-			//获取删除与用户相关联信息
-			int userCode = groupService.delGUser(id);
-			//获取删除与角色相关联信息
-			int roleCode = groupService.delGRole(id);
-			if(userCode >=0 && roleCode >= 0){
-				int groupCode = groupService.delGroup(id);
-				result.setCode(ResultCode.SUCCESS.getCode());
-				result.setData(groupCode);
-			}
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(groupService.delGroup(id));
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -104,14 +88,9 @@ public class OrganizationController {
 	@RequestMapping(value = "/getByIdUser")
 	public WebResult getByIdUser(Long id){
 		WebResult result = new WebResult();
-		Map<String, Object> map = new  HashMap<String, Object>();
 		try {
-			List<AGroup> listUser = groupService.getByIdUser(id);
-			List<AGroup> listNot = groupService.getByIdNotUser(id);
-			map.put("user", listUser);
-			map.put("notUser", listNot);
 			result.setCode(ResultCode.SUCCESS.getCode());
-			result.setData(map);
+			result.setData(groupService.getById(id));
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -133,8 +112,8 @@ public class OrganizationController {
 		return result;
 	}
 	@RequestMapping(method = RequestMethod.GET)
-    public String manager() {
-        return "admin/organization";
+    public ModelAndView manager() {
+        return new ModelAndView("admin/organization");
     }
 
   

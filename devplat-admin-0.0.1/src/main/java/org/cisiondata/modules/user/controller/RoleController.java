@@ -39,23 +39,14 @@ public class RoleController {
 	@ResponseBody
 	@RequestMapping(value = "/updata")
 	public WebResult getUpdata(RoleUser roleUser) {
-		String name = roleUser.getName();
 		WebResult result = new WebResult();
-		int code = iroleService.seletName(name);
-		
 		try {
-			if (code <= 0) {
-				System.out.println(code);
-				result.setData(iroleService.readUpdata(roleUser));
-				result.setCode(ResultCode.SUCCESS.getCode());
-			}else{
-				result.setCode(ResultCode.FAILURE.getCode());
-			}
+			result.setData(iroleService.SoleJudgment(roleUser));
+			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
 		}
-		System.out.println(result.getCode());
 		return result;
 
 	}
@@ -66,13 +57,8 @@ public class RoleController {
 	public WebResult getDelet(long id) {
 		WebResult result = new WebResult();
 		try {
-			int usercode = iroleService.readuserDelet(id);
-			int groupcode = iroleService.readgroupdelet(id);
-			if (usercode >= 0 && groupcode >= 0) {
-				int rolecode = iroleService.readDelet(id);
-				result.setData(rolecode);
-				result.setCode(ResultCode.SUCCESS.getCode());
-			}
+			result.setData(iroleService.DeleteJudgment(id));
+			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -87,7 +73,6 @@ public class RoleController {
 		WebResult result = new WebResult();
 		try {
 			result.setData(iroleService.getUser());
-			System.out.println(iroleService.getUser());
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
@@ -100,16 +85,10 @@ public class RoleController {
 	@ResponseBody
 	@RequestMapping("/getaddRole")
 	public WebResult getAddRole(RoleUser addRoleuser) {
-		String name=addRoleuser.getName();
-		int code=iroleService.seletName(name);
 		WebResult result = new WebResult();
 		try {
-			if(code<=0){
-				result.setData(iroleService.addedRole(addRoleuser));
-				result.setCode(ResultCode.SUCCESS.getCode());				
-			}else{
-				result.setCode(ResultCode.FAILURE.getCode());
-			}
+			result.setData(iroleService.AddJudgment(addRoleuser));
+			result.setCode(ResultCode.SUCCESS.getCode());				
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -122,8 +101,6 @@ public class RoleController {
 	@RequestMapping("/UserROleID")
 	public WebResult getRoleId(AUserARole auserRole) {
 		WebResult result = new WebResult();
-		System.out.println(auserRole.getAuser());
-		System.out.println(auserRole.getArole());
 		try {
 			result.setData(iroleService.roleuserID(auserRole));
 			result.setCode(ResultCode.SUCCESS.getCode());
@@ -161,7 +138,6 @@ public class RoleController {
 			result.setData(iroleService.AddDelete(addDelete, AddDeleteID));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
-			// TODO: handle exception
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
 		}
@@ -171,14 +147,11 @@ public class RoleController {
 	@ResponseBody
 	@RequestMapping("/Deleteadd/{Deleteadd}/{DeleteaddID}")
 	public WebResult Deleteadd(@PathVariable String Deleteadd,@PathVariable long DeleteaddID){
-		System.out.println(Deleteadd);
-		System.out.println(DeleteaddID);
 		WebResult result =new WebResult();
 		try {
 			result.setData(iroleService.Deleteadd(Deleteadd, DeleteaddID));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
-			// TODO: handle exception
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
 		}

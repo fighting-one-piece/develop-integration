@@ -33,6 +33,9 @@
       <div id="nav">
         <p><input id="username" type="text" name="username" class="input-medium validate[required]" value="" placeholder="账号" onkeydown="EnterPressLogin();"></p>
         <p><input id="password" type="password" name="password" class="input-medium validate[required]" value="" placeholder="密码" onkeydown="EnterPressLogin();"></p>
+        <!--  
+        <input id="redirectUrl" type="hide" name="redirectUrl" value="http://192.168.0.114:8060/devplat">
+        -->
         <p><input type="text" id="jcaptchaCode" name="jcaptchaCode" class="input-medium validate[required,ajax[ajaxJcaptchaCall]]" placeholder="验证码">
         	<img class="jcaptcha-btn jcaptcha-img" style="margin-left: 10px;" src="/devplat/jcaptcha.jpg" title="点击更换验证码">
             <a class="jcaptcha-btn btn btn-link">换一张</a>

@@ -1,7 +1,10 @@
 package org.cisiondata.modules.user.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -26,7 +29,14 @@ public class AGroupServiceImpl implements IAGroupService{
 	}
 	@Override
 	public String addGroup(AGroup group) {
-		return groupDAO.addGroup(group);
+		String resultCode = null;
+		String name = group.getName();
+		group.setCreateTime(new Date());
+		int code = selGroup(name);
+		if(code <= 0){
+			resultCode = groupDAO.addGroup(group);
+		}
+		return resultCode;
 	}
 	@Override
 	public List<AGroup> getIdGroup(Long id) {
@@ -50,7 +60,15 @@ public class AGroupServiceImpl implements IAGroupService{
 	}
 	@Override
 	public int delGroup(Long id) {
-		return groupDAO.delGroup(id);
+		int groupCode = 0; 
+		//获取删除与用户相关联信息
+		int userCode = delGUser(id);
+		//获取删除与角色相关联信息
+		int roleCode = delGRole(id);
+		if(userCode >=0 && roleCode >= 0){
+			 groupCode = groupDAO.delGroup(id);
+		}
+		return groupCode;
 	}
 	@Override
 	public List<AGroup> getByIdUser(Long id) {
@@ -85,6 +103,15 @@ public class AGroupServiceImpl implements IAGroupService{
 				agroupdao.delGUser(Long.parseLong(list.get(i)), group_id);
 			}
 		}
+	}
+	//根据ID查询
+	public Map<String, Object> getById(Long id) {
+		Map<String, Object> map = new  HashMap<String, Object>();
+		List<AGroup> listUser = getByIdUser(id);
+		List<AGroup> listNot = getByIdNotUser(id);
+		map.put("user", listUser);
+		map.put("notUser", listNot);
+		return map;
 	}
 
 }

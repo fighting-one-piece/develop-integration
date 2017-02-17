@@ -97,6 +97,7 @@ public class QQRelationGraph {
 	}
 	
 	public void queryNode(TitanGraph graph) {
+		System.out.println("S Current Thread : " + Thread.currentThread().getName());
 	    try {
 	        GraphTraversal<Vertex, Vertex> gt = graph.traversal().V().has("qqNum", 422345678);
 	        while (gt.hasNext()) {
@@ -124,15 +125,32 @@ public class QQRelationGraph {
 	    } finally {
 	        graph.tx().close();
 	    }
+	    System.out.println("E Current Thread : " + Thread.currentThread().getName());
 	}
 	
 	public static void main(String[] args) {
-		TitanGraph graph = GraphUtils.getInstance().getGraph();
+		TitanGraph graph = TitanUtils.getInstance().getGraph();
+		for (int i = 0; i < 10; i++) {
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					QQRelationGraph qqRelationGraph = new QQRelationGraph();
+					qqRelationGraph.queryNode(graph);
+				}
+				
+			}).start();
+		}
 		QQRelationGraph qqRelationGraph = new QQRelationGraph();
 //		qqRelationGraph.buildSchema(graph);
 //		qqRelationGraph.loadNode(graph);
 		qqRelationGraph.queryNode(graph);
-		graph.close();
+//		try {
+//			Thread.sleep(1000000000);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		graph.close();
 	}
 	
 }

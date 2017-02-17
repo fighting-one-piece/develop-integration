@@ -23,10 +23,9 @@ public class AccessSwitchServiceImpl implements IAccessSwitchService, Initializi
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		List<AccessSwitch> list = swithDAO.findAll();
-		System.out.println(list);
 		if (null == list || list.size() == 0) return;
-		for (AccessSwitch sSwitch : list) {
-			RedisClusterUtils.getInstance().set(sSwitch.getSwitch_identity(), sSwitch.getStatus());
+		for (AccessSwitch accessSwitch : list) {
+			RedisClusterUtils.getInstance().set(accessSwitch.getSwitch_identity(), accessSwitch.getStatus());
 		}
 	}
 	
@@ -38,11 +37,11 @@ public class AccessSwitchServiceImpl implements IAccessSwitchService, Initializi
 		return list;
 	}
 	
-	//添加save
+	//添加
 	@Override
-	public void saveSwitch(AccessSwitch sSwitch) throws IOException {
-		swithDAO.saveSwitch(sSwitch);
-		RedisClusterUtils.getInstance().set(sSwitch.getSwitch_identity(), sSwitch.getStatus());
+	public void saveSwitch(AccessSwitch accessSwitch) throws IOException {
+		swithDAO.saveSwitch(accessSwitch);
+		RedisClusterUtils.getInstance().set(accessSwitch.getSwitch_identity(), accessSwitch.getStatus());
 	}
 	
 	//删除
@@ -54,8 +53,15 @@ public class AccessSwitchServiceImpl implements IAccessSwitchService, Initializi
 	
 	//修改
 	@Override
-	public int updateId(AccessSwitch sSwitch) throws IOException {
-		RedisClusterUtils.getInstance().set(sSwitch.getSwitch_identity(), sSwitch.getStatus());
-		return swithDAO.updateId(sSwitch);
+	public int updateId(AccessSwitch accessSwitch) throws IOException {
+		RedisClusterUtils.getInstance().set(accessSwitch.getSwitch_identity(), accessSwitch.getStatus());
+		return swithDAO.updateId(accessSwitch);
+	}
+	
+	//批量修改
+	@Override
+	public void updateIdStatus(AccessSwitch accessSwitch) throws IOException {
+		swithDAO.updateIdStatus(accessSwitch);
+		RedisClusterUtils.getInstance().set(accessSwitch.getSwitch_identity(), accessSwitch.getStatus());
 	}
 }

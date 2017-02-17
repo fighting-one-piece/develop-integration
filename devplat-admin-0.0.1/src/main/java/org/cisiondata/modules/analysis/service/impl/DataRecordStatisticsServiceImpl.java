@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.cisiondata.utils.exception.BusinessException;
-import org.cisiondata.utils.sftp.SftpClient;
+import org.cisiondata.utils.ftp.SftpClient;
 import org.springframework.stereotype.Service;
 
 import com.jcraft.jsch.ChannelSftp;

@@ -7,9 +7,13 @@ import java.security.MessageDigest;
 
 public class MD5Utils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MD5Utils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MD5Utils.class);
 
-
+    /**
+     * 
+     * @param input
+     * @return
+     */
     private static byte[] md5(String input) {
         MessageDigest algorithm;
         try {
@@ -19,11 +23,16 @@ public class MD5Utils {
             byte[] messageDigest = algorithm.digest();
             return messageDigest;
         } catch (Exception e) {
-            LOGGER.error("MD5 Error...", e);
+            LOG.error("MD5 Error...", e);
         }
         return null;
     }
 
+    /**
+     * 
+     * @param hash
+     * @return
+     */
     private static final String toHex(byte hash[]) {
         if (hash == null) {
             return null;
@@ -38,12 +47,17 @@ public class MD5Utils {
         return buf.toString();
     }
 
-    public static String hash(String s) {
+    /**
+     * 
+     * @param input
+     * @return
+     */
+    public static String hash(String input) {
         try {
-            return new String(toHex(md5(s)).getBytes("UTF-8"), "UTF-8");
+            return new String(toHex(md5(input)).getBytes("UTF-8"), "UTF-8");
         } catch (Exception e) {
-            LOGGER.error("not supported charset...{}", e);
-            return s;
+            LOG.error("not supported charset...{}", e);
+            return input;
         }
     }
 

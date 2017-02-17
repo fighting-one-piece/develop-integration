@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class AUserController {
@@ -68,7 +69,6 @@ public class AUserController {
 	@ResponseBody
 	public WebResult updateAUser(AUser auser){
 		WebResult result = new WebResult();
-		System.out.println(auser.getIdentity());
 		try {
 			aUserService.updateAUser(auser);
 			result.setCode(ResultCode.SUCCESS.getCode());
@@ -151,7 +151,6 @@ public class AUserController {
 		@RequestMapping("/admin/selectrole")
 		@ResponseBody
 		public WebResult selectrole(Long userid) {
-			System.out.println("==========userid:"+userid);
 			WebResult result = new WebResult();
 			Map<String, Object> map = new HashMap<String, Object>();
 			try {
@@ -159,8 +158,6 @@ public class AUserController {
 				List<AUserARole> userrole = new ArrayList<AUserARole>();
 				userrole = aUserService.findusertrole(userid);
 				roleuser = iroleService.readDataRole();
-				System.out.println("userrole++++++:"+userrole);
-				System.out.println("roleuser======:"+roleuser);
 				map.put("role", roleuser);
 				map.put("userrole", userrole);
 				result.setData(map);
@@ -189,7 +186,7 @@ public class AUserController {
 			
 			
 	@RequestMapping(value="/admin/auser",method=RequestMethod.GET)
-	public String auserInterface() {
-		return "admin/auser";
+	public ModelAndView auserInterface() {
+		return new ModelAndView("admin/auser");
 	}
 }

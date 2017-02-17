@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * 敏感词
@@ -43,14 +44,9 @@ public class SensitiveController {
 	@RequestMapping(value="/updataID/{updateid}/{updateCount}/{updateInitialCount}")
 	public WebResult updataID(@PathVariable long updateid,@PathVariable String updateCount,@PathVariable String updateInitialCount){
 		WebResult result =new WebResult();
-		int code=sensitiveWordService.vserification(updateCount);
 		try {
-			if(code<=0){
-				result.setData(sensitiveWordService.Setpdate(updateid,updateCount,updateInitialCount));
-				result.setCode(ResultCode.SUCCESS.getCode());
-			}else{
-				result.setCode(ResultCode.FAILURE.getCode());
-			}
+			result.setData(sensitiveWordService.SoleJudgment(updateid,updateCount,updateInitialCount));
+			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -63,14 +59,9 @@ public class SensitiveController {
 	@RequestMapping(value="/AddSensitive")
 	public WebResult AddSensitive(String word){
 		WebResult result=new WebResult();
-		int code=sensitiveWordService.vserification(word);
 		 try {
-			 if(code<=0){
-				 result.setData(sensitiveWordService.AddSensitive(word));
-				 result.setCode(ResultCode.SUCCESS.getCode()); 
-			 }else{
-				 result.setCode(ResultCode.FAILURE.getCode());
-			 }
+			result.setData(sensitiveWordService.AddJudgment(word));
+			result.setCode(ResultCode.SUCCESS.getCode()); 
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -114,7 +105,7 @@ public class SensitiveController {
 	
 	//敏感词管理页面
 	@RequestMapping(value="/sensitive",method = RequestMethod.GET)
-	public String toMoblie() {
-		return "admin/sensitive";
+	public ModelAndView toMoblie() {
+		return new ModelAndView("admin/sensitive");
 	}
 }

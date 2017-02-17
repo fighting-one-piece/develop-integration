@@ -17,6 +17,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.cisiondata.modules.log.dao.LogMapper;
 import org.cisiondata.modules.log.entity.LogModel;
@@ -65,7 +66,17 @@ public class AccessLogFilter implements Filter {
         sb.append(getBlock(headers));
         sb.append(getBlock(httpServletRequest.getHeader("Referer")));
         LOG.info(sb.toString());
+        
         if(url.indexOf("/qq")!=-1 || url.indexOf("/search")!=-1 || url.indexOf("/phoneBank")!=-1 || url.indexOf("/query")!=-1 || url.indexOf("/mobile")!=-1){        	
+        	String account = (String) SecurityUtils.getSubject().getPrincipal();
+        	if (StringUtils.isBlank(account)) {
+        		String requestUrl = httpServletRequest.getRequestURI().replace("/devplat", "");
+        		if (requestUrl.startsWith("/app")) {
+        			account = "appClient";
+        		} else if (requestUrl.startsWith("/ext")) {
+        			account = request.getParameter("accessId");
+        		}
+        	}
         	if(url.indexOf("/devplat/mobile")!=-1){
         		String regExp = "^[1]([3][0-9]{1}|59|58|88|89)[0-9]{8}$"; 
         		Pattern p = Pattern.compile(regExp); 
@@ -74,7 +85,6 @@ public class AccessLogFilter implements Filter {
     			String session = httpServletRequest.getSession().getId();
     			String IP = getIPAddress(httpServletRequest);
     			String keyword = url.substring(url.lastIndexOf("/")+1, url.length());
-    			String account = (String) SecurityUtils.getSubject().getPrincipal();
     			Matcher m = p.matcher(keyword);
     			if(!IP.equals("0:0:0:0:0:0:0:1")){
     				logModel.setId(id);
@@ -105,7 +115,6 @@ public class AccessLogFilter implements Filter {
         			String session = httpServletRequest.getSession().getId();
         			String keyword = entry.getValue().toString();
         			String IP = getIPAddress(httpServletRequest);
-        			String account = (String) SecurityUtils.getSubject().getPrincipal();
         			if(!IP.equals("0:0:0:0:0:0:0:1")){
         				logModel.setId(id);
         				logModel.setSessionId(session);
@@ -118,9 +127,9 @@ public class AccessLogFilter implements Filter {
         		}
         	}
         }
-        
         chain.doFilter(request, response);
 	}
+	
 	//获取IP的方法
 	public static String getIPAddress(HttpServletRequest request){
 		String ip = request.getHeader("x-forwarded-for");
@@ -141,12 +150,13 @@ public class AccessLogFilter implements Filter {
 		}
 		return ip;
 	}
-	 public static String getBlock(Object msg) {
-	        if (msg == null) {
-	            msg = "";
-	        }
-	        return "[" + msg.toString() + "]";
-	    }
+	
+	public static String getBlock(Object msg) {
+        if (msg == null) {
+            msg = "";
+        }
+        return "[" + msg.toString() + "]";
+    }
 
     @SuppressWarnings("unchecked")
 	protected static String getParams(HttpServletRequest request) {

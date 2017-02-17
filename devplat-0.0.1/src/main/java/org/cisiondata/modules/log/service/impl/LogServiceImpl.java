@@ -1,6 +1,7 @@
 package org.cisiondata.modules.log.service.impl;
 
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +10,9 @@ import org.cisiondata.modules.log.dao.LogMapper;
 import org.cisiondata.modules.log.entity.LogModel;
 import org.cisiondata.modules.log.service.ILogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-@Service
+@Service("logService")
 public class LogServiceImpl implements ILogService{
 	
 	@Autowired
@@ -25,8 +27,8 @@ public class LogServiceImpl implements ILogService{
 		 logMapper.addLog(log);
 	}
 
+
 	public boolean delLog(String keyword) {
-		
 		return logMapper.delLog(keyword);
 	}
 
@@ -90,5 +92,38 @@ public class LogServiceImpl implements ILogService{
 		return selectordertime;
 	}
 
-	
+	@Override
+	public int selLogCount(String keyword) {
+		
+		return logMapper.selLogCount(keyword);
+	}
+
+	@Override
+	public int addLogCount(LogModel log) {
+		return logMapper.addLogCount(log);
+	}
+
+	@Override
+	public int upLogCount(LogModel log) {
+		return logMapper.upLogCount(log);
+	}
+
+	//每天统计关键字
+	@Scheduled(cron="0 0 8 * * ?")
+	public void keywordCount() {
+		List<LogModel> list = logMapper.count();
+		for (int i = 0; i < list.size(); i++) {
+			LogModel logModel = new LogModel();
+			logModel.setKeyword(list.get(i).getKeyword());
+			logModel.setCount(list.get(i).getCount());
+			logModel.setAccessTime(new Date());
+			if(selLogCount(list.get(i).getKeyword()) == 0){
+				addLogCount(logModel);
+			}
+			if(selLogCount(list.get(i).getKeyword()) == 1){
+				upLogCount(logModel);
+			}
+		}
+	}
+
 }

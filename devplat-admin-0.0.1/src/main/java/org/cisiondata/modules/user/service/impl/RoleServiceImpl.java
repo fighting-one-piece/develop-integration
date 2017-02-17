@@ -11,6 +11,7 @@ import org.cisiondata.modules.user.entity.AUser;
 import org.cisiondata.modules.user.entity.AUserARole;
 import org.cisiondata.modules.user.entity.RoleUser;
 import org.cisiondata.modules.user.service.IRoleService;
+import org.cisiondata.utils.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
 @Service("reloe")
@@ -157,5 +158,43 @@ public class RoleServiceImpl   implements IRoleService{
 				}
 			}
 		return Deleteadds;
+	}
+
+	//修改唯一判断
+	@Override
+	public int SoleJudgment(RoleUser roleUser) throws BusinessException{
+		String name = roleUser.getName();
+		int code = seletName(name);
+		if (code <= 0) {
+			return readUpdata(roleUser);
+		}else{
+			throw new BusinessException("修改失败");
+		}
+	}
+
+	//删除的唯一判断
+	@Override
+	public int DeleteJudgment(Long id) throws BusinessException {
+		int usercode = readuserDelet(id);
+		int groupcode =readgroupdelet(id);
+		if (usercode >= 0 && groupcode >= 0) {
+			return readDelet(id);
+		}else{
+			throw new BusinessException("删除失败！");
+		}
+		
+	}
+
+	//新增的唯一判断
+	@Override
+	public int AddJudgment(RoleUser roleUser) throws BusinessException {
+		String name=roleUser.getName();
+		int code=seletName(name);
+		if(code<=0){
+			return addedRole(roleUser);
+		}else{
+			throw new BusinessException("新增失败");
+		}
+		
 	}
 }

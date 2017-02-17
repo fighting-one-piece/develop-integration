@@ -20,4 +20,6 @@ public interface AccessSwitchDAO {
 	//修改
 	public int updateId(AccessSwitch sSwitch);
 	
+	//批量修改
+	public void updateIdStatus(AccessSwitch sSwitch);
 }

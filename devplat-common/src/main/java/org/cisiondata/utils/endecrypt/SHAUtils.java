@@ -5,47 +5,66 @@ import java.security.NoSuchAlgorithmException;
 
 public class SHAUtils {
 
-	public static String SHA(String decript) {
-		try {
-			MessageDigest digest = MessageDigest.getInstance("SHA");
-			digest.update(decript.getBytes());
-			byte messageDigest[] = digest.digest();
-			// Create Hex String
-			StringBuffer hexString = new StringBuffer();
-			// 字节数组转换为 十六进制数
-			for (int i = 0; i < messageDigest.length; i++) {
-				String shaHex = Integer.toHexString(messageDigest[i] & 0xFF);
-				if (shaHex.length() < 2) {
-					hexString.append(0);
-				}
-				hexString.append(shaHex);
-			}
-			return hexString.toString();
-
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return "";
+	/**
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String SHA(String input) {
+		return SHA(input, "SHA");
 	}
 
+	/**
+	 * 
+	 * @param input
+	 * @return
+	 */
 	public static String SHA1(String input) {
-		try {
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-			messageDigest.update(input.getBytes());
-			byte[] digest = messageDigest.digest();
-			StringBuffer hexString = new StringBuffer();
-			// 字节数组转换为十六进制数
-			for (int i = 0, len = digest.length; i < len; i++) {
-				String shaHex = Integer.toHexString(digest[i] & 0xFF);
-				if (shaHex.length() < 2)
-					hexString.append(0);
-				hexString.append(shaHex);
+		return SHA(input, "SHA-1");
+	}
+
+	/**
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String SHA256(String input) {
+		return SHA(input, "SHA-256");
+	}
+
+	/**
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String SHA512(String input) {
+		return SHA(input, "SHA-512");
+	}
+
+	/**
+	 * 
+	 * @param input
+	 * @param type
+	 * @return
+	 */
+	public static String SHA(String input, String type) {
+		if (input != null && input.length() > 0) {
+			try {
+				MessageDigest messageDigest = MessageDigest.getInstance(type);
+				messageDigest.update(input.getBytes());
+				byte[] digest = messageDigest.digest();
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0, len = digest.length; i < len; i++) {
+					String hex = Integer.toHexString(0xff & digest[i]);
+					if (hex.length() < 2) sb.append('0');
+					sb.append(hex);
+				}
+				return sb.toString();
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
 			}
-			return hexString.toString();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
 		}
 		return "";
 	}
-
+	
 }

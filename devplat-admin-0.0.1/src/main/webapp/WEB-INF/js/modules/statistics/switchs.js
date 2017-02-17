@@ -1,25 +1,59 @@
 $(function() {
-		load();
-		//添加接口
-		$("#addSwitch").click(function(){
-			var identity= $("#identity").val();
-			var name = $("#name").val();
-			var desc = $("#desc").val();
-			var status =$("#testSelect").val();
-			$.ajax({
-				type : "get",
-				url : "switch/findAll",
-				dataType : "json",
-				success : function(result) {
-					$("#areaList").empty();
-					if(result.code==1){
-						for (var i = 0; i < result.data.length; i++) {
-							var biaoshi = result.data[i].switch_identity;
-							if(identity==biaoshi){
-								/* swal(""); */
+load();
+//添加接口
+$("#addSwitch").click(function(){
+	var identity= $("#identity").val();
+	var name = $("#name").val();
+	var desc = $("#desc").val();
+	var status =$("#testSelect").val();
+	$.ajax({
+		type : "get",
+		url : "switch/findAll",
+		dataType : "json",
+		success : function(result) {
+			$("#areaList").empty();
+			if(result.code==1){
+				for (var i = 0; i < result.data.length; i++) {
+					var biaoshi = result.data[i].switch_identity;
+					if(identity==biaoshi){
+						/* swal(""); */
+						swal({
+	       					text:"该标识已有!",
+	       					type:"warning",  
+	       					confirmButtonColor: "#DD6B55",
+	       					confirmButtonText:"确定",
+	       				}).then(function(isConfirm){
+	       					if(isConfirm == true){
+	       						window.location.reload();
+	       					}else{
+	       						window.location.reload();
+	       					}})
+						$("#identity").attr("value",'');
+						$("#name").attr("value",'');
+						$("#desc").attr("value",'');
+						return;
+					}
+				}
+				if(identity==""||identity==undefined||identity==null){
+					swal("标识不能为空!");
+					load();
+				}else if (name==""||name==undefined||name==null) {
+					swal("名称不能为空!");
+				}else if (desc==""||desc==undefined||desc==null) {
+					swal("描述不能为空!");
+				}else if (status==""||status==undefined||status==null) {
+					swal("状态不能为空!");
+				}else{
+					$.ajax({
+						type : "post",
+						url : "switch/saveSwitch",
+						dataType : "json",
+						data:{"switch_identity":identity,"switch_name":name,"swith_desc":desc,"status":status},
+						success : function(result) {
+							if(result.code==1){
 								swal({
-			       					text:"该标识已有!",
-			       					type:"warning",  
+			       					text:"添加成功!",
+			       					type:"success",  
 			       					confirmButtonColor: "#DD6B55",
 			       					confirmButtonText:"确定",
 			       				}).then(function(isConfirm){
@@ -31,80 +65,204 @@ $(function() {
 								$("#identity").attr("value",'');
 								$("#name").attr("value",'');
 								$("#desc").attr("value",'');
-								return;
 							}
+						},
+						error : function() {
+							swal("系统错误！");
 						}
-						if(identity==""||identity==undefined||identity==null){
-							swal("标识不能为空!");
-							load();
-						}else if (name==""||name==undefined||name==null) {
-							swal("名称不能为空!");
-						}else if (desc==""||desc==undefined||desc==null) {
-							swal("描述不能为空!");
-						}else if (status==""||status==undefined||status==null) {
-							swal("状态不能为空!");
-						}else{
-							$.ajax({
-								type : "post",
-								url : "switch/saveSwitch",
-								dataType : "json",
-								data:{"switch_identity":identity,"switch_name":name,"swith_desc":desc,"status":status},
-								success : function(result) {
-									if(result.code==1){
-										swal({
-					       					text:"添加成功!",
-					       					type:"success",  
-					       					confirmButtonColor: "#DD6B55",
-					       					confirmButtonText:"确定",
-					       				}).then(function(isConfirm){
-					       					if(isConfirm == true){
-					       						window.location.reload();
-					       					}else{
-					       						window.location.reload();
-					       					}})
-										$("#identity").attr("value",'');
-										$("#name").attr("value",'');
-										$("#desc").attr("value",'');
-									}
-								},
-								error : function() {
-									swal("系统错误！");
-								}
-							})	
-						}
-					}
-				},
-				error : function() {
-					swal("系统错误!");
+					})	
 				}
-			})
-		})
-		
-	});
-	function bootstrapTable() {
-		$('#projectList').bootstrapTable({
-			data : tmp_arr
-		});
-	}
-	function load() {
-		var arealist_arr = new Array();
-		$.ajax({
-			type : "get",
-			url : "switch/findAll",
-			dataType : "json",
-			success : function(result) {
-				if(result.code==1){
-					arealist_arr=result.data;
-	                $('#areaList').bootstrapTable({
-	                    data: result.data
-	                });
-				}
-			},
-			error : function() {
-				bootstrapTable();
 			}
-		})
-	}
+		},
+		error : function() {
+			swal("系统错误!");
+		}
+	})
+})
+	
+$("#batchOpen").click(function(){
+	swal({
+		title:"",  
+		text:"确定批量打开？",  
+		type:"warning",  
+		showCancelButton:"true",  
+		showConfirmButton:"true",
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText:"确定",
+		cancelButtonText:"取消", 
+		animation:"slide-from-top"  
+	}).then(function(isConfirm){
+		if(isConfirm == true){
+		 var objs =$('#areaList').bootstrapTable('getAllSelections');			
+			if(objs=="" ||objs==undefined){
+				swal("请选中开启内容!");
+			}else{
+				$.map($('#areaList').bootstrapTable('getAllSelections'), function(row) {
+				var id =row.id;
+				$.ajax({
+					url:"switch/updateIdStatus",
+					type:"post",
+					dataType:"json",
+					data:{"id":id,"status":1},
+					success:function(result){
+						if(result.code==1){
+							swal({
+		       					text:"修改成功!",
+		       					type:"success",  
+		       					confirmButtonColor: "#DD6B55",
+		       					confirmButtonText:"确定",
+		       				}).then(function(isConfirm){
+		       					if(isConfirm == true){
+		       						window.location.reload();
+		       					}else{
+		       						window.location.reload();
+		       					}})
+						}
+					},
+					error:function(){
+						swal("操作失败!");
+					}
+				})
+			});
+			}
+		}
+	})
+})
+
+$("#batchClose").click(function(){
+	swal({
+		title:"",  
+		text:"确定批量关闭？",  
+		type:"warning",  
+		showCancelButton:"true",  
+		showConfirmButton:"true",
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText:"确定",
+		cancelButtonText:"取消", 
+		animation:"slide-from-top"  
+	}).then(function(isConfirm){
+		if(isConfirm == true){
+		 var objs =$('#areaList').bootstrapTable('getAllSelections');			
+			if(objs=="" ||objs==undefined){
+				swal("请选中关闭内容!");
+			}else{
+				$.map($('#areaList').bootstrapTable('getAllSelections'), function(row) {
+				var id =row.id; 
+				$.ajax({
+					url:"switch/updateIdStatus",
+					type:"post",
+					dataType:"json",
+					data:{"id":id,"status":0},
+					success:function(result){
+						if(result.code==1){
+							swal({
+		       					text:"修改成功!",
+		       					type:"success",  
+		       					confirmButtonColor: "#DD6B55",
+		       					confirmButtonText:"确定",
+		       				}).then(function(isConfirm){
+		       					if(isConfirm == true){
+		       						window.location.reload();
+		       					}else{
+		       						window.location.reload();
+		       					}})
+						}
+					},
+					error:function(){
+						swal("操作失败!");
+					}
+				})
+			});
+			}
+		}
+	})
+})
+	
+$("#batchTest").click(function(){
+	swal({
+		title:"",  
+		text:"确定批量测试接口修改？",  
+		type:"warning",  
+		showCancelButton:"true",  
+		showConfirmButton:"true",
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText:"确定",
+		cancelButtonText:"取消", 
+		animation:"slide-from-top"  
+	}).then(function(isConfirm){
+		if(isConfirm == true){
+		 var objs =$('#areaList').bootstrapTable('getAllSelections');			
+			if(objs=="" ||objs==undefined){
+				swal("请选中测试接口!");
+			}else{
+				$.map($('#areaList').bootstrapTable('getAllSelections'), function(row) {
+				var id =row.id; 
+				$.ajax({
+					url:"switch/updateIdStatus",
+					type:"post",
+					dataType:"json",
+					data:{"id":id,"status":2},
+					success:function(result){
+						if(result.code==1){
+							swal({
+		       					text:"修改成功!",
+		       					type:"success",  
+		       					confirmButtonColor: "#DD6B55",
+		       					confirmButtonText:"确定",
+		       				}).then(function(isConfirm){
+		       					if(isConfirm == true){
+		       						window.location.reload();
+		       					}else{
+		       						window.location.reload();
+		       					}})
+						}
+					},
+					error:function(){
+						swal("操作失败!");
+					}
+				})
+			});
+			}
+		}
+	})
+})
+
+});
+
+
+function bootstrapTable() {
+	$('#projectList').bootstrapTable({
+		data : tmp_arr
+	});
+}
+function load() {
+	$.ajax({
+		type : "get",
+		url : "switch/findAll",
+		dataType : "json",
+		success : function(result) {
+			if(result.code==1){
+				for (var i = 0; i < result.data.length; i++) {
+						var statusA =  result.data[i].status;
+						if(statusA==1){
+							result.data[i].status = '开';
+						}else if (statusA==2) {
+							result.data[i].status = '测试';
+						}else{
+							result.data[i].status = '关';
+						}
+				}
+                $('#areaList').bootstrapTable({
+                    data: result.data
+
+                });
+			}
+		},
+		error : function() {
+			bootstrapTable();
+		}
+	})
+}
 
 function actionFormatterProject(value, row, index) {
 		 return [       

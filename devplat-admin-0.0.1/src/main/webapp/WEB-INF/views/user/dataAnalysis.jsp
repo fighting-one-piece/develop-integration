@@ -91,7 +91,8 @@
 			<!--全局搜索选择框 -->
 			<div id="Ovaerall" class="radio_radios">
 				<label><input name="Fruit" type="radio" value="phone" />手机</label>
-				<label><input name="Fruit" type="radio" value="idCard" />身份证 </label><br/><br/>
+				<label><input name="Fruit" type="radio" value="idCard" />身份证 </label>
+				<label><input name="Fruit" type="radio" value="mailbox" />邮箱地址</label><br/><br/>
 			  <div class="styleWhite" align="center" id="centers">
 				<button class="btn btn-sm btn-info" id="ituationsuer">確定</button>&nbsp;&nbsp;
 				<button class="btn btn-sm btn-info" id="ituationColsebtn">关闭</button>	
@@ -101,6 +102,7 @@
 			<div id="local_locals" class="radio_radios">
 				<label><input name="Fru" type="radio" value="phone" />手机</label>
 				<label><input name="Fru" type="radio" value="idCard" />身份证 </label>
+				<label><input name="Fru" type="radio" value="mailbox" />邮箱地址 </label>
 				<!-- 下拉标签 -->
 				<div>
 				 <select style="width: 150px"class="index" id="localindex">

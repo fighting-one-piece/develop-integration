@@ -84,6 +84,52 @@
 	<div id="showAUserResult" align="center">
 	
 	</div>
+	<!-- 修改用户界面 -->
+	<div id="showupdateauserpagep" align="center" style="display: none; margin-top: 5%;">
+		<table style="height: 80%;width: 22%;" class="table table-striped table-bordered">
+			<tr align="center">
+				<td style="background: #EEE8AA;">账号</td>
+				<td><input type="text" style="width: 100%" id="setaccountp" placeholder="请输入账号"/></td>
+			</tr>
+			<tr align="center">
+				<td style="background: #EEE8AA;">密码</td>
+				<td><input type="password" style="width: 100%" id="setpasswordp" placeholder="密码为6至16位的字母及数字组成"/></td>
+			</tr>
+			<tr align="center">
+				<td style="background: #EEE8AA;">确认密码</td>
+				<td><input type="password" style="width: 100%" id="confirmpasswordp" placeholder="请输入确认密码"/></td>
+			</tr>
+			<tr align="center">
+				<td style="background: #EEE8AA;">昵称</td>
+				<td><input type="text" style="width: 100%" id="nicknamep"/></td>
+			</tr>
+			<tr align="center">
+				<td style="background: #EEE8AA;">邮箱</td>
+				<td><input type="text" style="width: 100%" id="emailp"/></td>
+			</tr>
+			<tr align="center">
+				<td style="background: #EEE8AA;">标识</td>
+				<td ><input type="text" style="width: 100%" id="identityp"/></td>
+			</tr>
+			<tr align="center">
+				<td style="background: #EEE8AA;">状态</td>
+				<td>
+					<select style="width: 100%" id="statusp">
+						<option>是</option>
+						<option>否</option>
+					</select>
+				</td>
+			</tr>
+			<tr align="center">
+				<td style="background: #EEE8AA;">过期时间</td>
+				<td><input type="text"  id="expireTimep" class="inline laydate-icon" style="width: 100%" /></td>
+			</tr>
+		</table>
+		<p><span id="addwarningp" style="color: red;"></span></p>
+		<div id="buttonp">
+			<button id="updateausers" class="btn btn-sm btn-info" value="1">确定</button>
+		</div>
+	</div>
 	<!-- 翻页按钮 -->
 	<div class="row" align="center" style="margin: 1%; display: none;" id="turnPage">
 		<div  class="btn-group" >
@@ -129,6 +175,12 @@
 //自定义日期格式
 laydate({
     elem: '#expireTime',
+    format: 'YYYY-MM-DD',
+    festival: true, //显示节日
+});
+//自定义日期格式
+laydate({
+    elem: '#expireTimep',
     format: 'YYYY-MM-DD',
     festival: true, //显示节日
 });

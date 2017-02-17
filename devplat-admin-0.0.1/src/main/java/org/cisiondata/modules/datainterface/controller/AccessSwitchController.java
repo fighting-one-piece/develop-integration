@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class AccessSwitchController {
@@ -91,10 +92,29 @@ public class AccessSwitchController {
 		}
 		return result;
 	}
+	//批量修改
+	@ResponseBody
+	@RequestMapping("/switch/updateIdStatus")
+	public WebResult updateIdStatus(int id,Integer status){
+		WebResult result = new WebResult();
+		try {
+			AccessSwitch sSwitch =new AccessSwitch();
+			sSwitch.setId(id);
+			sSwitch.setStatus(status);
+			aaccessSwitchService.updateIdStatus(sSwitch);
+			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+			LOG.error(e.getMessage(), e);
+		}
+		return result;
+	}
+	
 	
 	//接口开关
 	@RequestMapping(value="/accessSwitch",method=RequestMethod.GET)
-	public String toMoblie() {
-		return "admin/switch";
+	public ModelAndView toMoblie() {
+		return new ModelAndView("admin/switch");
 	}
 }

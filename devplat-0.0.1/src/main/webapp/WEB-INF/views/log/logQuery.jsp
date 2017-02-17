@@ -63,6 +63,7 @@
 					<td>关键字</td>
 					<td>IP</td>
 					<td>时间</td>
+					<td>访问者</td>
 				</tr>
 			</thead>
 			<tbody class="styletb">

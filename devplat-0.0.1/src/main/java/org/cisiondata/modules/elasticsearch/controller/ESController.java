@@ -94,12 +94,34 @@ public class ESController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/logistics/search")
+	@RequestMapping(value = "/logistics/all/search")
 	public WebResult readFinancialLogisticsDatas(String query) {
 		LOG.info("query:{}", query);
 		WebResult result = new WebResult();
 		try {
 			Object data = esBizService.readLogisticsDataList(query);
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(data);
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+			LOG.error(e.getMessage(), e);
+		}
+		return result;
+	}
+	
+	/**
+	 * 物流过滤查询(未分页)
+	 * @param query
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/logistics/search")
+	public WebResult readFinancialLogisticsFilterDatas(String query) {
+		LOG.info("query:{}", query);
+		WebResult result = new WebResult();
+		try {
+			Object data = esBizService.readLogisticsFilterDataList(query);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {

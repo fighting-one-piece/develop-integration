@@ -87,5 +87,27 @@ public class SensitiveWordServiceImpl implements ISensitiveWordService, Initiali
 		map.put("pageCount", pageCount);
 		return map;
 	}
+	
+	//修改的唯一判断
+	@Override
+	public int SoleJudgment(long updateid, String word, String updateInitialCount) throws IOException {
+		int code=vserification(word);
+		if(code<=0){
+				return Setpdate(updateid, word, updateInitialCount);
+		}else{
+			throw new BusinessException("修改失败！");
+		}
+	}
+	//新增的唯一判断
+	@Override
+	public int AddJudgment(String sitive) throws IOException {
+		int code=vserification(sitive);
+		if(code<0){
+				return AddSensitive(sitive);
+		}else{
+			throw new BusinessException("新增失败！");
+		}
+		
+	}
 
 }

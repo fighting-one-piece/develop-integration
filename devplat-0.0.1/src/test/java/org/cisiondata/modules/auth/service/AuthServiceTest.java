@@ -1,19 +1,28 @@
 package org.cisiondata.modules.auth.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.utils.endecrypt.EndecryptUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
+import org.cisiondata.utils.serde.SerializerUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import junit.framework.Assert;
+import redis.clients.jedis.BinaryJedisPubSub;
 
+@SuppressWarnings("deprecation")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:spring/applicationContext.xml"})
 public class AuthServiceTest {
@@ -32,7 +41,7 @@ public class AuthServiceTest {
 	
 	@Test
 	public void testUserServiceReadUserByAccount() {
-		User user = userService.readUserByAccount("admin");
+		User user = userService.readUserByAccount("test");
 		System.out.println(user.getNickname());
 	}
 	
@@ -71,8 +80,49 @@ public class AuthServiceTest {
 	
 	@Test
 	public void testA() {
-		int status = (int) RedisClusterUtils.getInstance().get("BankQueryQuota");
-		System.out.println("status: " + status);
+		RedisClusterUtils.getInstance().listPush("listOne", "test");
+		System.out.println("list data: " + (String) RedisClusterUtils.getInstance().listPop("listOne"));
+		WebResult webResult = new WebResult();
+		List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("user", new User());
+		data.add(map);
+		webResult.setData(data);
+		RedisClusterUtils.getInstance().listPush("listOne", webResult);
+		System.out.println(RedisClusterUtils.getInstance().listLength("listOne"));
+		WebResult returnObject = (WebResult) RedisClusterUtils.getInstance().listPop("listOne");
+		System.out.println(returnObject.getData());
+		System.out.println("!@!!@@");
+		try {
+			RedisClusterUtils.getInstance().getJedisCluster().subscribe(
+					new BinaryJedisPubSub() {
+						@Override
+						public void onMessage(byte[] channel, byte[] message) {
+							System.out.println("channel: " + new String(channel));
+							try {
+								System.out.println("message: " + SerializerUtils.read(message));
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+						
+					}, SerializerUtils.write("webresult"));
+			Long code = RedisClusterUtils.getInstance().getJedisCluster().publish(
+					SerializerUtils.write("webresult"), SerializerUtils.write(webResult));
+			System.out.println("code: " + code);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testB() {
+//		int status = (int) RedisClusterUtils.getInstance().get("education_organizeD");
+//		System.err.println(status);
+		RedisClusterUtils.getInstance().set("education_organizeD", 1);
+		int status1 = (int) RedisClusterUtils.getInstance().get("education_organizeD");
+		System.err.println(status1);
+
 	}
 	
 }

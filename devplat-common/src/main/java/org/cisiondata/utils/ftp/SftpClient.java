@@ -24,8 +24,7 @@ public class SftpClient {
      * @param password 密码
      * @return
      */
-    public ChannelSftp connect(String host, int port, String username,
-            String password) {
+    public ChannelSftp connect(String host, int port, String username, String password) {
         ChannelSftp sftp = null;
         try {
             JSch jsch = new JSch();

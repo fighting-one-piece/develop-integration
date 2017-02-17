@@ -48,16 +48,23 @@ $(document).ready(function(){
 			dataType:"json",
 			data:{"index":index},
 			success:function(result){
-				console.log(result);
 				var array = eval(result.data.data);
+				console.log(array);
 				$("#endpage").val(result.data.pageCount);
 				var html="";
+				var account ="";
 				for(var i=0;i<array.length;i++){
 					var date = new Date(array[i].accessTime);
+					if(array[i].account == null || array[i].account == ""){
+						account = "";
+					}else{
+						account = array[i].account;
+					}
 					html+='<tr id="'+j+'">'+
 								'<td><a>'+array[i].keyword+'</a></td>'+
 								'<td>'+FormatDate(date)+'</td>'+
 								'<td>'+array[i].ip+'</td>'+
+								'<td>'+account+'</td>'+
 //								'<td><button id="'+j+'" class="btn btn-warning" value="'+array[i].keyword+'">删除</button></td>'+
 							'</tr>'	
 					j++;
@@ -66,7 +73,7 @@ $(document).ready(function(){
 									"<td>关键字</td>"+
 									"<td>时间</td>"+
 									"<td>IP</td>"+
-//									"<td>操作</td>"+
+									"<td>访问者</td>"+
 								"</tr>";
 				$(".styleThead").html(styleThead);
 				$(".Tbody").html(html);
@@ -255,12 +262,19 @@ $(document).ready(function(){
 				var array = eval(result.data.data);
 				$("#end").val(result.data.pageCount);
 				var html="";
+				var account ="";
 				for(var i=0;i<array.length;i++){
 					var date = new Date(array[i].accessTime);
+					if(array[i].account == null || array[i].account == ""){
+						account = "";
+					}else{
+						account = array[i].account;
+					}
 					html+='<tr>'+
 								'<td>'+array[i].keyword+'</td>'+
 								'<td>'+array[i].ip+'</td>'+
 								'<td>'+FormatDate(date)+'</td>'+
+								'<td>'+account+'</td>'+
 							'</tr>'	
 				}
 				$(".styletb").html(html);

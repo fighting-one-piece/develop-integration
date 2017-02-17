@@ -5,8 +5,10 @@ import java.util.List;
 import org.cisiondata.modules.user.entity.AUser;
 import org.cisiondata.modules.user.entity.AUserARole;
 import org.cisiondata.modules.user.entity.RoleUser;
+import org.cisiondata.utils.exception.BusinessException;
 
 public interface IRoleService{
+	
 	
 	/**
 	 * 全部角色
@@ -73,4 +75,15 @@ public interface IRoleService{
 	 * 中间表删除
 	 */
 	public List<String>Deleteadd(String Deleteadd,long DeleteaddID);
+	
+	//修改的唯一判断修改
+	public int SoleJudgment(RoleUser roleUser) throws BusinessException;
+	
+	//删除的唯一判断
+	public int DeleteJudgment(Long id)throws BusinessException;
+	
+	//新增的唯一判断
+	public int AddJudgment(RoleUser roleUser) throws BusinessException;
+	
+	
 }

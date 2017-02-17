@@ -5,6 +5,7 @@ $(document).ready(function () {
 		$("#showSelectauser").hide();
 		$("#showaddauserpage").hide();
 		$("#showupdateauserpage").hide();
+		$("#showupdateauserpagep").hide();
 		$("#turnPage").hide();
 	};
 	
@@ -512,12 +513,8 @@ $(document).ready(function () {
 	var id=null;
 	$("#showAUserResult").on("click","#updateauser",function(){
 		hideAll();
-		$("#addwarning").empty();
-		$("#showaddauserpage").show();
-		$("#button").empty();
-		var button ="<button id='updateausers' class='btn btn-sm btn-info' value='1'>确定</button>";
-		$("#button").append(button);
-		$("#showAUserResult").empty();
+		$("#addwarningp").empty();
+		$("#showupdateauserpagep").show();
 		 id= $(this).parent().parent().find("td").eq(0).html();
 		var account= $(this).parent().parent().find("td").eq(1).html();
 		var identity= $(this).parent().parent().find("td").eq(2).html();
@@ -527,44 +524,42 @@ $(document).ready(function () {
 		var createTime= $(this).parent().parent().find("td").eq(6).html();
 		var expireTime= $(this).parent().parent().find("td").eq(7).html();
 		var deleteFlag= $(this).parent().parent().find("td").eq(8).html();
+		$("#showAUserResult").empty();
 		if (account != "undefined") {
-			$("#setaccount").val(account);
+			$("#setaccountp").val(account);
 		}
 		if (identity != "undefined") {
-			$("#identity").val(identity);
+			$("#identityp").val(identity);
 		}
 		if (nickname != "undefined") {
-			$("#nickname").val(nickname);
+			$("#nicknamep").val(nickname);
 		}
 		if (email != "undefined") {
-			$("#email").val(email);
+			$("#emailp").val(email);
 		}
 		if (status != "undefined") {
-			$("#status").val(status);
-		}
-		if (createTime != "undefined") {
-			$("#createTime").val(FormatDate(new Date(createTime)));
+			$("#statusp").val(status);
 		}
 		if (expireTime != "undefined") {
-			$("#expireTime").val(FormatDate(new Date(expireTime)));
+			$("#expireTimep").val(FormatDate(new Date(expireTime)));
 		}
 		if (deleteFlag != "undefined") {
-			$("#deleteFlag").val(deleteFlag);
+			$("#deleteFlagp").val(deleteFlag);
 		}
-		$("#setpassword").val("");
-		$("#confirmpassword").val("");
+		$("#setpasswordp").val("");
+		$("#confirmpasswordp").val("");
 	});
 	
 	//点击修改页面确定按钮
-	$("#button").on("click","#updateausers",function(){
-		var account = $("#setaccount").val().trim();
-		var password = $("#setpassword").val().trim();
-		var confirmpassword = $("#confirmpassword").val().trim();
-		var nickname = $("#nickname").val().trim();
-		var email = $("#email").val().trim();
-		var identity = $("#identity").val().trim();
-		var status = $("#status").val().trim();	
-		var expireTime =new Date($("#expireTime").val().trim());
+	$("#buttonp").on("click","#updateausers",function(){
+		var account = $("#setaccountp").val().trim();
+		var password = $("#setpasswordp").val().trim();
+		var confirmpassword = $("#confirmpasswordp").val().trim();
+		var nickname = $("#nicknamep").val().trim();
+		var email = $("#emailp").val().trim();
+		var identity = $("#identityp").val().trim();
+		var status = $("#statusp").val().trim();	
+		var expireTime =new Date($("#expireTimep").val().trim());
 		if (status == "是" ) {
 			status = "0";
 		}else {
@@ -580,26 +575,26 @@ $(document).ready(function () {
 			identity = null;
 		}
 		if (account == null || account == "") {
-			$("#addwarning").empty();
-			 $("#addwarning").append("账号不能为空！");
+			$("#addwarningp").empty();
+			 $("#addwarningp").append("账号不能为空！");
 		}else if (password == null || password == "" ) {
-			$("#addwarning").empty();
-			$("#addwarning").append("请输入密码！");
+			$("#addwarningp").empty();
+			$("#addwarningp").append("请输入密码！");
 		}else if( password.match(new RegExp("^[a-zA-Z][a-zA-Z0-9_]{5，15}")) || password.length < 6 || password.length > 16){
-			$("#addwarning").empty();
-			 $("#addwarning").append("密码为6至16位的字母及数字组成！");
+			$("#addwarningp").empty();
+			 $("#addwarningp").append("密码为6至16位的字母及数字组成！");
 		}else if (confirmpassword == null || confirmpassword == "" ) {
-			$("#addwarning").empty();
-			$("#addwarning").append("请输入确认密码！");
+			$("#addwarningp").empty();
+			$("#addwarningp").append("请输入确认密码！");
 		}else if(password != confirmpassword) {
-			$("#addwarning").empty();
-			 $("#addwarning").append("两次输入的密码不相同！");
+			$("#addwarningp").empty();
+			 $("#addwarningp").append("两次输入的密码不相同！");
 		}else if(email.match(new RegExp(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/))) {
-			$("#addwarning").empty();
-			 $("#addwarning").append("邮箱不正确！");
+			$("#addwarningp").empty();
+			 $("#addwarningp").append("邮箱不正确！");
 		}else{
-			$("#addwarning").empty();
-			 $("#addwarning").append("正在全速处理中····");
+			$("#addwarningp").empty();
+			 $("#addwarningp").append("正在全速处理中····");
 			 swal({
 					title:"",  
 					text:"确定修改吗？",  
@@ -619,13 +614,13 @@ $(document).ready(function () {
 					data:{"account":account,"password":password,"id":id,"nickname":nickname,"email":email,"identity":identity,"status":status,"expireTime":expireTime},
 					success:function(result){
 						if (result.code == 1) {
-							$("#addwarning").empty();
-							 $("#addwarning").append(result.data);
+							$("#addwarningp").empty();
+							 $("#addwarningp").append(result.data);
 							 alert("修改成功！");
 							 loadingAuser(1);
 						}else {
-							$("#addwarning").empty();
-							$("#addwarning").append("更新失败！");
+							$("#addwarningp").empty();
+							$("#addwarningp").append("更新失败！");
 						}
 				}
 			});
@@ -680,7 +675,6 @@ $(document).ready(function () {
 	//修改剩余条数
 	$(document).on("click",".update-accessUserControl",function(){
 		var account = $(this).parent().parent().children().eq(1).html();
-		console.log(account)
 		$("#submitupdateAccessUserControlBtn").data("account",account);
 		document.getElementById('updateAccessUserControl').style.display='block';
 		document.getElementById('resourceTreeFade').style.display='block';

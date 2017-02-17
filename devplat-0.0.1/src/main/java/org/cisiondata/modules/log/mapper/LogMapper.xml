@@ -11,7 +11,7 @@
 		<result column="access_time" property="accessTime" javaType="java.util.Date"/>
 		<result column="keyword" property="keyword"/>
 		<result column="account" property="account"/>
-		<result column="c" property="count"/>
+		<result column="keyword_Count" property="count"/>
 	</resultMap>
 	<!-- 增加 -->
 	<insert id="addLog" parameterType="LogModel">
@@ -31,22 +31,35 @@
 	</delete>
 	<!-- 统计关键字 -->
 	<select id="count" resultMap="LogModelMap">
-		SELECT keyword,COUNT(keyword) AS C FROM T_LOG GROUP BY keyword
+		SELECT keyword,keyword_Count AS Count FROM T_LOG_COUNT 
 	</select>
 	<!-- 统计关键字分页 -->
 	<select id="countPage" resultMap="LogModelMap">
-		SELECT keyword,COUNT(keyword) AS C FROM T_LOG GROUP BY keyword ORDER BY C DESC LIMIT #{0},#{1}
+		SELECT keyword,keyword_Count AS Count FROM T_LOG_COUNT ORDER BY Count DESC LIMIT #{0},#{1}
 	</select>
 	<!-- 查询某个关键字 -->
 	<select id="selectByKey" resultMap="LogModelMap">
-		SELECT id,session_id,ip,access_time,keyword FROM T_LOG WHERE keyword = #{0}
+		SELECT id,session_id,ip,access_time,keyword,account FROM T_LOG WHERE keyword = #{0}
 	</select>
 	<!-- 查询到某个关键字进行分页 -->
 	<select id="keyByPage" resultMap="LogModelMap">
-		SELECT id,session_id,ip,access_time,keyword FROM T_LOG WHERE keyword = #{0} LIMIT #{1},#{2}
+		SELECT id,session_id,ip,access_time,keyword,account FROM T_LOG WHERE keyword = #{0} LIMIT #{1},#{2}
 	</select>
 	<!-- 分页SQL语句 -->
 	<select id="selectByorderTime" resultMap="LogModelMap">
 		SELECT * FROM T_LOG  ORDER BY access_time DESC limit #{0},#{1}
 	</select>
+	
+	<!-- 查询统计关键字的表 -->
+	<select id="selLogCount" resultType="int">
+		SELECT COUNT(*) FROM T_LOG_COUNT WHERE keyword = #{0}
+	</select>
+	<!-- 统计关键字存入另一张表 -->
+	<insert id="addLogCount" parameterType="LogModel">
+		INSERT INTO T_LOG_COUNT(keyword,keyword_Count,access_time) value(#{keyword},#{count},#{accessTime})
+	</insert>
+	<!-- 修改已存在的关键字统计个数 -->
+	<update id="upLogCount" parameterType="LogModel">
+		UPDATE T_LOG_COUNT SET keyword_Count = #{count} ,access_time = #{accessTime} WHERE keyword = #{keyword}
+	</update>
 </mapper>

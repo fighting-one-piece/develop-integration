@@ -35,8 +35,7 @@ public class WebLayerAspect {
 
 	private Logger LOG = LoggerFactory.getLogger("MODULE_LOG");
 
-	private static final String EXECUTION = "execution(* org.cisiondata.modules.datada.controller.*.*(..)) or "
-			+ "execution(* org.cisiondata.modules.datainterface.controller.*.*(..)) or "
+	private static final String EXECUTION = "execution(* org.cisiondata.modules.datainterface.controller.*.*(..)) or "
 			+ "execution(* org.cisiondata.modules.identity.controller.*.*(..)) or "
 			+ "execution(* org.cisiondata.modules.elasticsearch.controller.ESController.*(..))";
 	

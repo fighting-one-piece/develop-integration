@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping(value = "/excludegroup")
@@ -22,8 +23,8 @@ public class AutoGroupController {
 	private Map<String, List<String>> cache = new HashMap<String, List<String>>(); 
 	
 	@RequestMapping(value = "/",method = RequestMethod.GET)
-	public String groupView() {
-		return "/user/group";
+	public ModelAndView groupView() {
+		return new ModelAndView("/user/group");
 	}
 	
 	@ResponseBody

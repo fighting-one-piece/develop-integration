@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import org.cisiondata.modules.datainterface.dao.AccessSwitchDAO;
 import org.cisiondata.modules.datainterface.entity.AccessSwitch;
 import org.cisiondata.modules.datainterface.service.IAccessSwitchService;
+import org.cisiondata.utils.excel.PoiExcelUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
@@ -60,8 +61,15 @@ public class AccessSwitchServiceImpl implements IAccessSwitchService, Initializi
 	
 	//批量修改
 	@Override
-	public void updateIdStatus(AccessSwitch accessSwitch) throws IOException {
-		swithDAO.updateIdStatus(accessSwitch);
-		RedisClusterUtils.getInstance().set(accessSwitch.getSwitch_identity(), accessSwitch.getStatus());
+	public void updateIdStatus(String id,String identity,Integer status) throws IOException {
+		List<String> listId = PoiExcelUtils.stringToList(id);
+		List<String> listIdentity = PoiExcelUtils.stringToList(identity);
+		for (int i = 0; i < listId.size(); i++) {
+			AccessSwitch accessSwitch = new AccessSwitch();
+			accessSwitch.setId(Integer.valueOf(listId.get(i)));
+			accessSwitch.setStatus(status);
+			swithDAO.updateIdStatus(accessSwitch);
+			RedisClusterUtils.getInstance().set(listIdentity.get(i), status);
+		}
 	}
 }

@@ -32,4 +32,19 @@ public class AccessUserControlControler {
 		}
 		return result;
 	}
+	
+	@RequestMapping("/admin/accessUserControl/updateMoney")
+	@ResponseBody
+	public WebResult changeCount(Double changeCount,String type,String account){
+		WebResult result = new WebResult();
+		try {
+			result.setData(accessUserControlService.updateMoney(changeCount, type, account));
+			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+			LOG.error(e.getMessage(), e);
+		}
+		return result;
+	}
 }

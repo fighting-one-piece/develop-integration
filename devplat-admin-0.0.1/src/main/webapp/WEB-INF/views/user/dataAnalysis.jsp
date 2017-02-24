@@ -34,6 +34,10 @@
     				<input type="button" value="导出" id="btnExport" name="btnExport" class="btn btn-sm btn-success">
     				<input type="button" value="下载模板" id="btnExportDemo" name="btnExportDemo" class="btn btn-sm btn-success">
 					<i id="styleCheck">*格式错误,请参考模板。</i>
+					<div>
+					<br/>
+						命中率：<span id="hitRate"></span>
+					</div>
 				</div>
 			</form>
 		</div>
@@ -92,7 +96,8 @@
 			<div id="Ovaerall" class="radio_radios">
 				<label><input name="Fruit" type="radio" value="phone" />手机</label>
 				<label><input name="Fruit" type="radio" value="idCard" />身份证 </label>
-				<label><input name="Fruit" type="radio" value="mailbox" />邮箱地址</label><br/><br/>
+				<label><input name="Fruit" type="radio" value="mailbox" />邮箱地址</label>
+				<label><input name="Fruit" type="radio" value="company" />公司信息</label><br/><br/>
 			  <div class="styleWhite" align="center" id="centers">
 				<button class="btn btn-sm btn-info" id="ituationsuer">確定</button>&nbsp;&nbsp;
 				<button class="btn btn-sm btn-info" id="ituationColsebtn">关闭</button>	
@@ -103,6 +108,7 @@
 				<label><input name="Fru" type="radio" value="phone" />手机</label>
 				<label><input name="Fru" type="radio" value="idCard" />身份证 </label>
 				<label><input name="Fru" type="radio" value="mailbox" />邮箱地址 </label>
+				<label><input name="Fru" type="radio" value="company" />公司信息 </label>
 				<!-- 下拉标签 -->
 				<div>
 				 <select style="width: 150px"class="index" id="localindex">

@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.cisiondata.modules.log.dao.UserAccessLogDAO;
 import org.cisiondata.modules.log.entity.UserAccessLog;
 import org.cisiondata.utils.spring.SpringBeanFactory;
-import org.cisiondata.utils.web.IpUtils;
+import org.cisiondata.utils.web.IPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,12 +30,12 @@ import com.google.gson.GsonBuilder;
 
 public class AccessLogFilter implements Filter {
 	
-	private UserAccessLogDAO logMapper;
 	private Logger LOG = LoggerFactory.getLogger("ACCESS_LOG");
+	private UserAccessLogDAO userAccessLogDAO = null;
 	
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		logMapper = SpringBeanFactory.getBean("logMapper");
+		userAccessLogDAO = SpringBeanFactory.getBean("userAccessLogDAO");
 	}
 	
 	@Override
@@ -47,7 +47,7 @@ public class AccessLogFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 		String jsessionId = httpServletRequest.getRequestedSessionId();
-        String ip = IpUtils.getIpAddr(httpServletRequest);
+        String ip = IPUtils.getIPAddress(httpServletRequest);
         String accept = httpServletRequest.getHeader("accept");
         String userAgent = httpServletRequest.getHeader("User-Agent");
         String url = httpServletRequest.getRequestURI();
@@ -82,7 +82,7 @@ public class AccessLogFilter implements Filter {
     				logModel.setKeyword(keyword);
     				logModel.setAccount(account);
     				if(m.matches()){
-    					logMapper.addLog(logModel);
+    					userAccessLogDAO.addLog(logModel);
     				}
     			}
         	}else{
@@ -109,7 +109,7 @@ public class AccessLogFilter implements Filter {
         				logModel.setAccessTime(new Date());
         				logModel.setKeyword(keyword.substring(1,keyword.length()-1));
         				logModel.setAccount(account);
-        				logMapper.addLog(logModel);
+        				userAccessLogDAO.addLog(logModel);
         			}
         		}
         	}

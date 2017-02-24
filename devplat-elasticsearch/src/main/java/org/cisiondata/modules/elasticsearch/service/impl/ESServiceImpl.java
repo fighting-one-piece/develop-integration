@@ -483,7 +483,7 @@ public class ESServiceImpl implements IESService {
 			}
 			if (isPagination) {
 				Map<String, Object> result = new HashMap<String, Object>();
-				result.put("index", MessageUtils.getInstance().getMessage(prefix));
+				result.put("index", MessageUtils.getInstance().getMessage(hit.getIndex()));
 				result.put("type", MessageUtils.getInstance().getMessage(prefix));
 				result.put("data", replaceSource);
 				resultList.add(result);

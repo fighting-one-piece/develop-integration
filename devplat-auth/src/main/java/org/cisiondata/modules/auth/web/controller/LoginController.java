@@ -1,8 +1,5 @@
 package org.cisiondata.modules.auth.web.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +8,7 @@ import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.auth.service.ILoginService;
 import org.cisiondata.modules.auth.web.jcaptcha.JCaptcha;
+import org.cisiondata.utils.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +30,15 @@ public class LoginController {
     private ILoginService loginService = null;
 
     @RequestMapping(value = {"/{login:login;?.*}"}, method = RequestMethod.POST)
-    public WebResult login(HttpServletRequest request, String username, String password) {
+    public WebResult login(HttpServletRequest request, String account, String password) {
         WebResult webResult = new WebResult();
         try {
-        	webResult.setData(loginService.readUserLoginInfoByAccountAndPassowrd(username, password));
+        	webResult.setData(loginService.readUserLoginInfoByAccountAndPassowrd(account, password));
         	webResult.setResultCode(ResultCode.SUCCESS);
+        } catch (BusinessException be) {
+        	LOG.error(be.getMessage(), be);
+        	webResult.setCode(be.getCode());
+        	webResult.setFailure(be.getMessage());
         } catch (Exception e) {
         	LOG.error(e.getMessage(), e);
         	webResult.setResultCode(ResultCode.FAILURE);
@@ -46,86 +48,23 @@ public class LoginController {
     }
     
     @RequestMapping(value = "/jcaptcha-validate", method = RequestMethod.GET)
-    public Object jqueryValidationEngineValidate (HttpServletRequest request, HttpServletResponse response,
-            @RequestParam(value = "fieldId", required = false) String fieldId,
-            @RequestParam(value = "fieldValue", required = false) String fieldValue) {
-        ValidateResponse validateResponse = ValidateResponse.newInstance();
-        if (JCaptcha.hasCaptcha(request, fieldValue) == false) {
-        	validateResponse.validateFail(fieldId, messageSource.getMessage("jcaptcha.validate.error", null, null));
-        } else {
-        	validateResponse.validateSuccess(fieldId, messageSource.getMessage("jcaptcha.validate.success", null, null));
+    public WebResult jqueryValidationEngineValidate(HttpServletRequest request, HttpServletResponse response,
+    		@RequestParam(value = "verificationCode", required = true) String verificationCode) {
+    	LOG.info("verificationCode : {}", verificationCode);
+    	WebResult webResult = new WebResult();
+    	try {
+    		if (JCaptcha.hasCaptcha(request, verificationCode)) {
+    			webResult.setData(messageSource.getMessage("jcaptcha.validate.success", null, null));
+    		} else {
+    			webResult.setData(messageSource.getMessage("jcaptcha.validate.error", null, null));
+    		}
+    		webResult.setResultCode(ResultCode.SUCCESS);
+        } catch (Exception e) {
+        	LOG.error(e.getMessage(), e);
+        	webResult.setResultCode(ResultCode.FAILURE);
+        	webResult.setFailure(e.getMessage());
         }
-        return validateResponse.result();
-    }
-
-}
-
-class ValidateResponse {
-    /**
-     * 验证成功
-     */
-    private static final Integer OK = 1;
-    /**
-     * 验证失败
-     */
-    private static final Integer FAIL = 0;
-
-    private List<Object> results = new ArrayList<Object>();
-
-    private ValidateResponse() {
-    }
-
-    public static ValidateResponse newInstance() {
-        return new ValidateResponse();
-    }
-
-    /**
-     * 验证成功（使用前台alertTextOk定义的消息）
-     *
-     * @param fieldId 验证成功的字段名
-     */
-    public void validateFail(String fieldId) {
-        validateFail(fieldId, "");
-    }
-
-    /**
-     * 验证成功
-     *
-     * @param fieldId 验证成功的字段名
-     * @param message 验证成功时显示的消息
-     */
-    public void validateFail(String fieldId, String message) {
-        results.add(new Object[]{fieldId, FAIL, message});
-    }
-
-    /**
-     * 验证成功（使用前台alertTextOk定义的消息）
-     *
-     * @param fieldId 验证成功的字段名
-     */
-    public void validateSuccess(String fieldId) {
-        validateSuccess(fieldId, "");
-    }
-
-    /**
-     * 验证成功
-     *
-     * @param fieldId 验证成功的字段名
-     * @param message 验证成功时显示的消息
-     */
-    public void validateSuccess(String fieldId, String message) {
-        results.add(new Object[]{fieldId, OK, message});
-    }
-
-    /**
-     * 返回验证结果
-     * @return
-     */
-    public Object result() {
-        if (results.size() == 1) {
-            return results.get(0);
-        }
-        return results;
+        return webResult;
     }
 
 }

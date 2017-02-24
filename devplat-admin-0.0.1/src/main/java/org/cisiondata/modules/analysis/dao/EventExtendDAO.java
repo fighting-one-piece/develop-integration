@@ -26,4 +26,13 @@ public interface EventExtendDAO extends GenericDAO<EventExtend, Long>{
 	
 	//统计条数
 	public int count(long id);
+	
+	//数据匹配命中
+	public int hitRate(int extend_base_id);
+	
+	//数据更新字段标识统计
+	public int statisIdentification(int StatisIdentification);
+	//上传数据统计
+	public int uploadStatistics(int uploadStatistics);
+	
 }

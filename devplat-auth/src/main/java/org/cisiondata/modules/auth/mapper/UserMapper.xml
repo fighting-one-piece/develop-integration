@@ -6,16 +6,27 @@
         <id property="id" column="ID"/>  
         <result property="account" column="ACCOUNT"/>
         <result property="password" column="PASSWORD"/>  
+        <result property="salt" column="SALT"/>  
         <result property="identity" column="IDENTITY"/> 
         <result property="nickname" column="NICK_NAME"/> 
+        <result property="realname" column="REAL_NAME"/> 
+        <result property="idCard" column="ID_CARD"/> 
+        <result property="mobilePhone" column="MOBILE_PHONE"/> 
         <result property="email" column="EMAIL"/> 
         <result property="status" column="STATUS"/> 
         <result property="createTime" column="CREATE_TIME"/> 
         <result property="expireTime" column="EXPIRE_TIME"/> 
+        <result property="question" column="QUESTION"/> 
+        <result property="answer" column="ANSWER"/> 
+        <result property="firstLoginFlag" column="FIRST_LOGIN_FLAG"/> 
         <result property="deleteFlag" column="DELETE_FLAG"/> 
     </resultMap>
     
-    <sql id="columnClause">ID, ACCOUNT, PASSWORD, IDENTITY, NICK_NAME, EMAIL, STATUS, CREATE_TIME, EXPIRE_TIME, DELETE_FLAG</sql>
+    <sql id="columnClause">
+    	ID, ACCOUNT, PASSWORD, SALT, IDENTITY, NICK_NAME, REAL_NAME, ID_CARD, 
+    	MOBILE_PHONE, EMAIL, STATUS, CREATE_TIME, EXPIRE_TIME, QUESTION,
+    	ANSWER, FIRST_LOGIN_FLAG, DELETE_FLAG
+    </sql>
     
     <sql id="whereClause">
     	<where>
@@ -28,11 +39,29 @@
     		<if test="condition.nickname != null and condition.nickname != ''">
     			AND NICK_NAME = #{condition.nickname}
     		</if>
-    		<if test="condition.expireTime != null and condition.expireTime != ''">
+    		<if test="condition.realname != null and condition.realname != ''">
+    			AND REAL_NAME = #{condition.realname}
+    		</if>
+    		<if test="condition.idCard != null and condition.idCard != ''">
+    			AND ID_CARD = #{condition.idCard}
+    		</if>
+    		<if test="condition.mobilePhone != null and condition.mobilePhone != ''">
+    			AND MOBILE_PHONE = #{condition.mobilePhone}
+    		</if>
+    		<if test="condition.expireTime != null">
     			AND EXPIRE_TIME = #{condition.expireTime}
     		</if>
     		<if test="condition.status != null">
     			AND STATUS = #{condition.status}
+    		</if>
+    		<if test="condition.question != null and condition.question != ''">
+    			AND QUESTION = #{condition.question}
+    		</if>
+    		<if test="condition.answer != null and condition.answer != ''">
+    			AND ANSWER = #{condition.answer}
+    		</if>
+    		<if test="condition.firstLoginFlag != null">
+    			AND FIRST_LOGIN_FLAG = #{condition.firstLoginFlag}
     		</if>
     		<if test="condition.deleteFlag != null">
     			AND DELETE_FLAG = #{condition.deleteFlag}
@@ -41,28 +70,73 @@
     </sql>
     
      <insert id="insert" parameterType="User">
-            INSERT INTO T_USER(ACCOUNT, PASSWORD, IDENTITY, NICK_NAME, EMAIL, CREATE_TIME, EXPIRE_TIME, DELETE_FLAG) 
-            VALUES(#{account},#{password},#{identity},#{nickName},#{insertTime})  
+	    INSERT INTO T_USER(ACCOUNT, PASSWORD, SALT, IDENTITY, NICK_NAME, REAL_NAME, ID_CARD, MOBILE_PHONE, 
+	    EMAIL, CREATE_TIME, EXPIRE_TIME, QUESTION, ANSWER, FIRST_LOGIN_FLAG, DELETE_FLAG) 
+	    VALUES(#{account},#{password},#{salt},#{identity},#{nickname},#{realname},#{idCard},#{mobilePhone},
+	    #{email},#{createTime},#{expireTime},#{question},#{answer},#{firstLoginFlag},#{deleteFlag})  
     </insert>
     
+    <update id="update" parameterType="User">
+    	UPDATE T_USER
+    	<set>
+    		<if test="password != null">
+    			PASSWORD = #{password}
+    		</if>
+    		<if test="identity != null">
+    			IDENTITY = #{identity}
+    		</if>
+    		<if test="nickname != null">
+    			NICK_NAME = #{nickname}
+    		</if>
+    		<if test="realname != null">
+    			REAL_NAME = #{realname}
+    		</if>
+    		<if test="idCard != null">
+    			ID_CARD = #{idCard}
+    		</if>
+    		<if test="mobilePhone != null">
+    			MOBILE_PHONE = #{mobilePhone}
+    		</if>
+    		<if test="expireTime != null">
+    			EXPIRE_TIME = #{expireTime}
+    		</if>
+    		<if test="status != null">
+    			STATUS = #{status}
+    		</if>
+    		<if test="question != null">
+    			QUESTION = #{question}
+    		</if>
+    		<if test="answer != null">
+    			ANSWER = #{answer}
+    		</if>
+    		<if test="firstLoginFlag != null">
+    			FIRST_LOGIN_FLAG = #{firstLoginFlag}
+    		</if>
+    		<if test="deleteFlag != null">
+    			DELETE_FLAG = #{deleteFlag}
+    		</if>
+    	</set>
+    	WHERE ACCOUNT=#{account}
+    </update>
+    
     <select id="readDataByPK" resultMap="userResultMap">  
-            SELECT 
-            <include refid="columnClause"/>
-            FROM T_USER WHERE ID = #{id}
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_USER WHERE ID = #{id}
     </select>
     
     <select id="readDataByCondition" resultMap="userResultMap">  
-            SELECT 
-            <include refid="columnClause"/>
-            FROM T_USER
-            <include refid="whereClause"/>
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_USER
+        <include refid="whereClause"/>
     </select>
     
     <select id="readDataListByCondition" resultMap="userResultMap">  
-            SELECT 
-            <include refid="columnClause"/>
-            FROM T_USER
-            <include refid="whereClause"/>
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_USER
+        <include refid="whereClause"/>
     </select>
     
     <select id="readDataPaginationByCondition" resultMap="userResultMap">  
@@ -71,14 +145,4 @@
         ]]>   
     </select>
     
-    <!-- 根据账号查询 -->
-	<select id="findUserByAccount" resultMap="userResultMap">
-		select ID,ACCOUNT,PASSWORD,IDENTITY,NICK_NAME,EMAIL,STATUS,CREATE_TIME,EXPIRE_TIME,DELETE_FLAG  from T_USER WHERE ACCOUNT = #{account}
-	</select> 
-	
-	<!-- 根据ID更新-->
-	<update id="updateUserPassword" parameterType="User"> 
-		update T_USER SET ACCOUNT=#{account},PASSWORD=#{password},IDENTITY=#{identity},NICK_NAME=#{nickname},EMAIL=#{email},STATUS=#{status},EXPIRE_TIME=#{expireTime} WHERE ID=#{id}
-	</update> 
-	
 </mapper>

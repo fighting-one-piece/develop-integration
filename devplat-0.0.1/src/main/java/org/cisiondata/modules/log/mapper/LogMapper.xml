@@ -8,6 +8,7 @@
 		<result column="id" property="id" jdbcType="INTEGER"/>
 		<result column="session_id" property="sessionId"/>
 		<result column="ip" property="ip"/>
+		<result column="url" property="url"/>
 		<result column="access_time" property="accessTime" javaType="java.util.Date"/>
 		<result column="keyword" property="keyword"/>
 		<result column="account" property="account"/>
@@ -15,11 +16,11 @@
 	</resultMap>
 	<!-- 增加 -->
 	<insert id="addLog" parameterType="LogModel">
-		insert into T_LOG(id,session_id,ip,access_time,keyword,account) value (#{id},#{sessionId},#{ip},#{accessTime},#{keyword},#{account})
+		insert into T_LOG(id,session_id,ip,url,access_time,keyword,account) value (#{id},#{sessionId},#{ip},#{url},#{accessTime},#{keyword},#{account})
 	</insert>
 	<!-- 查询全部 -->
 	<select id="findAll" resultMap="LogModelMap">
-		select id,session_id,ip,access_time,keyword from T_LOG
+		select id,session_id,ip,url,access_time,keyword from T_LOG
 	</select>
 	<!-- 分页SQL语句 -->
 	<select id="selectByPage" resultMap="LogModelMap">
@@ -39,11 +40,11 @@
 	</select>
 	<!-- 查询某个关键字 -->
 	<select id="selectByKey" resultMap="LogModelMap">
-		SELECT id,session_id,ip,access_time,keyword,account FROM T_LOG WHERE keyword = #{0}
+		SELECT id,session_id,ip,url,access_time,keyword,account FROM T_LOG WHERE keyword = #{0}
 	</select>
 	<!-- 查询到某个关键字进行分页 -->
 	<select id="keyByPage" resultMap="LogModelMap">
-		SELECT id,session_id,ip,access_time,keyword,account FROM T_LOG WHERE keyword = #{0} LIMIT #{1},#{2}
+		SELECT id,session_id,ip,url,access_time,keyword,account FROM T_LOG WHERE keyword = #{0} LIMIT #{1},#{2}
 	</select>
 	<!-- 分页SQL语句 -->
 	<select id="selectByorderTime" resultMap="LogModelMap">
@@ -62,4 +63,12 @@
 	<update id="upLogCount" parameterType="LogModel">
 		UPDATE T_LOG_COUNT SET keyword_Count = #{count} ,access_time = #{accessTime} WHERE keyword = #{keyword}
 	</update>
+	<!-- 查询某个访问者所访问的资源个数 -->
+	<select id="selByAccount" resultType="int">
+		SELECT COUNT(*) FROM T_LOG WHERE account = #{0}
+	</select>
+	<!-- 分页显示查询到某个访问者所访问的资源 -->
+	<select id="selByAcPage" resultMap="LogModelMap">
+		SELECT * FROM T_LOG WHERE account = #{0} LIMIT #{1},#{2}
+	</select>
 </mapper>

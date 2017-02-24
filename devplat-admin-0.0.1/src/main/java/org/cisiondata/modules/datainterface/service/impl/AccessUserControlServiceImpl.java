@@ -26,7 +26,6 @@ public class AccessUserControlServiceImpl implements IAccessUserControlService {
 		if (accessUserControl == null || accessUserControl.getAccount() == null){//不存在，新增
 			AccessUserControl access = new AccessUserControl();
 			access.setAccount(account);
-			access.setInterfaceUrl("");
 			if("1".equals(type)){
 				access.setCount(changeCount);
 				access.setRemainingCount(changeCount);
@@ -38,7 +37,6 @@ public class AccessUserControlServiceImpl implements IAccessUserControlService {
 		} else {//修改
 			AccessUserControl access = new AccessUserControl();
 			access.setAccount(account);
-			access.setInterfaceUrl(accessUserControl.getInterfaceUrl());
 			if(accessUserControl.getCount() == null){//没有count字段
 				if("1".equals(type)){
 					access.setCount(changeCount);
@@ -58,6 +56,21 @@ public class AccessUserControlServiceImpl implements IAccessUserControlService {
 			}
 			return accessUserControlDao.updateAccessControlByAccount(access);
 		}
+	}
+
+	@Override
+	public int updateMoney(Double changeCount, String type, String account) throws BusinessException {
+		AccessUserControl accessUserControl = accessUserControlDao.findAccessControlByAccount(account);
+		AccessUserControl access = new AccessUserControl();
+		access.setAccount(account);
+		if("1".equals(type)){
+			access.setMoney(changeCount + accessUserControl.getMoney());
+			access.setRemainingMoney(changeCount + accessUserControl.getRemainingMoney());
+		} else {
+			access.setRemainingMoney(accessUserControl.getRemainingMoney() - changeCount < 0 ? 0 : accessUserControl.getRemainingMoney() - changeCount);
+			access.setMoney(accessUserControl.getRemainingMoney() - changeCount < 0 ? accessUserControl.getMoney() - accessUserControl.getRemainingMoney() : accessUserControl.getMoney() - changeCount);
+		}
+		return accessUserControlDao.updateMoneyByAccount(access);
 	}
 
 }

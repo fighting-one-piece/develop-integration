@@ -100,10 +100,10 @@ public class LoginController {
             @RequestParam(value = "fieldId", required = false) String fieldId,
             @RequestParam(value = "fieldValue", required = false) String fieldValue) {
         ValidateResponse validateResponse = ValidateResponse.newInstance();
-        if (JCaptcha.hasCaptcha(request, fieldValue) == false) {
-        	validateResponse.validateFail(fieldId, messageSource.getMessage("jcaptcha.validate.error", null, null));
-        } else {
+        if (JCaptcha.hasCaptcha(request, fieldValue)) {
         	validateResponse.validateSuccess(fieldId, messageSource.getMessage("jcaptcha.validate.success", null, null));
+        } else {
+        	validateResponse.validateFailure(fieldId, messageSource.getMessage("jcaptcha.validate.error", null, null));
         }
         return validateResponse.result();
     }
@@ -111,14 +111,11 @@ public class LoginController {
 }
 
 class ValidateResponse {
-    /**
-     * 验证成功
-     */
-    private static final Integer OK = 1;
-    /**
-     * 验证失败
-     */
-    private static final Integer FAIL = 0;
+	
+    /** 验证成功 */
+    private static final Integer SUCCESS = 1;
+    /** 验证失败 */
+    private static final Integer FAILURE = 0;
 
     private List<Object> results = new ArrayList<Object>();
 
@@ -131,26 +128,23 @@ class ValidateResponse {
 
     /**
      * 验证成功（使用前台alertTextOk定义的消息）
-     *
      * @param fieldId 验证成功的字段名
      */
-    public void validateFail(String fieldId) {
-        validateFail(fieldId, "");
+    public void validateFailure(String fieldId) {
+        validateFailure(fieldId, "");
     }
 
     /**
      * 验证成功
-     *
      * @param fieldId 验证成功的字段名
      * @param message 验证成功时显示的消息
      */
-    public void validateFail(String fieldId, String message) {
-        results.add(new Object[]{fieldId, FAIL, message});
+    public void validateFailure(String fieldId, String message) {
+        results.add(new Object[]{fieldId, FAILURE, message});
     }
 
     /**
      * 验证成功（使用前台alertTextOk定义的消息）
-     *
      * @param fieldId 验证成功的字段名
      */
     public void validateSuccess(String fieldId) {
@@ -159,12 +153,11 @@ class ValidateResponse {
 
     /**
      * 验证成功
-     *
      * @param fieldId 验证成功的字段名
      * @param message 验证成功时显示的消息
      */
     public void validateSuccess(String fieldId, String message) {
-        results.add(new Object[]{fieldId, OK, message});
+        results.add(new Object[]{fieldId, SUCCESS, message});
     }
 
     /**
@@ -172,10 +165,7 @@ class ValidateResponse {
      * @return
      */
     public Object result() {
-        if (results.size() == 1) {
-            return results.get(0);
-        }
-        return results;
+        return results.size() == 1 ? results.get(0) : results;
     }
 
 }

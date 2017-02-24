@@ -95,13 +95,10 @@ public class AccessSwitchController {
 	//批量修改
 	@ResponseBody
 	@RequestMapping("/switch/updateIdStatus")
-	public WebResult updateIdStatus(int id,Integer status){
+	public WebResult updateIdStatus(String id,String identity,Integer status){
 		WebResult result = new WebResult();
 		try {
-			AccessSwitch sSwitch =new AccessSwitch();
-			sSwitch.setId(id);
-			sSwitch.setStatus(status);
-			aaccessSwitchService.updateIdStatus(sSwitch);
+			aaccessSwitchService.updateIdStatus(id,identity,status);
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());

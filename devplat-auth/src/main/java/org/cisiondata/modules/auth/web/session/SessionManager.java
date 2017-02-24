@@ -106,4 +106,8 @@ public class SessionManager {
 		cookieHandler.setCookieMaxAge(cookieMaxAge);
 	}
 	
+	public void setCookieSecure(boolean cookieSecure) {
+		cookieHandler.setCookieSecure(cookieSecure);;
+	}
+	
 }

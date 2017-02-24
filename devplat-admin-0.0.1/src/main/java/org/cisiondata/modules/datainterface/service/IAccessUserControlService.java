@@ -6,4 +6,6 @@ public interface IAccessUserControlService {
 
 	public int updateAccessUserControlCount(Long changeCount,String type,String account) throws BusinessException;
 	
+	public int updateMoney(Double changeCount,String type,String account) throws BusinessException;
+	
 }

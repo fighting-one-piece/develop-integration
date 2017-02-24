@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.identity.service.IHongGuService;
+import org.cisiondata.utils.exception.BusinessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,9 +26,12 @@ public class HongGuController {
 		try {
 			result.setData(hongGuService.pywToQQ(url));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setFailure("系统错误");
 		}
 		return result;
 	}
@@ -40,9 +44,12 @@ public class HongGuController {
 		try {
 			result.setData(hongGuService.wbToQQ(url));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setFailure("系统错误");
 		}
 		return result;
 	}
@@ -55,9 +62,12 @@ public class HongGuController {
 		try {
 			result.setData(hongGuService.qqToPyw(qq));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setFailure("系统错误");
 		}
 		return result;
 	}
@@ -70,9 +80,12 @@ public class HongGuController {
 		try {
 			result.setData(hongGuService.qqTowb(qq));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setFailure("系统错误");
 		}
 		return result;
 	}
@@ -85,9 +98,12 @@ public class HongGuController {
 		try {
 			result.setData(hongGuService.temporaryWindow(qq));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setFailure("系统错误");
 		}
 		return result;
 	}
@@ -100,9 +116,12 @@ public class HongGuController {
 		try {
 			result.setData(hongGuService.qqLastShuoShuo(qq));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setFailure("系统错误");
 		}
 		return result;
 	}
@@ -115,9 +134,12 @@ public class HongGuController {
 		try {
 			result.setData(hongGuService.phoneNumToQQ(phone));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setFailure("系统错误");
 		}
 		return result;
 	}

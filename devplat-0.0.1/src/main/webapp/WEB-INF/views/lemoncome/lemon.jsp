@@ -61,6 +61,8 @@
 	<p><a href="<%=basePath %>/lemonGamblingDrug">赌博吸毒名单</a></p><!-- 30 -->
 	<p><a href="<%=basePath %>/educationf">学历查询（F机构）</a></p><!-- 39 -->
 	<p><a href="<%=basePath %>/ExecutedPeopleB">法院被执行人查询</a></p><!-- 40 -->
+	<p><a href="<%=basePath %>/wlPhone">金融用户画像</a></p><!-- 40 -->
+	
 </div>
 </body>
 </html>

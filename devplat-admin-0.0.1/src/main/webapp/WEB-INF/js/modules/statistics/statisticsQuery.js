@@ -8,6 +8,7 @@ $(function() {
 //			console.log(result.data)
 			$("#logistics").empty();
 			if (result.code == 1) {
+				console.log(result.data)
 				$("#logistics").append(result.data.logistics);
 				$("#account").append(result.data.account);
 				$("#mailbox").append(result.data.email);

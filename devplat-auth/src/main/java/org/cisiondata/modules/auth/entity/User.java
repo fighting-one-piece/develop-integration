@@ -30,6 +30,15 @@ public class User extends PKAutoEntity<Long> {
 	/** 用户昵称*/
 	@Column(name="NICK_NAME")
 	private String nickname = null;
+	/** 用户真名*/
+	@Column(name="REAL_NAME")
+	private String realname = null;
+	/** 身份证号码*/
+	@Column(name="ID_CARD")
+	private String idCard = null;
+	/** 手机号码*/
+	@Column(name="MOBILE_PHONE")
+	private String mobilePhone = null;
 	/** 用户邮箱*/
 	@Column(name="EMAIL")
 	private String email = null;
@@ -42,6 +51,15 @@ public class User extends PKAutoEntity<Long> {
 	/** 过期时间*/
 	@Column(name="EXPIRE_TIME")
 	private Date expireTime = null;
+	/** 用户密保问题*/
+	@Column(name="QUESTION")
+	private String question = null;
+	/** 用户密保答案*/
+	@Column(name="ANSWER")
+	private String answer = null;
+	/** 是否首次登录标志 */
+	@Column(name = "FIRST_LOGIN_FLAG")
+	private Boolean firstLoginFlag = Boolean.FALSE;
 	/** 是否删除标志 */
 	@Column(name = "DELETE_FLAG")
 	private Boolean deleteFlag = Boolean.FALSE;
@@ -85,7 +103,31 @@ public class User extends PKAutoEntity<Long> {
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
-	
+
+	public String getRealname() {
+		return realname;
+	}
+
+	public void setRealname(String realname) {
+		this.realname = realname;
+	}
+
+	public String getIdCard() {
+		return idCard;
+	}
+
+	public void setIdCard(String idCard) {
+		this.idCard = idCard;
+	}
+
+	public String getMobilePhone() {
+		return mobilePhone;
+	}
+
+	public void setMobilePhone(String mobilePhone) {
+		this.mobilePhone = mobilePhone;
+	}
+
 	public String getEmail() {
 		return email;
 	}
@@ -116,6 +158,30 @@ public class User extends PKAutoEntity<Long> {
 
 	public void setExpireTime(Date expireTime) {
 		this.expireTime = expireTime;
+	}
+
+	public String getQuestion() {
+		return question;
+	}
+
+	public void setQuestion(String question) {
+		this.question = question;
+	}
+
+	public String getAnswer() {
+		return answer;
+	}
+
+	public void setAnswer(String answer) {
+		this.answer = answer;
+	}
+
+	public Boolean getFirstLoginFlag() {
+		return firstLoginFlag;
+	}
+
+	public void setFirstLoginFlag(Boolean firstLoginFlag) {
+		this.firstLoginFlag = firstLoginFlag;
 	}
 
 	public Boolean getDeleteFlag() {

@@ -165,6 +165,32 @@
 			id="submitupdateAccessUserControlBtn"
 			style="margin-top: 10px; margin-right: 5%">提交</button>
 	</div>
+	<!-- 修改金额 -->
+	<div id="updateRemainingMoney" class="resource_link_white_content">
+		<div class="styleWhite">
+			<button class="btn btn-sm btn-info" id="closeupdateRemainingMoneyBtn"
+				style="margin-bottom: 10px; margin-left: 5%">关闭</button>
+		</div>
+		<br>
+		<div align="center" id="chooseUpdateRemainingMoneyTypeDiv">
+			<input type="radio" class="btn btn-info" id="updateRemainingMoneyRadio1" name="chooseUpdateRemainingMoneyType" value="1" checked="checked"><label for="updateRemainingMoneyRadio1">增加</label>&nbsp;&nbsp;&nbsp;
+			<input type="radio" class="btn btn-info" id="updateRemainingMoneyRadio2" name="chooseUpdateRemainingMoneyType" value="2"><label for="updateRemainingMoneyRadio2">减少</label>
+		</div>
+		<br>
+		<table class="table table-striped table-bordered">
+
+			<tbody class="tbodyStyle">
+				<tr>
+					<td>请输入增加/减少金额</td>
+					<td><input class="form-control" id="updateRemainingMoneyCount"></td>
+				</tr>
+			</tbody>
+		</table>
+		<div id="updateRemainingMoneyWaring" align="center" style="min-height: 55%;color: red;"></div>
+		<button class="btn btn-sm btn-info pull-right"
+			id="submitupdateRemainingMoneyBtn"
+			style="margin-top: 10px; margin-right: 5%">提交</button>
+	</div>
 </body>
 <script type="text/javascript">
 !function(){

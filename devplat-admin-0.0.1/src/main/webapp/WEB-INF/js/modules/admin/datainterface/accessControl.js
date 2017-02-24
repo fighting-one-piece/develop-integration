@@ -20,19 +20,25 @@ $(function(){
 						var deleteFlag = accessUser.deleteFlag;
 						var count = "";
 						var remainingCount = "";
+						var money = "";
+						var remainingMoney = "";
 						if (accessUser.accessControl){
 							count = accessUser.accessControl.count;
-							remainingCount = accessUser.accessControl.remainingCount
+							remainingCount = accessUser.accessControl.remainingCount;
+							money = accessUser.accessControl.money;
+							remainingMoney = accessUser.accessControl.remainingMoney;
 						} else {
 							count = 0;
 							remainingCount = 0;
+							money = 0.0;
+							remainingMoney = 0.0;
 						}
 						if (deleteFlag == 0){
 							str = str + "<tr id='"+accessId+"'><td>"+accessId+"</td><td>"+accessKey+"</td><td>"+name
-							+"</td><td>"+applyTime+"</td><td>"+count+"</td><td>"+remainingCount+"</td><td>正常使用</td><td><button class='btn btn-sm btn-info update-accessControl'>修改剩余条数</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class='btn btn-sm btn-info delete-accessUser'>停用</button></td></tr>";
+							+"</td><td>"+applyTime+"</td><td>"+count+"</td><td>"+remainingCount+"</td><td>"+money+"</td><td>"+remainingMoney+"</td><td>正常使用</td><td><button class='btn btn-sm btn-info update-accessControl'>修改剩余条数</button><button class='btn btn-sm btn-info update-remainingMoney'>修改剩余金额</button><button class='btn btn-sm btn-info delete-accessUser'>停用</button></td></tr>";
 						} else {
 							str = str + "<tr id='"+accessId+"'><td>"+accessId+"</td><td>"+accessKey+"</td><td>"+name
-							+"</td><td>"+applyTime+"</td><td>"+count+"</td><td>"+remainingCount+"</td><td>已停用</td><td><button class='btn btn-sm btn-info update-accessControl'>修改剩余条数</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class='btn btn-sm btn-info enable-accessUser'>启用</button></td></tr>";
+							+"</td><td>"+applyTime+"</td><td>"+count+"</td><td>"+remainingCount+"</td><td>"+money+"</td><td>"+remainingMoney+"</td><td>已停用</td><td><button class='btn btn-sm btn-info update-accessControl'>修改剩余条数</button><button class='btn btn-sm btn-info update-remainingMoney'>修改剩余金额</button><button class='btn btn-sm btn-info enable-accessUser'>启用</button></td></tr>";
 						}
 					})
 					$("#Accessendpage").val(result.data.pageCount);
@@ -199,6 +205,52 @@ $(function(){
 			}
 		}
 	})
+	
+	
+		//修改剩余金额
+	$(document).on("click",".update-remainingMoney",function(){
+		var account = $(this).parent().parent().children().eq(0).html();
+		$("#submitupdateRemainingMoneyBtn").data("account",account);
+		document.getElementById('updateRemainingMoney').style.display='block';
+		document.getElementById('addAccessFade').style.display='block';
+	})
+	$("#closeupdateRemainingMoneyBtn").click(function(){
+		$("#updateRemainingMoneyWaring").html("")
+		document.getElementById('updateRemainingMoney').style.display='none';
+		document.getElementById('addAccessFade').style.display='none';
+	})
+	//增加减少剩余金额
+	$("#submitupdateRemainingMoneyBtn").click(function(){
+		$("#updateRemainingMoneyWaring").html("");
+		var account = $(this).data("account");
+		var num = $("#updateRemainingMoneyCount").val().trim();
+		var updateType = $("#chooseUpdateRemainingMoneyTypeDiv input[name=chooseUpdateRemainingMoneyType]:checked").val();
+		if (num == ''){
+			$("#updateAccessUserControlWaring").html("请输入增加/减少金额！")
+		} else {
+			if (judgeIsNum(num)){
+				$.ajax({
+					type:"post",
+					data:{"changeCount":num,"type":updateType,"account":account},
+					url:projectName+"/admin/accessUserControl/updateMoney",
+					dataType:"json",
+					success:function(result){
+						if(result.code == 1){
+							$("#closeupdateRemainingMoneyBtn").click();
+							swal("Updated! ", "修改成功！", "success");
+							var page = $("#Accesslastpage").val();
+							showAccess(page,10);
+						} else {
+							swal("Error!", "系统繁忙，请稍后再试！", "error");
+						}
+					}
+				});
+			} else {
+				$("#updateAccessUserControlWaring").html("增加/减少金额必须为纯数字！")
+			}
+		}
+	})
+	
 	
 	//判断是否为纯数字
 	function judgeIsNum (srt){  

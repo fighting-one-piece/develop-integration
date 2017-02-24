@@ -10,6 +10,7 @@ import org.cisiondata.modules.auth.dao.UserDAO;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.auth.service.IUserService;
 import org.cisiondata.utils.endecrypt.EndecryptUtils;
+import org.cisiondata.utils.endecrypt.IDUtils;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,27 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements I
 	}
 	
 	@Override
+	protected void postHandle(Object object) throws BusinessException {
+		if (object instanceof User) {
+			User user = (User) object;
+			RedisClusterUtils.getInstance().delete(genAccountCacheKey(user.getAccount()));
+		}
+	}
+	
+	@Override
+	public void insertUser(User user) throws BusinessException {
+		String salt = IDUtils.genUUID();
+		user.setSalt(salt);
+		user.setPassword(EndecryptUtils.encryptPassword(user.getPassword(), salt));
+		super.insert(user);
+	}
+
+	@Override
+	public void updateUser(User user) throws BusinessException {
+		super.insert(user);
+	}
+
+	@Override
 	public User readUserByAccount(String account) throws BusinessException {
 		if (StringUtils.isBlank(account)) throw new BusinessException("账号不能为空");
 		String accountCacheKey = genAccountCacheKey(account);
@@ -34,7 +56,7 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements I
 		Query query = new Query();
 		query.addCondition("account", account);
 		User user = userDAO.readDataByCondition(query);
-		if (null != user) RedisClusterUtils.getInstance().set(accountCacheKey, user, 300);
+		if (null != user) RedisClusterUtils.getInstance().set(accountCacheKey, user, 1800);
 		return user;
 	}
 	
@@ -59,12 +81,15 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements I
 		if (!password.equals(user.getPassword())) {
 			throw new BusinessException("原密码不正确!");
 		}
+		User updateUser = new User();
+		user.setAccount(account);
 		user.setPassword(EndecryptUtils.encryptPassword(newPassword, user.getSalt()));
-		userDAO.updateUserPassword(user);
+		userDAO.update(updateUser);
+		RedisClusterUtils.getInstance().delete(genAccountCacheKey(account));
 	}
 	
 	private String genAccountCacheKey(String account) {
-		return "user:account:" + account;
+		return "user:cache:account:" + account;
 	}
 
 }

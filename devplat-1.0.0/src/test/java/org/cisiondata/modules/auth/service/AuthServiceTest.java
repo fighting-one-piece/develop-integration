@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.cisiondata.modules.auth.dto.UserDTO;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.utils.endecrypt.EndecryptUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
@@ -27,6 +28,9 @@ public class AuthServiceTest {
 	
 	@Resource(name = "authService")
 	private IAuthService authService = null;
+	
+	@Resource(name = "loginService")
+	private ILoginService loginService = null;
 	
 	@Resource(name = "accessUserService")
 	private IAccessUserService accessUserService = null;
@@ -65,6 +69,14 @@ public class AuthServiceTest {
 	}
 	
 	@Test
+	public void testLoginServiceReadUserLoginInfo() {
+		String account = "test";
+		String password = "@#test456";
+		UserDTO userDTO = loginService.readUserLoginInfoByAccountAndPassowrd(account, password);
+		System.out.println("accessToken: " + userDTO.getAccessToken());
+	}
+	
+	@Test
 	public void testReadAccessKeyByAccessId() {
 		String accessKey = accessUserService.readAccessKeyByAccessId("Fc89A13022BfdD2f");
 		Assert.assertEquals("F0de5A94aEb07f3a6F0959060fc4B697", accessKey);
@@ -72,8 +84,18 @@ public class AuthServiceTest {
 	
 	@Test
 	public void testA() {
-		Object value = RedisClusterUtils.getInstance().get("test");
-		System.out.println("value: " + value);
+		Object value = RedisClusterUtils.getInstance().get("user:account:test");
+		System.out.println("value: " + ((User) value).getPassword());
+		System.out.println("value: " + ((User) value).getSalt());
+		RedisClusterUtils.getInstance().delete("user:account:test");
+	}
+	
+	@Test
+	public void testB() {
+		Set<String> keys = RedisClusterUtils.getInstance().getJedisCluster().hkeys("cisiondata*");
+		for (String key : keys) {
+			System.out.println(key);
+		}
 	}
 	
 }

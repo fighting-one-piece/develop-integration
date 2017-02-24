@@ -4,6 +4,55 @@ $(document).ready(function(){
 		document.getElementById('lightone').style.display='block';
 		document.getElementById('fadeone').style.display='block';
 	}
+	//搜索用户名方法
+	function accountPage(index){
+		var name = $("#account").val();
+		$.ajax({
+			url:"log/selAccount",
+			type:"get",
+			dataType:"json",
+			data:{"index":index,"name":name},
+			success:function(result){
+				var array = eval(result.data.data);
+				$("#endpage").val(result.data.pageCount);
+				var html="";
+				var account ="";
+				var url="";
+				for(var i=0;i<array.length;i++){
+					var date = new Date(array[i].accessTime);
+					if(array[i].account == null || array[i].account == ""){
+						account = "";
+					}else{
+						account = array[i].account;
+					}
+					if(array[i].url == null  || array[i].url == ""){
+						url="";
+					}else{
+						url = array[i].url;
+					}
+					html+='<tr>'+
+								'<td><a>'+array[i].keyword+'</a></td>'+
+								'<td>'+FormatDate(date)+'</td>'+
+								'<td>'+array[i].ip+'</td>'+
+								'<td>'+url+'</td>'+
+								'<td>'+account+'</td>'+
+							'</tr>'	
+				}
+				var styleThead = "<tr>"+
+									"<td>关键字</td>"+
+									"<td>时间</td>"+
+									"<td>IP</td>"+
+									"<td>访问地址</td>"+
+									"<td>访问者</td>"+
+								"</tr>";
+				$(".styleThead").html(styleThead);
+				$(".Tbody").html(html);
+			},
+			error:function(){
+				console.log("出错！");
+			}
+		});
+	}
 	
 	//热词搜索 分页显示的方法
 	function loadPage(index){
@@ -49,10 +98,10 @@ $(document).ready(function(){
 			data:{"index":index},
 			success:function(result){
 				var array = eval(result.data.data);
-				console.log(array);
 				$("#endpage").val(result.data.pageCount);
 				var html="";
 				var account ="";
+				var url="";
 				for(var i=0;i<array.length;i++){
 					var date = new Date(array[i].accessTime);
 					if(array[i].account == null || array[i].account == ""){
@@ -60,10 +109,16 @@ $(document).ready(function(){
 					}else{
 						account = array[i].account;
 					}
+					if(array[i].url == null  || array[i].url == ""){
+						url="";
+					}else{
+						url = array[i].url;
+					}
 					html+='<tr id="'+j+'">'+
 								'<td><a>'+array[i].keyword+'</a></td>'+
 								'<td>'+FormatDate(date)+'</td>'+
 								'<td>'+array[i].ip+'</td>'+
+								'<td>'+url+'</td>'+
 								'<td>'+account+'</td>'+
 //								'<td><button id="'+j+'" class="btn btn-warning" value="'+array[i].keyword+'">删除</button></td>'+
 							'</tr>'	
@@ -73,6 +128,7 @@ $(document).ready(function(){
 									"<td>关键字</td>"+
 									"<td>时间</td>"+
 									"<td>IP</td>"+
+									"<td>访问地址</td>"+
 									"<td>访问者</td>"+
 								"</tr>";
 				$(".styleThead").html(styleThead);
@@ -102,6 +158,12 @@ $(document).ready(function(){
 		check = 1;
 	});
 	
+	//点击搜索查询用户名的日志
+	$("#submitAc").click(function(){
+		$(".Tbody").empty();
+		accountPage(1);
+		check = 2;
+	});
 	
 	
 	//进入页面加载热词搜索
@@ -118,8 +180,10 @@ $(document).ready(function(){
 			$("#homepage").val(index);
 			if (check == 0) {
 				loadPage(index);
-			}else {
+			}else if(check == 1){
 				orderTime(index);
+			}else if(check == 2){
+				accountPage(index);
 			}
 		});
 		
@@ -134,9 +198,11 @@ $(document).ready(function(){
 				$("#homepage").val(index);
 				if (check == 0) {
 					loadPage(index);
-				}else {
+				}else if(check == 1){
 					orderTime(index);
-			}
+				}else if(check == 2){
+					accountPage(index);
+				}
 		});
 		
 		
@@ -149,9 +215,11 @@ $(document).ready(function(){
 				$("#homepage").val(index);
 				if (check == 0) {
 					loadPage(index);
-				}else {
+				}else if(check == 1){
 					orderTime(index);
-			}
+				}else if(check == 2){
+					accountPage(index);
+				}
 		});
 		
 		//末页
@@ -160,8 +228,10 @@ $(document).ready(function(){
 			$("#homepage").val(index);
 			if (check == 0) {
 				loadPage(index);
-			}else {
+			}else if(check == 1){
 				orderTime(index);
+			}else if(check == 2){
+				accountPage(index);
 			}
 		});
 		
@@ -263,6 +333,7 @@ $(document).ready(function(){
 				$("#end").val(result.data.pageCount);
 				var html="";
 				var account ="";
+				var url="";
 				for(var i=0;i<array.length;i++){
 					var date = new Date(array[i].accessTime);
 					if(array[i].account == null || array[i].account == ""){
@@ -270,9 +341,15 @@ $(document).ready(function(){
 					}else{
 						account = array[i].account;
 					}
+					if(array[i].url == null  || array[i].url == ""){
+						url="";
+					}else{
+						url = array[i].url;
+					}
 					html+='<tr>'+
 								'<td>'+array[i].keyword+'</td>'+
 								'<td>'+array[i].ip+'</td>'+
+								'<td>'+url+'</td>'+
 								'<td>'+FormatDate(date)+'</td>'+
 								'<td>'+account+'</td>'+
 							'</tr>'	

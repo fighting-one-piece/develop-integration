@@ -31,4 +31,8 @@ public interface LogMapper {
 	public int addLogCount(LogModel log);
 	//修改已存在的关键字统计的个数
 	public int upLogCount(LogModel log);
+	//查询某个用户访问的资源总数
+	public int selByAccount(String name);
+	//查询某个用户访问的资源进行分页
+	public List<LogModel> selByAcPage(String name,int startPos,int padeSize);
 }

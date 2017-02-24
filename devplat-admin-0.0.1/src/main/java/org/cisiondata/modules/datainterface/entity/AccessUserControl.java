@@ -8,13 +8,42 @@ public class AccessUserControl implements Serializable{
 	
 	private String account = null;
 	
-	private String interfaceUrl = null;
-	
 	private Long count = null;
 	
 	private Long remainingCount = null;
 	
 	private String deleteFlag = null;
+	//总金额
+	private Double money = null;
+	//剩余金额
+	private Double remainingMoney = null;
+	//账户类型 1代表普通用户，2代表接口调用方
+	private Integer source = null;
+
+
+	public Double getMoney() {
+		return money;
+	}
+
+	public void setMoney(Double money) {
+		this.money = money;
+	}
+
+	public Double getRemainingMoney() {
+		return remainingMoney;
+	}
+
+	public void setRemainingMoney(Double remainingMoney) {
+		this.remainingMoney = remainingMoney;
+	}
+
+	public Integer getSource() {
+		return source;
+	}
+
+	public void setSource(Integer source) {
+		this.source = source;
+	}
 
 	public String getAccount() {
 		return account;
@@ -22,14 +51,6 @@ public class AccessUserControl implements Serializable{
 
 	public void setAccount(String account) {
 		this.account = account;
-	}
-
-	public String getInterfaceUrl() {
-		return interfaceUrl;
-	}
-
-	public void setInterfaceUrl(String interfaceUrl) {
-		this.interfaceUrl = interfaceUrl;
 	}
 
 	public Long getCount() {

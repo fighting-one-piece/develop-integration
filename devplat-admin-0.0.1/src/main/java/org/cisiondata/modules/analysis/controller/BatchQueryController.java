@@ -76,20 +76,47 @@ public class BatchQueryController {
 		}
 		return result;	
 	}
-	
+	//命中率
+	@ResponseBody
+	@RequestMapping(value="/batchquery/hitRate")
+	public WebResult hitRate(HttpServletRequest request){
+		MultipartHttpServletRequest mRquest=(MultipartHttpServletRequest)(request);
+		MultipartFile file=mRquest.getFile("upfile");
+		String fileName=file.getOriginalFilename();
+		String filename = fileName.substring(0, fileName.lastIndexOf("."));
+		WebResult result=new WebResult();
+		try {
+			result.setData(batchQueryService.hitRate(filename));
+			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;	
+	}
 	
 	@ResponseBody
 	@RequestMapping(value="/batchquery/{type}")
-	public WebResult readClassifiedQuery(@PathVariable String type,HttpServletRequest request) {
+	public void readClassifiedQuery(@PathVariable String type,HttpServletRequest request) {
 		MultipartHttpServletRequest mRquest=(MultipartHttpServletRequest)(request);
 		MultipartFile file=mRquest.getFile("upfile");
 		
 		String fileName=file.getOriginalFilename();
 		String filename = fileName.substring(0, fileName.lastIndexOf("."));
 		System.out.println(filename);
-		WebResult result = new WebResult();
+		batchQueryService.updateStatistics(type,filename);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/batchquery/matchResults")
+	public WebResult matchResults(HttpServletRequest request){
+		MultipartHttpServletRequest mRquest=(MultipartHttpServletRequest)(request);
+		MultipartFile file=mRquest.getFile("upfile");
+		String fileName=file.getOriginalFilename();
+		String filename = fileName.substring(0, fileName.lastIndexOf("."));
+		WebResult result=new WebResult();
 		try {
-			result.setData(batchQueryService.updateStatistics(type,filename));
+			result.setData(batchQueryService.result(filename));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());

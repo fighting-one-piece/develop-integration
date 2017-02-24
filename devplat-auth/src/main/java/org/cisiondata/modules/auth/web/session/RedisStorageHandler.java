@@ -1,10 +1,10 @@
 package org.cisiondata.modules.auth.web.session;
 
-import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cisiondata.utils.endecrypt.Base64Utils;
+import org.cisiondata.utils.endecrypt.IDUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.cisiondata.utils.serde.SerializerUtils;
 import org.springframework.stereotype.Component;
@@ -34,12 +34,8 @@ public class RedisStorageHandler implements StorageHandler {
 
 	@Override
 	public String createSessionId(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String sessionId = null;
-		for (int i = 0; i < 10; i++) {
-			sessionId = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
-			String key = sessionKey(sessionId);
-			RedisClusterUtils.getInstance().set(key, "1", valueTTL);
-		}
+		String sessionId = Base64Utils.encode(IDUtils.genUUID());
+		RedisClusterUtils.getInstance().set(sessionKey(sessionId), "1", valueTTL);
 		return sessionId;
 	}
 

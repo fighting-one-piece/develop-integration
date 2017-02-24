@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="org.cisiondata.modules.datainterface.dao.AccessInterfaceDao">
+
+	<resultMap type="org.cisiondata.modules.datainterface.entity.AccessInterface" id="AccessInterfacetMap">  
+        <result property="id" column="ID"/>
+        <result property="url" column="URL"/> 
+        <result property="identity" column="IDENTITY"/> 
+        <result property="money" column="MONEY"/> 
+        <result property="deleteFlag" column="DELETE_FLAG"/> 
+    </resultMap>
+    
+    <insert id="addAccessInterface" parameterType="org.cisiondata.modules.datainterface.entity.AccessInterface">
+    	insert into T_ACCESS_INTERFACE (URL,IDENTITY,MONEY,DELETE_FLAG) values (#{url},#{identity},#{money},0)
+    </insert>
+    
+    <update id="updateAccessInterface" parameterType="org.cisiondata.modules.datainterface.entity.AccessInterface">
+    	update T_ACCESS_INTERFACE set URL=#{url},IDENTITY=#{identity},MONEY=#{money} WHERE ID=#{id}
+    </update>
+    
+    <update id="updateAccessInterfaceDeleteFlag" parameterType="org.cisiondata.modules.datainterface.entity.AccessInterface">
+    	update T_ACCESS_INTERFACE set DELETE_FLAG=#{deleteFlag} where ID=#{id}
+    </update>
+    
+    <select id="findAll" resultMap="AccessInterfacetMap">
+    	select ID,URL,IDENTITY,MONEY,DELETE_FLAG FROM T_ACCESS_INTERFACE WHERE DELETE_FLAG=0
+    </select>
+    
+    <select id="findCount" resultType="int">
+    	select COUNT(ID) from T_ACCESS_INTERFACE
+    </select>
+    
+    <select id="findByPage" resultMap="AccessInterfacetMap">
+    	select ID,URL,IDENTITY,MONEY,DELETE_FLAG from T_ACCESS_INTERFACE limit #{0},#{1}
+    </select>
+
+</mapper>

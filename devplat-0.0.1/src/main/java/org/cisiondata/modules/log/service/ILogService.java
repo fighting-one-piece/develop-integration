@@ -44,4 +44,10 @@ public interface ILogService {
 	
 	//每天执行统计关键字的方法
 	public void keywordCount();
+	
+	//查询某个用户访问的资源总数
+	public int selByAccount(String name);
+
+	// 查询某个用户访问的资源进行分页
+	public Map<String, Object> selByAcPage(int index, String name);
 }

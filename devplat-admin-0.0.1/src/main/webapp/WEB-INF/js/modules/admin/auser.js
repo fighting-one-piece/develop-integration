@@ -41,6 +41,8 @@ $(document).ready(function () {
 				 	html += 	"<td>删除标识</td>";
 				 	html += 	"<td>查询总条数</td>";
 				 	html += 	"<td>剩余条数</td>";
+				 	html += 	"<td>查询总金额</td>";
+				 	html += 	"<td>剩余金额</td>";
 				 	html += 	"<td>修改/删除</td>";
 				 	html += 	"<td>添加功能</td>";
 				 	html += "</tr></thead>";
@@ -62,12 +64,21 @@ $(document).ready(function () {
 					}
 					var count = "";
 					var remainingCount = "";
+					var money = "";
+					var remainingMoney = "";
 					if (data.aUser[i].accessUserControl.count){
 						count = data.aUser[i].accessUserControl.count;
 						remainingCount = data.aUser[i].accessUserControl.remainingCount
 					} else {
 						count = 0;
 						remainingCount = 0;
+					}
+					if(data.aUser[i].accessUserControl.money){
+						money = data.aUser[i].accessUserControl.money;
+						remainingMoney = data.aUser[i].accessUserControl.remainingMoney
+					} else {
+						money = 0.0;
+						remainingMoney = 0.0;
 					}
 					html += "<tr align='center'>";
 					html += 	"<td>"+data.aUser[i].id+"</td>";
@@ -81,7 +92,9 @@ $(document).ready(function () {
 					html += 	"<td id='deleteFlag'>"+data.aUser[i].deleteFlag+"</td>";
 					html += 	"<td>"+count+"</td>";
 					html += 	"<td>"+remainingCount+"</td>";
-					html += 	"<td><button class='btn btn-sm btn-info update-accessUserControl' style='margin-right: 1%;'>修改剩余条数</button><button id='updateauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>修改</button>";
+					html += 	"<td>"+money+"</td>";
+					html += 	"<td>"+remainingMoney+"</td>";
+					html += 	"<td><button class='btn btn-sm btn-info update-accessUserControl' style='margin-right: 1%;'>修改剩余条数</button><button class='btn btn-sm btn-info update-remainingMoney' style='margin-right: 1%;'>修改剩余金额</button><button id='updateauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>修改</button>";
 					html +=		"<button id='deleteauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>删除</button></td>";
 					html += 	"<td><button id='addgroup' class='btn btn-sm btn-info' style='margin-right: 1%;'>组</button>";
 					html += 	"<button id='addrole' class='btn btn-sm btn-info' style='margin-right: 1%;'>角色</button>";
@@ -90,7 +103,7 @@ $(document).ready(function () {
 				}
 					html += "</table>";
 				$("#showAUserResult").append(html);
-				if (result.data.pageCount > 10) {
+				if (result.data.pageCount > 1) {
 					$("#turnPage").show();
 				}
 			}else {
@@ -121,6 +134,7 @@ $(document).ready(function () {
 				data:{"account":account},
 				dataType:"json",
 				success:function(result){
+					console.log(result)
 					if (result.code == 1) {
 						if (result.data.nickname == undefined) {
 							result.data.nickname = "";
@@ -140,6 +154,8 @@ $(document).ready(function () {
 				 	html += 	"<td>删除标识</td>";
 				 	html += 	"<td>查询总条数</td>";
 				 	html += 	"<td>剩余条数</td>";
+				 	html += 	"<td>查询总金额</td>";
+				 	html += 	"<td>剩余金额</td>";
 				 	html += 	"<td>修改/删除</td>";
 				 	html += 	"<td>添加功能</td>";
 				 	html += "</tr></thead>";
@@ -155,6 +171,8 @@ $(document).ready(function () {
 					html += 	"<td>"+result.data.deleteFlag+"</td>";
 					var count = "";
 					var remainingCount = "";
+					var money = "";
+					var remainingMoney = "";
 					if (result.data.accessUserControl.count){
 						count = result.data.accessUserControl.count;
 						remainingCount = result.data.accessUserControl.remainingCount
@@ -162,9 +180,18 @@ $(document).ready(function () {
 						count = 0;
 						remainingCount = 0;
 					}
+					if(result.data.accessUserControl.money){
+						money = result.data.accessUserControl.money;
+						remainingMoney = result.data.accessUserControl.remainingMoney
+					} else {
+						money = 0.0;
+						remainingMoney = 0.0;
+					}
 					html += 	"<td>"+count+"</td>";
 					html += 	"<td>"+remainingCount+"</td>";
-					html += 	"<td><button class='btn btn-sm btn-info update-accessUserControl' style='margin-right: 1%;'>修改剩余条数</button><button id='updateauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>修改</button>";
+					html += 	"<td>"+money+"</td>";
+					html += 	"<td>"+remainingMoney+"</td>";
+					html += 	"<td><button class='btn btn-sm btn-info update-accessUserControl' style='margin-right: 1%;'>修改剩余条数</button><button class='btn btn-sm btn-info update-remainingMoney' style='margin-right: 1%;'>修改剩余金额</button><button id='updateauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>修改</button>";
 					html += 	"<button id='deleteauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>删除</button></td>";
 					html += 	"<td><button id='addgroup' class='btn btn-sm btn-info' style='margin-right: 1%;'>组</button>";
 					html += 	"<button id='addrole' class='btn btn-sm btn-info' style='margin-right: 1%;'>角色</button>";
@@ -272,6 +299,7 @@ $(document).ready(function () {
 									if (result.code == 1) {
 										$("#addwarning").empty();
 										 $("#addwarning").append(result.data);
+										 loadingAuser(1);
 									}else {
 										$("#addwarning").empty();
 										$("#addwarning").append("添加失败！");
@@ -458,6 +486,7 @@ $(document).ready(function () {
 			success:function(result){
 				if (result.code == 1) {
 					alert("添加成功！");
+					 loadingAuser(1);
 				}else {
 					alert("添加失败！");
 				}
@@ -715,6 +744,49 @@ $(document).ready(function () {
 		}
 	})
 	
+	//修改剩余金额
+	$(document).on("click",".update-remainingMoney",function(){
+		var account = $(this).parent().parent().children().eq(1).html();
+		$("#submitupdateRemainingMoneyBtn").data("account",account);
+		document.getElementById('updateRemainingMoney').style.display='block';
+		document.getElementById('resourceTreeFade').style.display='block';
+	})
+	$("#closeupdateRemainingMoneyBtn").click(function(){
+		$("#updateRemainingMoneyWaring").html("")
+		document.getElementById('updateRemainingMoney').style.display='none';
+		document.getElementById('resourceTreeFade').style.display='none';
+	})
+	//增加减少剩余金额
+	$("#submitupdateRemainingMoneyBtn").click(function(){
+		$("#updateRemainingMoneyWaring").html("");
+		var account = $(this).data("account");
+		var num = $("#updateRemainingMoneyCount").val().trim();
+		var updateType = $("#chooseUpdateRemainingMoneyTypeDiv input[name=chooseUpdateRemainingMoneyType]:checked").val();
+		if (num == ''){
+			$("#updateAccessUserControlWaring").html("请输入增加/减少金额！")
+		} else {
+			if (judgeIsNum(num)){
+				$.ajax({
+					type:"post",
+					data:{"changeCount":num,"type":updateType,"account":account},
+					url:projectName+"/admin/accessUserControl/updateMoney",
+					dataType:"json",
+					success:function(result){
+						if(result.code == 1){
+							$("#closeupdateRemainingMoneyBtn").click();
+							swal("Updated! ", "修改成功！", "success");
+							$("#showselectallauser").click();
+						} else {
+							swal("Error!", "系统繁忙，请稍后再试！", "error");
+						}
+					}
+				});
+			} else {
+				$("#updateAccessUserControlWaring").html("增加/减少金额必须为纯数字！")
+			}
+		}
+	})
+	
 	//判断是否为纯数字
 	function judgeIsNum (srt){  
         var pattern=/^\d+$/g;    
@@ -737,8 +809,9 @@ function FormatDate (strTime) {
     return date.getFullYear()+"-"+paddNum(date.getMonth() + 1)+"-"+paddNum(date.getDate())+" "+paddNum(date.getHours())+":"+paddNum(date.getMinutes())+":"+paddNum(date.getSeconds());
 }
 function FormatYear () {
-    var date = new Date();
-    var dates = new  Date((date.getFullYear()+ 1)+"-"+date.getMonth() + 1+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds());
+	stamp = Date.parse(new Date());
+	weeklater = stamp + 3600*24*7*1000;
+	 var dates = new  Date(weeklater);
     return dates;
 }
 //enter 控件

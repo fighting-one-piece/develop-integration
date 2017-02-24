@@ -255,12 +255,44 @@ $(document).ready(function() {
         					contentType : false,
         					processData : false,
         					success:function(result){
-        						$(".col-xs-7").empty();
-        						console.log(result.data);
-        						var set="<table style='table-layout:fixed' class='table table-striped table-bordered'><tr>";
+        						 $.ajax({
+        	            	    	 type:"post",
+        	            	    	 url:projectName+"/batchquery/hitRate",
+        	            	    	 dataType:"json",
+        	            	    	 data:new FormData($('#form1')[0]),
+        	            	    	 async:true,
+        	            	    	 beforeSend:function(){
+        	            	    		ShowDiv();
+        	            	    	 },
+        	            	    	 complete:function(){
+        	            	    		HiddenDiv();
+        	            	    		 },
+        	            	    	 cache : false,
+        	            	    	 contentType : false,
+        	            	    	 processData : false,
+        	            	    	 success:function(reults){
+        	            	    		$("#hitRate").text(reults.data);
+        	            	    			}
+        	            	    	    })	
+        					}
+        				})	    		
+        				//匹配结果显示
+        				$.ajax({
+        					type:"post",
+        					url:projectName+"/batchquery/matchResults",
+        					dataType:"json",
+        					data:new FormData($('#form1')[0]),
+        					async : true,
+        					cache : false,
+	            	    	contentType : false,
+	            	    	processData : false,
+	            	    	success:function(reults){
+	            	    		$(".col-xs-7").empty();
+	            	    		console.log(reults);
+	            	    		var set="<table style='table-layout:fixed' class='table table-striped table-bordered'><tr>";
         						var value="<tr>";
         						set=set+"<td>"+"数据结果展示:"+"</td>"
-        						$.each(result.data,function(n,x){
+        						$.each(reults.data,function(n,x){
         							var str = "[]";
         							if(x){
         								str = x.extendInfo2
@@ -270,11 +302,13 @@ $(document).ready(function() {
         						set=set+"</tr>";
         						$(".col-xs-7").append(set+value);
         						$("#resultShow").empty();
-        					}   			
-        				})	    		
+	            	    	}
+        				})
+        				
         			}else{
         				swal("ERROR!", "操作失败！", "error");
         			}
+        			
         			document.getElementById('local_locals').style.display='none';
         			document.getElementById('UserPresentation').style.display='none';
         			document.getElementById('addLinkAddressFade').style.display='none';
@@ -310,7 +344,7 @@ $(document).ready(function() {
     	 //获取到value 初始值
     	  $("#localindex").change(function(){
     		  //获得index value 值
-    		  var checkValue=$("select option:selected").val() ;
+    		  var checkValue=$("select option:selected").val();
     		  console.log(checkValue);
     		  //传回 获得type类型 
     		  $.ajax({
@@ -377,6 +411,25 @@ $(document).ready(function() {
   							set=set+"</tr>";
   							$(".col-xs-7").append(set+value);
   							$("#resultShow").empty();
+  							 $.ajax({
+    	            	    	 type:"post",
+    	            	    	 url:projectName+"/batchquery/hitRate",
+    	            	    	 dataType:"json",
+    	            	    	 data:new FormData($('#form1')[0]),
+    	            	    	 async:true,
+    	            	    	 beforeSend:function(){
+    	            	    		ShowDiv();
+    	            	    	 },
+    	            	    	 complete:function(){
+    	            	    		HiddenDiv();
+    	            	    		 },
+    	            	    	 cache : false,
+    	            	    	 contentType : false,
+    	            	    	 processData : false,
+    	            	    	 success:function(reults){
+    	            	    		$("#hitRate").text(reults.data);
+    	            	    			}
+    	            	    	    })
   						}
     			  })
     		  }

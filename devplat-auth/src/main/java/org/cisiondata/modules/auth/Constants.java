@@ -61,13 +61,14 @@ public class Constants {
     
     public interface SessionName {
    	 	public static final String CURRENT_USER = "_CURRENT_USER_";
-        public static final String CURRENT_USER_NAME = "_CURRENT_USERNAME_";
+        public static final String CURRENT_USER_ACCOUNT = "_CURRENT_USER_ACCOUNT_";
         public static final String CURRENT_USER_RIGHTS = "_CURRENT_USER_RIGHTS_";
         public static final String VERIFICATION_CODE = "_VERIFICATION_CODE_";
     }
     
     public interface CookieName {
-        public static final String USER_ACCOUNT = "USER_ACCOUNT";
+        public static final String USER_ACCOUNT = "_user_account_";
+        public static final String USER_SESSION = "_session_";
     }
     
 }

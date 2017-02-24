@@ -20,5 +20,5 @@ public interface IAccessSwitchService{
 	public int updateId(AccessSwitch accessSwitch) throws IOException, Exception;
 	
 	/*批量修改*/
-	public void updateIdStatus(AccessSwitch accessSwitch) throws IOException;
+	public void updateIdStatus(String id,String identity,Integer status) throws IOException;
 }

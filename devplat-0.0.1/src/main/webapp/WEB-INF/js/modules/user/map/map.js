@@ -232,7 +232,7 @@
     	document.getElementById('background').style.display='block';
     	$.ajax({
 			type:"get",
-			url:projectName+"/logistics/search",
+			url:projectName+"/logistics/all/search",
 			data:{"query":query},
 			dataType:"json",
 			success:function(result){

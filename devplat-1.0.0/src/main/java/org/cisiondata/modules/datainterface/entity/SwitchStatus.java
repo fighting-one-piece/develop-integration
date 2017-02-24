@@ -1,4 +1,4 @@
-package org.cisiondata.modules.datainterface;
+package org.cisiondata.modules.datainterface.entity;
 
 public enum SwitchStatus {
 	

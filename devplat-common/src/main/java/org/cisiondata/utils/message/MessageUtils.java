@@ -59,7 +59,7 @@ public class MessageUtils {
         	return messageSource.getMessage(code, args, Locale.CHINESE);
         } catch (NoSuchMessageException e) {
         	LOG.error(e.getMessage());
-        	return code;
+        	return null;
         }
     }
 

@@ -16,7 +16,6 @@ $(document).ready(function(){
 			showDIV();
 		})
 		$("#submitQQ").click(function(){
-			document.getElementById('background').style.display='block';
 			$("#nextQQNick").hide();
 			$(".styleQQThead tr").empty();
 			$(".styleQQTbody tr").empty();
@@ -29,11 +28,14 @@ $(document).ready(function(){
 	        for(var i=0;i<chkObjs.length;i++){
 	            if(chkObjs[i].checked==true){
 	                if(chkObjs[i].value =="qq"){
+	                	document.getElementById('background').style.display='block';
 	        			readQQBaseQun();
 	                }else if(chkObjs[i].value =="qqqun"){
+	                	document.getElementById('background').style.display='block';
 	        			var qunNum=$("#query").val();
 	        			searchQQ(qunNum);
 	                }else if(chkObjs[i].value =="qqnick"){
+	                	document.getElementById('background').style.display='block';
 	                	scrollId = "";
 	        			searchQQNick();
 	                }

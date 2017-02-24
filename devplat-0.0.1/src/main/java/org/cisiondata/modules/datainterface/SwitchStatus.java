@@ -19,9 +19,9 @@ public enum SwitchStatus {
 		case 0:
 			return SwitchStatus.DEMO;
 		case 1:
-			return SwitchStatus.TEST;
-		case 2:
 			return SwitchStatus.NORMAL;
+		case 2:
+			return SwitchStatus.TEST;
 		default:
 			return SwitchStatus.DEMO;
 		}

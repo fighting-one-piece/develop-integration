@@ -16,7 +16,8 @@
 		<result column="DELETE_FLAG" property="deleteFlag"/>
 		<association property="accessUserControl" javaType="org.cisiondata.modules.datainterface.entity.AccessUserControl">
             <result property="account" column="ACCOUNT1"/>
-            <result property="interfaceUrl" column="INTERFACE_URL"/>
+            <result property="money" column="MONEY"/>
+            <result property="remainingMoney" column="REMAINING_MONEY"/>
             <result property="count" column="COUNT"/>
             <result property="remainingCount" column="REMAINING_COUNT"/>
             <result property="deleteFlag" column="DELETE_FLAG1"/>
@@ -47,7 +48,7 @@
 	<!-- 分页查询 -->
 	<select id="findAUserByPage" resultMap="AUserModelMap">
 		select t1.ID ID,t1.ACCOUNT ACCOUNT,t1.IDENTITY IDENTITY,t1.NICK_NAME NICK_NAME,t1.EMAIL EMAIL,t1.STATUS STATUS,t1.CREATE_TIME CREATE_TIME,
-		t1.EXPIRE_TIME EXPIRE_TIME,t1.DELETE_FLAG DELETE_FLAG,t2.ACCOUNT ACCOUNT1,t2.INTERFACE_URL INTERFACE_URL,
+		t1.EXPIRE_TIME EXPIRE_TIME,t1.DELETE_FLAG DELETE_FLAG,t2.ACCOUNT ACCOUNT1,t2.MONEY MONEY,t2.REMAINING_MONEY REMAINING_MONEY,
 		t2.COUNT COUNT,t2.REMAINING_COUNT REMAINING_COUNT,t2.DELETE_FLAG DELETE_FLAG1
 		from T_USER t1 LEFT JOIN T_ACCESS_USER_CONTROL t2 ON t1.ACCOUNT=t2.ACCOUNT AND t2.DELETE_FLAG=0
 		ORDER BY t1.ID LIMIT #{0},#{1}
@@ -55,7 +56,7 @@
 	<!-- 根据账号查询 -->
 	<select id="findAuser" resultMap="AUserModelMap">
 		select t1.ID ID,t1.ACCOUNT ACCOUNT,t1.IDENTITY IDENTITY,t1.NICK_NAME NICK_NAME,t1.EMAIL EMAIL,t1.STATUS STATUS,t1.CREATE_TIME CREATE_TIME,
-		t1.EXPIRE_TIME EXPIRE_TIME,t1.DELETE_FLAG DELETE_FLAG,t2.ACCOUNT ACCOUNT1,t2.INTERFACE_URL INTERFACE_URL,
+		t1.EXPIRE_TIME EXPIRE_TIME,t1.DELETE_FLAG DELETE_FLAG,t2.ACCOUNT ACCOUNT1,t2.MONEY MONEY,t2.REMAINING_MONEY REMAINING_MONEY,
 		t2.COUNT COUNT,t2.REMAINING_COUNT REMAINING_COUNT,t2.DELETE_FLAG DELETE_FLAG1
 		from T_USER t1 LEFT JOIN T_ACCESS_USER_CONTROL t2 ON t1.ACCOUNT=t2.ACCOUNT AND t2.DELETE_FLAG=0
 		WHERE t1.ACCOUNT = #{account}

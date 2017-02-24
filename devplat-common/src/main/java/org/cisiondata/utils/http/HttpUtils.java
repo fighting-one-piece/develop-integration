@@ -22,6 +22,10 @@ public class HttpUtils {
 	private static final Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
 	
 	public static String sendGet(String url) {
+		return sendGet(url, null);
+	}
+	
+	public static String sendGet(String url, String[] headers) {
         String result = "";
         BufferedReader in = null;
         try {
@@ -39,6 +43,12 @@ public class HttpUtils {
             conn.setRequestProperty("accept", "*/*");
             conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+            if (null != headers && headers.length != 0) {
+            	for (int i = 0, len = headers.length; i < len;) {
+            		conn.setRequestProperty(headers[i], headers[i + 1]);
+            		i = i + 2;
+            	}
+            }
             // 建立实际的连接
             conn.connect();
             // 定义 BufferedReader输入流来读取URL的响应

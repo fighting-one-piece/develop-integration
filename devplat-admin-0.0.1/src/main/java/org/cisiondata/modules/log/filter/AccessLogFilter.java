@@ -13,7 +13,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.cisiondata.utils.web.IpUtils;
+import org.cisiondata.utils.web.IPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class AccessLogFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 		String jsessionId = httpServletRequest.getRequestedSessionId();
-        String ip = IpUtils.getIpAddr(httpServletRequest);
+        String ip = IPUtils.getIPAddress(httpServletRequest);
         String accept = httpServletRequest.getHeader("accept");
         String userAgent = httpServletRequest.getHeader("User-Agent");
         String url = httpServletRequest.getRequestURI();

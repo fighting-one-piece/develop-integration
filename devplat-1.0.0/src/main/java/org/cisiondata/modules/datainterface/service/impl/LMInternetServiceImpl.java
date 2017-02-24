@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.cisiondata.modules.datainterface.Constants;
-import org.cisiondata.modules.datainterface.SwitchStatus;
+import org.cisiondata.modules.datainterface.entity.SwitchStatus;
 import org.cisiondata.modules.datainterface.service.ILMInternetService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.http.HttpUtils;

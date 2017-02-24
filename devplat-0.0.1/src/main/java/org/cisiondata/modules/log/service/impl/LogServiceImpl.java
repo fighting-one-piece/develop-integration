@@ -126,4 +126,23 @@ public class LogServiceImpl implements ILogService{
 		}
 	}
 
+	//查询某个用户访问的资源总数
+	public int selByAccount(String name) {
+		return logMapper.selByAccount(name);
+	}
+
+	//查询某个用户访问的资源进行分页
+	public Map<String, Object> selByAcPage(int index, String name) {
+		Map<String, Object> map = new HashMap<String,Object>();
+		int amount = selByAccount(name);
+		if(amount > 0){
+			pageCount = amount % 10 == 0? amount / 10 : amount /10 + 1;
+		}
+		//计算当前页数数据量
+		page = (index -1) * 10;
+		List<LogModel> keyPage = logMapper.selByAcPage(name, page, count);
+		map.put("data", keyPage);
+		map.put("pageCount", pageCount);
+		return map;
+	}
 }

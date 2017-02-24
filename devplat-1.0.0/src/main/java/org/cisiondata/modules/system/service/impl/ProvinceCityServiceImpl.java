@@ -14,10 +14,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
 @Service("provinceCityService")
-public class ProvinceCityServiceImpl implements IProvinceCityService,InitializingBean {
+public class ProvinceCityServiceImpl implements IProvinceCityService, InitializingBean {
 
 	@Resource(name = "provinceCityDAO")
-	private ProvinceCityDAO provinceCityDAO;
+	private ProvinceCityDAO provinceCityDAO = null;
 	
 	private List<String> provinceList = null;
 	

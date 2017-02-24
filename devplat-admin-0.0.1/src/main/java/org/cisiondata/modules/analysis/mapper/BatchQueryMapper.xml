@@ -24,7 +24,7 @@
     </select>
      <!-- 写入操作 -->
      <update id="Updata">
-     	update T_EVENT_EXTEND set extend_info2=#{0} where event_extend_id=#{1};
+     	update T_EVENT_EXTEND set extend_info2=#{0},UPDATE_FLAG=1 where event_extend_id=#{1};
      </update>
      <!-- 查询xlsID -->
      <select id="findbaseID" parameterType="String" resultType="int">
@@ -34,9 +34,16 @@
      <select id="readall" parameterType="int" resultMap="eventBaseResultMap">
      	select extend_info2 from T_EVENT_EXTEND where extend_base_id=#{extend_base_id};
      </select>
-     <!-- 修改状态 -->
-     <update id="codes">
-     	UPDATE  T_EVENT_EXTEND set DELETE_FLAG=1 where extend_base_id=#{0};
-     </update>
-     
+     <!--命中率 -->
+     <select id="hitRate" parameterType="int" resultType="int">
+     	select COUNT(extend_info2) FROM  T_EVENT_EXTEND  where extend_info2 != "[]" AND extend_base_id=#{0};
+     </select>
+     <!--数据更新字段标识统计 -->
+     <select id="statisIdentification" parameterType="int" resultType="int">
+     	select COUNT(*) from T_EVENT_EXTEND where extend_base_id=#{0} AND UPDATE_FLAG=1;
+     </select>
+     <!--上传数据统计-->
+     <select id="uploadStatistics" parameterType="int" resultType="int">
+     	select COUNT(*) from T_EVENT_EXTEND where extend_base_id=#{0};
+     </select>    
 </mapper>

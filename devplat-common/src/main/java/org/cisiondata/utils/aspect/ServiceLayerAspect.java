@@ -52,6 +52,9 @@ public class ServiceLayerAspect {
 		Object result = null;
 		try {
 			result = proceedingJoinPoint.proceed();
+		} catch (BusinessException be) {
+			LOG.error(be.getMessage(), be);
+			throw be;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			throw new BusinessException(e.getMessage());

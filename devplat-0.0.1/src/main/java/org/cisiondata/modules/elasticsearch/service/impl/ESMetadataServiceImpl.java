@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
@@ -23,11 +24,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
-import redis.clients.jedis.JedisCluster;
-
 import com.carrotsearch.hppc.ObjectLookupContainer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
+
+import redis.clients.jedis.JedisCluster;
 
 @Service("esMetadataService")
 public class ESMetadataServiceImpl implements IESMetadataService, InitializingBean {
@@ -151,7 +152,20 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 			String typeName = new ArrayList<String>(typeMappings.keySet()).get(0);
 			if (!typeName.equalsIgnoreCase(type))
 				continue;
-			return typeMappings.get(type);
+			Map<String,String> map = typeMappings.get(type);
+			Map<String,String> typeMap = new HashMap<String,String>();
+			for(Entry<String,String> entry : map.entrySet()){
+				if( entry.getKey().endsWith("inputPerson") || entry.getKey().endsWith("insertTime")
+						|| entry.getKey().endsWith("updateTime") || entry.getKey().endsWith("sourceFile")
+						|| entry.getKey().endsWith("cnote")
+						|| ("email".equals(type) && "inputPersion".equals(entry.getKey())) 
+						|| ("logistics".equals(type) && "expressCompanyName".equals(entry.getKey()))){
+					continue;
+				} else {
+					typeMap.put(entry.getKey(), entry.getValue());
+				}
+			}
+			return typeMap;
 		}
 		return new HashMap<String, String>();
 	}

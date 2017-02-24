@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.datainterface.dao.AccessUserInterfaceDAO">
+
+	<resultMap type="org.cisiondata.modules.datainterface.entity.AccessUserInterface" id="UserInterfaceResultMap">
+        <result property="account" column="ACCOUNT"/>
+        <result property="interfaceId" column="INTERFACE_ID"/>
+        <result property="chargeFlag" column="CHARGE_FLAG"/>
+        <result property="deleteFlag" column="DELETE_FLAG"/>
+    </resultMap>
+   <!-- 统计数据数据量的多少 -->
+   <select id="contun" resultType="int">
+   		select COUNT(ID) from T_ACCESS_USER_INTERFACE where DELETE_FLAG=0;
+   </select>
+   <!--分页查询数据-->
+   <select id="Pagination" resultMap="UserInterfaceResultMap">
+   		select ID,ACCOUNT,INTERFACE_ID,CHARGE_FLAG from T_ACCESS_USER_INTERFACE WHERE DELETE_FLAG=0 limit #{0},#{1};
+   </select>
+   <!-- id查询数据  -->
+   <select id="QueryId" parameterType="long" resultMap="UserInterfaceResultMap">
+   		select ID,ACCOUNT,INTERFACE_ID,CHARGE_FLAG from T_ACCESS_USER_INTERFACE where ID=#{id};
+   </select>
+   <!-- 修改状态 -->
+   <update id="Revamp">
+   		UPDATE T_ACCESS_USER_INTERFACE set CHARGE_FLAG=#{0} where ID=#{1} AND DELETE_FLAG=0;
+   </update>
+   <!--删除用户  -->
+   <update id="RemoveUser">
+   		UPDate T_ACCESS_USER_INTERFACE set DELETE_FLAG=1 where ID=#{0} AND  DELETE_FLAG=0;
+   </update>
+   <!--增加用户  -->
+   <insert id="addUserAccount">
+   		insert into T_ACCESS_USER_INTERFACE (ACCOUNT,INTERFACE_ID,CHARGE_FLAG,DELETE_FLAG) values(#{0},#{1},#{2},0);
+   </insert>
+</mapper>

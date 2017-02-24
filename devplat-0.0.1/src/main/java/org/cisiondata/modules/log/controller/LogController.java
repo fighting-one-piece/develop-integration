@@ -96,6 +96,20 @@ public class LogController {
 		}
 		return result;
 	}
+	//根据用户名查询
+	@ResponseBody
+	@RequestMapping(value="selAccount")
+	public WebResult selByAccount(int index,String name){
+		WebResult result = new WebResult();
+		try {
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(logService.selByAcPage(index, name));
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView toMoblie(){
 		return new ModelAndView("/log/logQuery");

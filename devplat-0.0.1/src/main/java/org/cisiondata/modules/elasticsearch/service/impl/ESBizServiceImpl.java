@@ -107,21 +107,30 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 			return (List<Map<String, Object>>) cacheObject;
 		}
 		LOG.info("read labels and hits method with cache not hit");
-		List<Future<Map<String, Object>>> fs = new ArrayList<Future<Map<String, Object>>>();
+		Map<String, Future<Map<String, Object>>> fmap = new HashMap<String, Future<Map<String, Object>>>();
 		for (int i = 0, len = includeTypes.length; i < len; i++) {
 			String type = includeTypes[i];
-			fs.add(executorService.submit(new ReadLabelsAndHitsThread(type_index_mapping.get(type), type, query)));
+			fmap.put(type, executorService.submit(new ReadLabelsAndHitsThread(
+					type_index_mapping.get(type), type, query)));
 		}
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-		try {
-			for (int i = 0, len = fs.size(); i < len; i++) {
-				Future<Map<String, Object>> future = fs.get(i);
-				Map<String, Object> result = future.get(20, TimeUnit.SECONDS);
-				if (!result.isEmpty()) resultList.add(result);
+		for (Map.Entry<String, Future<Map<String, Object>>> entry : fmap.entrySet()) {
+			Future<Map<String, Object>> future = entry.getValue();
+			Map<String, Object> result = null;
+			try {
+				result = future.get(20, TimeUnit.SECONDS);
+			} catch (Exception e) {
+				result = new HashMap<String, Object>();
+				String type = entry.getKey();
+				String index = type_index_mapping.get(type);
+				result.put("hits", -1);
+				result.put("index", index);
+				result.put("type", type);
+				result.put("label", MessageUtils.getInstance().getMessage(index + "." + type));
+				LOG.error(e.getMessage(), e);
 			}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		} 
+			if (!result.isEmpty()) resultList.add(result);
+		}
 		RedisClusterUtils.getInstance().set(labelsHitCacheKey, resultList, 180);
 		return resultList;
 	}
@@ -265,11 +274,12 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	
 	private BoolQueryBuilder buildBoolQuery(String keyword, Set<String> q_identity_attributes, 
 			Set<String> q_chinese_attributes) {
-		if (keyword.trim().indexOf(" ") == -1) {
+		keyword = keyword.trim().toLowerCase();
+		if (keyword.indexOf(" ") == -1) {
 			return buildSingleBoolQuery(keyword, q_identity_attributes, q_chinese_attributes);
 		}
 		BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-		String[] keywords = keyword.trim().split(" ");
+		String[] keywords = keyword.split(" ");
 		for (int i = 0, len = keywords.length; i < len; i++) {
 			boolQueryBuilder.must(buildSingleBoolQuery(keywords[i], q_identity_attributes, q_chinese_attributes));
 		}
@@ -282,8 +292,11 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		boolean isChineseWord = isChineseWord(keyword);
 		Set<String> attributes = isChineseWord ? q_chinese_attributes : q_identity_attributes;
 		for (String attribute : attributes) {
-			boolQueryBuilder.should(isChineseWord ? QueryBuilders.matchPhraseQuery(attribute, keyword)
-					: QueryBuilders.termQuery(attribute, keyword));
+			if (isChineseWord && attribute.indexOf("name") == -1) {
+				boolQueryBuilder.should(QueryBuilders.matchPhraseQuery(attribute, keyword));
+			} else {
+				boolQueryBuilder.should(QueryBuilders.termQuery(attribute, keyword));
+			}
 		}
 		return boolQueryBuilder;
 	}

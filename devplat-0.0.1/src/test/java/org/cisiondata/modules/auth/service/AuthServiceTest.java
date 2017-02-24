@@ -10,6 +10,9 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.cisiondata.modules.abstr.web.WebResult;
+import org.cisiondata.modules.auth.entity.AccessInterface;
+import org.cisiondata.modules.auth.entity.AccessUserInterface;
+import org.cisiondata.modules.auth.entity.AccessUserInterfaceMoney;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.utils.endecrypt.EndecryptUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
@@ -79,6 +82,26 @@ public class AuthServiceTest {
 	}
 	
 	@Test
+	public void testReadAccessInterface() {
+		AccessInterface accessInterface = accessUserService
+				.readAccessInterfaceByIdentity("123");
+		System.out.println("id: " + accessInterface.getId());
+		System.out.println("url: " + accessInterface.getUrl());
+		System.out.println("money: " + accessInterface.getMoney());
+	}
+	
+	@Test
+	public void testReadAccessUserInterface() {
+		AccessUserInterface accessUserInterface = accessUserService
+				.readAccessUserInterfaceByAccountAndInterfaceId("test", 1L);
+		System.out.println(accessUserInterface.getMonies().size());
+		for (AccessUserInterfaceMoney money : accessUserInterface.getMonies()) {
+			System.out.println("responseCode: " + money.getResponseCode());
+			System.out.println("money: " + money.getMoney());
+		}
+	}
+	
+	@Test
 	public void testA() {
 		RedisClusterUtils.getInstance().listPush("listOne", "test");
 		System.out.println("list data: " + (String) RedisClusterUtils.getInstance().listPop("listOne"));
@@ -119,9 +142,13 @@ public class AuthServiceTest {
 	public void testB() {
 //		int status = (int) RedisClusterUtils.getInstance().get("education_organizeD");
 //		System.err.println(status);
-		RedisClusterUtils.getInstance().set("education_organizeD", 1);
+//		RedisClusterUtils.getInstance().set("education_organizeD", 1);
 		int status1 = (int) RedisClusterUtils.getInstance().get("education_organizeD");
+		int status2 = (int) RedisClusterUtils.getInstance().get("PhoneBank11_14");
+		int status3 = (int) RedisClusterUtils.getInstance().get("readMultiPlatform");
 		System.err.println(status1);
+		System.err.println(status2);
+		System.err.println(status3);
 
 	}
 	

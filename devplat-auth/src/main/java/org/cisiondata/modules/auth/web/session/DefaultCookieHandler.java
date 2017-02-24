@@ -4,16 +4,17 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cisiondata.modules.auth.Constants.CookieName;
 import org.springframework.stereotype.Component;
 
 @Component("defaultCookieHandler")
 public class DefaultCookieHandler implements CookieHandler {
 
-	private String cookieName = "_session";
+	private String cookieName = CookieName.USER_SESSION;
 	private String domain;
 	private String path = "/";
 	private int cookieMaxAge = -1;
-	private boolean secure = false;
+	private boolean secure = true;
 
 	public DefaultCookieHandler() {
 	}

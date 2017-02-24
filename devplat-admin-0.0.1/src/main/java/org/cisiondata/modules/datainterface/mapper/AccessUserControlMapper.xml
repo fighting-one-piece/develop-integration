@@ -9,6 +9,9 @@
         <result property="count" column="COUNT"/> 
         <result property="remainingCount" column="REMAINING_COUNT"/> 
         <result property="deleteFlag" column="DELETE_FLAG"/> 
+        <result property="money" column="MONEY"/> 
+        <result property="remainingMoney" column="REMAINING_MONEY"/> 
+        <result property="resource" column="RESOURCE"/> 
     </resultMap>
     
     <select id="findAccessControlByAccount" resultMap="AccessControlResultMap">
@@ -18,10 +21,17 @@
     <update id="updateAccessControlByAccount" parameterType="org.cisiondata.modules.datainterface.entity.AccessUserControl">
     	update T_ACCESS_USER_CONTROL set COUNT=#{count},REMAINING_COUNT=#{remainingCount} where ACCOUNT=#{account}
     </update>
+    <update id="updateMoneyByAccount" parameterType="org.cisiondata.modules.datainterface.entity.AccessUserControl">
+    	update T_ACCESS_USER_CONTROL set MONEY=#{money},REMAINING_MONEY=#{remainingMoney} where ACCOUNT=#{account}
+    </update>
 
 	<insert id="addAccessUserControl" parameterType="org.cisiondata.modules.datainterface.entity.AccessUserControl">
-    	insert into T_ACCESS_USER_CONTROL (ACCOUNT,INTERFACE_URL,COUNT,REMAINING_COUNT)
-    	values (#{account},#{interfaceUrl},#{count},#{remainingCount})
+    	insert into T_ACCESS_USER_CONTROL (ACCOUNT,COUNT,REMAINING_COUNT,MONEY,REMAINING_MONEY)
+    	values (#{account},#{count},#{remainingCount},#{money},#{remainingMoney})
     </insert>
+    
+    <select id="findAccessControlAll" resultMap="AccessControlResultMap">
+    		select ACCOUNT from T_ACCESS_USER_CONTROL where DELETE_FLAG=0
+    </select>
 	
 </mapper>

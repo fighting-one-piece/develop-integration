@@ -99,6 +99,7 @@ public class Session {
                 _localCache = new HashMap<String, Object>();
             }
             _localCache.put(name, value);
+            storageHandler.setAttribute(id, request, response, name, value);
         } catch (Exception e) {
         	LOG.error(e.getMessage(), e);
             throw new SessionException(e);

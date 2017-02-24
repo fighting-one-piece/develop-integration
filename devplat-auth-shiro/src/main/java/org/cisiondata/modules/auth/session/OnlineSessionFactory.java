@@ -7,7 +7,7 @@ import org.apache.shiro.session.mgt.SessionContext;
 import org.apache.shiro.session.mgt.SessionFactory;
 import org.apache.shiro.web.session.mgt.WebSessionContext;
 import org.cisiondata.modules.auth.entity.UserOnline;
-import org.cisiondata.utils.web.IpUtils;
+import org.cisiondata.utils.web.IPUtils;
 
 /**
  * 创建自定义的session，
@@ -25,7 +25,7 @@ public class OnlineSessionFactory implements SessionFactory {
             WebSessionContext webSessionContext = (WebSessionContext) sessionContext;
             HttpServletRequest request = (HttpServletRequest) webSessionContext.getServletRequest();
             if (request != null) {
-                onlineSession.setHost(IpUtils.getIpAddr(request));
+                onlineSession.setHost(IPUtils.getIPAddress(request));
                 onlineSession.setUserAgent(request.getHeader("User-Agent"));
                 onlineSession.setSystemHost(request.getLocalAddr() + ":" + request.getLocalPort());
             }

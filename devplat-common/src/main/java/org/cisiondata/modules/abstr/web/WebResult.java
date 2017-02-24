@@ -27,10 +27,6 @@ public class WebResult implements Serializable {
 	}
 
 	public void setCode(Integer code) {
-		if (code != null && (code == 200 || code == 201)) {
-			this.code = ResultCode.SUCCESS.getCode();
-			return;
-		}
 		this.code = code;
 	}
 
@@ -56,7 +52,6 @@ public class WebResult implements Serializable {
 		} else {
 			this.code = code.getCode();
 		}
-		this.failure = code.getDesc();
 	}
 	
 	public WebResult buildFailure(int code, String failure) {

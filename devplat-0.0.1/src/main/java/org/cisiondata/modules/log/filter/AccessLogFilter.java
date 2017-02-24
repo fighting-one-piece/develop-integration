@@ -22,7 +22,7 @@ import org.apache.shiro.SecurityUtils;
 import org.cisiondata.modules.log.dao.LogMapper;
 import org.cisiondata.modules.log.entity.LogModel;
 import org.cisiondata.utils.spring.SpringBeanFactory;
-import org.cisiondata.utils.web.IpUtils;
+import org.cisiondata.utils.web.IPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class AccessLogFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 		String jsessionId = httpServletRequest.getRequestedSessionId();
-        String ip = IpUtils.getIpAddr(httpServletRequest);
+        String ip = IPUtils.getIPAddress(httpServletRequest);
         String accept = httpServletRequest.getHeader("accept");
         String userAgent = httpServletRequest.getHeader("User-Agent");
         String url = httpServletRequest.getRequestURI();
@@ -66,7 +66,6 @@ public class AccessLogFilter implements Filter {
         sb.append(getBlock(headers));
         sb.append(getBlock(httpServletRequest.getHeader("Referer")));
         LOG.info(sb.toString());
-        
         if(url.indexOf("/qq")!=-1 || url.indexOf("/search")!=-1 || url.indexOf("/phoneBank")!=-1 || url.indexOf("/query")!=-1 || url.indexOf("/mobile")!=-1){        	
         	String account = (String) SecurityUtils.getSubject().getPrincipal();
         	if (StringUtils.isBlank(account)) {
@@ -86,13 +85,14 @@ public class AccessLogFilter implements Filter {
     			String IP = getIPAddress(httpServletRequest);
     			String keyword = url.substring(url.lastIndexOf("/")+1, url.length());
     			Matcher m = p.matcher(keyword);
-    			if(!IP.equals("0:0:0:0:0:0:0:1")){
+    			if(!IP.equals("0:0:0:0:0:0:0:1") && keyword.indexOf(",") == -1 && keyword != null){
     				logModel.setId(id);
     				logModel.setSessionId(session);
     				logModel.setIp(IP);
     				logModel.setAccessTime(new Date());
     				logModel.setKeyword(keyword);
     				logModel.setAccount(account);
+    				logModel.setUrl(url.substring(url.indexOf("/devplat")+8,url.length()));
     				if(m.matches()){
     					logMapper.addLog(logModel);
     				}
@@ -115,21 +115,22 @@ public class AccessLogFilter implements Filter {
         			String session = httpServletRequest.getSession().getId();
         			String keyword = entry.getValue().toString();
         			String IP = getIPAddress(httpServletRequest);
-        			if(!IP.equals("0:0:0:0:0:0:0:1")){
+        			if(!IP.equals("0:0:0:0:0:0:0:1") && keyword.indexOf(",") == -1 && keyword != null){
         				logModel.setId(id);
         				logModel.setSessionId(session);
         				logModel.setIp(IP);
         				logModel.setAccessTime(new Date());
         				logModel.setKeyword(keyword.substring(1,keyword.length()-1));
         				logModel.setAccount(account);
+        				logModel.setUrl(url.substring(url.indexOf("/devplat")+8,url.length()));
         				logMapper.addLog(logModel);
         			}
         		}
         	}
         }
+        
         chain.doFilter(request, response);
 	}
-	
 	//获取IP的方法
 	public static String getIPAddress(HttpServletRequest request){
 		String ip = request.getHeader("x-forwarded-for");
@@ -150,13 +151,12 @@ public class AccessLogFilter implements Filter {
 		}
 		return ip;
 	}
-	
-	public static String getBlock(Object msg) {
-        if (msg == null) {
-            msg = "";
-        }
-        return "[" + msg.toString() + "]";
-    }
+	 public static String getBlock(Object msg) {
+	        if (msg == null) {
+	            msg = "";
+	        }
+	        return "[" + msg.toString() + "]";
+	    }
 
     @SuppressWarnings("unchecked")
 	protected static String getParams(HttpServletRequest request) {

@@ -288,7 +288,7 @@ public class EventBaseServiceImpl extends GenericServiceImpl<EventBase, Long> im
 				break;
 			}
 			String headerCode = PoiExcelUtils.listToString(listBiao);
-			if(headerCode.indexOf("电话号码") != -1 || headerCode.indexOf("身份证号码") != -1 || headerCode.indexOf("邮箱地址") != -1){
+			if(headerCode.indexOf("电话号码") != -1 || headerCode.indexOf("身份证号码") != -1 || headerCode.indexOf("邮箱地址") != -1 || headerCode.indexOf("公司信息") != -1){
 				maprs.put("listBiao", listBiao);
 				int max = sheet.getRow(0).getLastCellNum() - 1;
 				for (int j = 0; j <= sheet.getLastRowNum(); j++) {

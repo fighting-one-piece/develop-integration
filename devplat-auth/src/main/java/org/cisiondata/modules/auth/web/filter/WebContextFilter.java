@@ -15,32 +15,38 @@ import javax.servlet.http.HttpServletResponse;
 import org.cisiondata.modules.auth.web.WebContext;
 import org.cisiondata.modules.auth.web.session.Session;
 import org.cisiondata.modules.auth.web.session.SessionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class WebContextFilter implements Filter {
 	
+	private Logger LOG = LoggerFactory.getLogger(WebContextFilter.class);
+	
 	private ServletContext ctx = null;
-	private WebApplicationContext wac = null;
+	private SessionManager sessionManager = null;
 
 	public void init(FilterConfig config) throws ServletException {
 		ctx = config.getServletContext();
-		wac = WebApplicationContextUtils.getWebApplicationContext(ctx);
+		WebApplicationContext wac = WebApplicationContextUtils.getWebApplicationContext(ctx);
+		sessionManager = wac.getBean(SessionManager.class);
 	}
 
-	public void destroy() {
-	}
-
-	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-		SessionManager sessionManager = wac.getBean(SessionManager.class);
-		Session session = sessionManager.getSession((HttpServletRequest) req, (HttpServletResponse) res);
-		WebContext instance = new WebContext((HttpServletRequest) req, (HttpServletResponse) res, session, ctx);
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) 
+			throws IOException, ServletException {
+		Session session = sessionManager.getSession((HttpServletRequest) request, (HttpServletResponse) response);
+		LOG.info("current session id : {}", session.getId());
+		WebContext instance = new WebContext((HttpServletRequest) request, (HttpServletResponse) response, session, ctx);
 		try {
 			WebContext.set(instance);
-			chain.doFilter(req, res);
+			chain.doFilter(request, response);
 		} finally {
 			WebContext.set(null);
 		}
+	}
+	
+	public void destroy() {
 	}
 
 }

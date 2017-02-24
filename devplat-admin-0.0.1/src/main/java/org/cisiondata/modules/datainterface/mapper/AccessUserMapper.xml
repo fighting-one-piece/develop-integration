@@ -11,7 +11,8 @@
         <result property="applyTime" column="APPLY_TIME" javaType="java.util.Date"/> 
         <association property="accessControl" javaType="org.cisiondata.modules.datainterface.entity.AccessUserControl">
             <result property="account" column="ACCOUNT"/>
-            <result property="interfaceUrl" column="INTERFACE_URL"/>
+            <result property="money" column="MONEY"/>
+            <result property="remainingMoney" column="REMAINING_MONEY"/>
             <result property="count" column="COUNT"/>
             <result property="remainingCount" column="REMAINING_COUNT"/>
             <result property="deleteFlag" column="DELETE_FLAG1"/>
@@ -28,7 +29,7 @@
     
     <select id="findAccessByPage" resultMap="AccessUserResultMap">
     	SELECT t1.ACCESS_ID ACCESS_ID,t1.ACCESS_KEY ACCESS_KEY,t1.NAME NAME,t1.DELETE_FLAG DELETE_FLAG,t1.APPLY_TIME APPLY_TIME,
-    	t2.ACCOUNT ACCOUNT,t2.INTERFACE_URL INTERFACE_URL,t2.COUNT COUNT,t2.REMAINING_COUNT REMAINING_COUNT,t2.DELETE_FLAG DELETE_FLAG1
+    	t2.ACCOUNT ACCOUNT,t2.MONEY MONEY,t2.REMAINING_MONEY REMAINING_MONEY,t2.COUNT COUNT,t2.REMAINING_COUNT REMAINING_COUNT,t2.DELETE_FLAG DELETE_FLAG1
     	from
     	T_ACCESS_USER t1 LEFT JOIN T_ACCESS_USER_CONTROL t2 ON t1.ACCESS_ID=t2.ACCOUNT AND t2.DELETE_FLAG=0 limit #{0},#{1}
     </select>

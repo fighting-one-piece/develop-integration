@@ -13,5 +13,6 @@
      <mapping path="/data_analy*" exclue="true"/>
      <mapping path="/sensitive*" exclue="true"/>  
      <mapping path="/accessSwitch*" exclue="true"/>
+     <mapping path="/accessUserInterface*" exclue="true"/>
      
 </sitemesh>

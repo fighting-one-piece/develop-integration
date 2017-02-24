@@ -229,7 +229,7 @@ $(document).ready(function () {
 									valueStr += "<td style='background: white;'></td>";
 								}
 							}
-							valueStr += "<td style='background: white;'>"+item.index+"</td><td style='background: white;'>"+item.type+"</td>";
+							valueStr += "<td style='background: white;'>"+item.type+"</td>";
 							valueStr += "</tr>";
 							valueStrArr[n] = valueStr;
 						})
@@ -246,7 +246,7 @@ $(document).ready(function () {
 								tables += "<td style='background: #EEE8AA;'>"+keys[j]+"</td>";
 							}
 							if(flag)tables += "<td style='background: #EEE8AA;'>源文件</td>";
-							tables += "<td style='background: #EEE8AA;'>库</td><td style='background: #EEE8AA;'>表</td>"
+							tables += "<td style='background: #EEE8AA;'>表</td>"
 							tables += "</tr>";
 							tables += valueStrArr[i];
 							tables += "</table>";
@@ -391,7 +391,7 @@ $(document).ready(function () {
 									valueStr += "<td style='background: white;'></td>";
 								}
 							}
-							valueStr += "<td style='background: white;'>"+item.index+"</td><td style='background: white;'>"+item.type+"</td>";
+							valueStr += "<td style='background: white;'>"+item.type+"</td>";
 							valueStr += "</tr>";
 							valueStrArr[n] = valueStr;
 						})
@@ -408,7 +408,7 @@ $(document).ready(function () {
 								tables += "<td style='background: #EEE8AA;'>"+keys[j]+"</td>";
 							}
 							if(flag)tables += "<td style='background: #EEE8AA;'>源文件</td>";
-							tables += "<td style='background: #EEE8AA;'>库</td><td style='background: #EEE8AA;'>表</td>"
+							tables += "<td style='background: #EEE8AA;'>表</td>"
 							tables += "</tr>";
 							tables += valueStrArr[i];
 							tables += "</table>";

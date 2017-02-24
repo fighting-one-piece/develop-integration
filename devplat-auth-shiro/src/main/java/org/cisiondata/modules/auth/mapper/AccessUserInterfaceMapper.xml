@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.auth.dao.AccessUserInterfaceDAO">
+
+	<resultMap type="AccessUserInterface" id="accessUserInterfaceResultMap">  
+    	<id property="id" column="ID"/>     
+		<result property="account" column="ACCOUNT"/>
+        <result property="interfaceId" column="INTERFACE_ID"/>
+        <result property="chargeFlag" column="CHARGE_FLAG"/>
+        <result property="deleteFlag" column="DELETE_FLAG"/> 
+    </resultMap>
+    
+    <resultMap type="AccessUserInterface" id="accessUserInterfaceWithMoneyResultMap">  
+    	<id property="id" column="ID"/>     
+		<result property="account" column="ACCOUNT"/>
+        <result property="interfaceId" column="INTERFACE_ID"/>
+        <result property="chargeFlag" column="CHARGE_FLAG"/>
+        <result property="deleteFlag" column="DELETE_FLAG"/>
+    	<collection property="monies" column="ID" javaType="ArrayList" 
+    		ofType="AccessUserInterfaceMoney" select="readAccessUserInterfaceMoneyById"/>
+    </resultMap>
+    
+    <resultMap type="AccessUserInterfaceMoney" id="accessUserInterfaceMoneyResultMap">  
+    	<id property="id" column="ID"/>     
+		<result property="userInterfaceId" column="USER_INTERFACE_ID"/>
+        <result property="responseCode" column="RESPONSE_CODE"/>
+        <result property="money" column="MONEY"/>
+        <result property="deleteFlag" column="DELETE_FLAG"/> 
+    </resultMap>
+    
+    <sql id="columnClause">ID, ACCOUNT, INTERFACE_ID, CHARGE_FLAG, DELETE_FLAG</sql>
+    
+    <sql id="whereClause">
+    	<where>
+    		<if test="condition.account != null and condition.account != ''">
+    			AND ACCOUNT = #{condition.account}
+    		</if>
+    		<if test="condition.interfaceId != null and condition.interfaceId != ''">
+    			AND INTERFACE_ID = #{condition.interfaceId}
+    		</if>
+    		<if test="condition.chargeFlag != null">
+    			AND CHARGE_FLAG = #{condition.chargeFlag}
+    		</if>
+    		<if test="condition.deleteFlag != null">
+    			AND DELETE_FLAG = #{condition.deleteFlag}
+    		</if>
+    	</where>
+    </sql>
+    
+    <select id="readDataByPK" resultMap="accessUserInterfaceResultMap">  
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_ACCESS_USER_INTERFACE WHERE ID = #{id}
+    </select>
+    
+    <select id="readDataByUserInterface" parameterType="AccessUserInterface" resultMap="accessUserInterfaceWithMoneyResultMap">
+    	SELECT * FROM T_ACCESS_USER_INTERFACE 
+    	WHERE ACCOUNT = #{account} 
+    	AND INTERFACE_ID = #{interfaceId}
+    	AND CHARGE_FLAG = #{chargeFlag}
+    	AND DELETE_FLAG = #{deleteFlag}
+    </select>
+    
+    <select id="readDataByCondition" resultMap="accessUserInterfaceResultMap">  
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_ACCESS_USER_INTERFACE
+        <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataListByCondition" resultMap="accessUserInterfaceResultMap">  
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_ACCESS_USER_INTERFACE
+        <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataPaginationByCondition" resultMap="accessUserInterfaceResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_ACCESS_USER_INTERFACE
+        ]]>   
+    </select>
+    
+    <select id="readAccessUserInterfaceMoneyById" resultMap="accessUserInterfaceMoneyResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_ACCESS_USER_INTERFACE_MONEY WHERE USER_INTERFACE_ID = #{ID}
+        ]]>   
+    </select>
+    
+</mapper>

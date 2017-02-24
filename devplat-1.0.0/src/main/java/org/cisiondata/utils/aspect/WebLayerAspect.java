@@ -134,24 +134,33 @@ public class WebLayerAspect {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 	private long parseReturnResultCount(Object result) {
-    	if (result instanceof WebResult) {
+		if (result instanceof WebResult) {
     		WebResult webResult = (WebResult) result;
-    		Object data = webResult.getData();
-    		if (data instanceof List) {
-    			return ((List) data).size();
-    		} else if (data instanceof QueryResult) {
-    			QueryResult queryResult = (QueryResult) data;
-    			return queryResult.getResultList().size();
-    		} else if (data instanceof Map) {
-    			Map<String, Object> map = (Map<String, Object>) data;
-    			long count = 0;
-    			for (Map.Entry<String, Object> entry : map.entrySet()) {
-    				Object value = entry.getValue();
-    				if (value instanceof List) {
-    					count += ((List) value).size();
-    				}
-    			}
-    			return count;
+    		int resultCode = webResult.getCode();
+    		if (resultCode == ResultCode.SUCCESS.getCode()) {
+	    		Object data = webResult.getData();
+	    		if (data instanceof List) {
+	    			return ((List) data).size();
+	    		} else if (data instanceof QueryResult) {
+	    			QueryResult queryResult = (QueryResult) data;
+	    			return queryResult.getResultList().size();
+	    		} else if (data instanceof Map) {
+	    			Map<String, Object> map = (Map<String, Object>) data;
+	    			long count = 0;
+	    			boolean valueIsList = false;
+	    			for (Map.Entry<String, Object> entry : map.entrySet()) {
+	    				Object value = entry.getValue();
+	    				if (value instanceof List) {
+	    					count += ((List) value).size();
+	    					valueIsList = true;
+	    				}
+	    			}
+	    			return valueIsList ? count : 1;
+	    		} else if (data instanceof String) {
+	    			return 1;
+	    		}
+    		} else if (resultCode == ResultCode.NOT_BINDING_QQ.getCode()) {
+    			return 1;
     		}
     	}
     	return 0;

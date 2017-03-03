@@ -133,6 +133,28 @@ public class ESController {
 	}
 	
 	/**
+	 * 公积金过滤查询(未分页)
+	 * @param query
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/accumylationfund/search")
+	public WebResult readWorkAccumulationFundFilterDatas(String query) {
+		LOG.info("query:{}", query);
+		WebResult result = new WebResult();
+		try {
+			Object data = esBizService.readAccumulationFundFilterDataList(query);
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(data);
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+			LOG.error(e.getMessage(), e);
+		}
+		return result;
+	}
+	
+	/**
 	 * 物流关系查询
 	 * @param query
 	 * @return

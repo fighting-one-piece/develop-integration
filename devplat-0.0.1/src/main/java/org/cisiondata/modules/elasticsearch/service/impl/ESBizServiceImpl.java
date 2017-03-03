@@ -473,5 +473,66 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 			return result;
 		}
 	}
+
+	private List<Map<String, Object>> readAccumulationFundDataList(String query){
+		BoolQueryBuilder queryBuilder = null;
+		if (query.trim().indexOf(" ") == -1) {
+			queryBuilder = buildAccumulationFundBoolQuery(query);
+		} else {
+			queryBuilder = new BoolQueryBuilder();
+			String[] keywords = query.trim().split(" ");
+			for (int i = 0, len = keywords.length; i < len; i++) {
+				queryBuilder.must(buildAccumulationFundBoolQuery(keywords[i]));
+			}
+		}
+		return readDataListByCondition("work", "accumulationfund", queryBuilder);
+	}
+	
+	private BoolQueryBuilder buildAccumulationFundBoolQuery(String keyword) {
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+		boolean isChineseWord = isChineseWord(keyword);
+		String[] attributes = isChineseWord ? new String[]{"name","companyName"}: new String[]{"cardNo","idCard","mobilePhone"};
+		for (int i = 0, len = attributes.length; i < len; i++) {
+			boolQueryBuilder.should(isChineseWord ? QueryBuilders.matchPhraseQuery(attributes[i], keyword)
+					: QueryBuilders.termQuery(attributes[i], keyword));
+		}
+		return boolQueryBuilder;
+	}
+	
+	@Override
+	public List<Map<String, Object>> readAccumulationFundFilterDataList(String query) throws BusinessException {
+		List<Map<String, Object>> accumulationFundFilterDataList = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> accumulationFundList = readAccumulationFundDataList(query);
+		Map<String, Object> accumulationFilterData = null;
+		Map<String, Object> accumulationData = null;
+		Set<String> locations = new HashSet<String>();
+		for (int i = 0, len = accumulationFundList.size(); i < len; i++) {
+			accumulationData = accumulationFundList.get(i);
+			String name = null != accumulationData.get("姓名") ? (String)accumulationData.get("姓名") : "";
+			String cardNo = null != accumulationData.get("卡号") ? (String)accumulationData.get("卡号") : "";
+			String idCard = null != accumulationData.get("身份证号") ? (String)accumulationData.get("身份证号") : "";
+			String companyName = null != accumulationData.get("公司名称") ? (String)accumulationData.get("公司名称") : "";
+			String mobilePhone = null != accumulationData.get("手机号") ? (String)accumulationData.get("手机号") : "";
+			String openDate = null != accumulationData.get("开户时间") ? (String)accumulationData.get("开户时间") : "";
+			String costEndTime = null != accumulationData.get("闭户时间") ? (String)accumulationData.get("闭户时间") : "";
+			String percentOfOrganiza = null != accumulationData.get("缴费金额") ? (String)accumulationData.get("缴费金额") : "";
+			String location = new StringBuilder().append(name).append(cardNo).append(idCard)
+					.append(companyName).append(mobilePhone).append(openDate).append(costEndTime)
+					.append(percentOfOrganiza).toString();
+			if (locations.contains(location)) continue;
+			locations.add(location);
+			accumulationFilterData = new HashMap<String, Object>();
+			accumulationFilterData.put("姓名", name);
+			accumulationFilterData.put("卡号", cardNo);
+			accumulationFilterData.put("身份证号", idCard);
+			accumulationFilterData.put("公司名称", companyName);
+			accumulationFilterData.put("手机号", mobilePhone);
+			accumulationFilterData.put("开户时间", openDate);
+			accumulationFilterData.put("闭户时间", costEndTime);
+			accumulationFilterData.put("缴费金额", percentOfOrganiza);
+			accumulationFundFilterDataList.add(accumulationFilterData);
+		}
+		return accumulationFundFilterDataList;
+	}
 	
 }

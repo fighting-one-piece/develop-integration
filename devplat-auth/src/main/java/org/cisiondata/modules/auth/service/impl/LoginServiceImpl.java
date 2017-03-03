@@ -25,6 +25,7 @@ public class LoginServiceImpl implements ILoginService {
 	private IUserService userService = null;
 	
 	public UserDTO readUserLoginInfoByAccountAndPassowrd(String account, String password) throws BusinessException {
+		LOG.info("account: {} password: {}", account, password);
 		User user = userService.readUserByAccountAndPassword(account, password);
 		String macAddress = IPUtils.getMACAddress(WebContext.get().getRequest());
 		String accessToken = TokenUtils.genMD5Token(account, user.getPassword(), macAddress);

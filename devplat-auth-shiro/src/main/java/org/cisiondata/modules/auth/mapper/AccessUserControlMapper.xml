@@ -48,6 +48,10 @@
    		UPDATE T_ACCESS_USER_CONTROL SET REMAINING_MONEY = #{remainingMoney} WHERE ACCOUNT = #{account}
     </update>
     
+    <update id="updateRemainingMoneyIncOrDec" parameterType="AccessUserControl">
+   		UPDATE T_ACCESS_USER_CONTROL SET REMAINING_MONEY = REMAINING_MONEY + #{remainingMoney} WHERE ACCOUNT = #{account}
+    </update>
+    
     <select id="readDataByPK" resultMap="accessUserControlResultMap">  
         SELECT 
         <include refid="columnClause"/>

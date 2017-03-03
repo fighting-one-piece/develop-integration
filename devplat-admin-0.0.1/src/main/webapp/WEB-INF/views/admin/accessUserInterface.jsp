@@ -114,10 +114,6 @@
 				<div  style="margin-bottom: 1%;"><button style="left: 0px;" id="closeAAccessMoney">关闭</button><button style="right: 0px;" id="addSureAccessMoney">确定</button></div>
 				<table class="table table-striped table-bordered" style="text-align: center;" id="accessAMoneyResult">
 					<tr>
-						<td>用户接口ID</td>
-						<td><input type="text" id="asetUserID"/></td>
-					</tr>
-					<tr>
 						<td>响应代码</td>
 						<td><input type="text" id="asetRponeCode"/></td>
 					</tr>

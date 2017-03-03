@@ -126,6 +126,7 @@ public class QQServiceImpl implements IQQService {
 				data.put("群名称", listMap.get(j).get("群名称").toString());
 				data.put("群通知", listMap.get(j).get("群通知").toString());
 			}
+			data.remove("源文件");
 		}
 		return qr;
 	}

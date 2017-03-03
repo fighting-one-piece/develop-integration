@@ -30,6 +30,8 @@ import org.cisiondata.utils.clazz.ObjectMethodParams;
 import org.cisiondata.utils.clazz.ParameterBinder;
 import org.cisiondata.utils.date.DateFormatter;
 import org.cisiondata.utils.endecrypt.SHAUtils;
+import org.cisiondata.utils.exception.BusinessException;
+import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -113,11 +115,13 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		this.accessUserService = (IAccessUserService) ctx.getBean("accessUserService");
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		try {
 			String path = request.getRequestURI().replace("/devplat", "");
 			LOG.info("url handler adapter request path: {}", path);
+			judgeSensitiveWord(request.getParameterMap());
 			if (path.startsWith("/app")) {
 				if (authenticationAppRequest(request, response)) {
 					Object result = handleExternalRequest(path.replace("/app", ""), request, response);
@@ -222,6 +226,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			ParameterBinder parameterBinder = new ParameterBinder(ctx);
 			paramMap.putAll(omp.getParams());
 			Object[] params = parameterBinder.bindParameters(omp, paramMap, request, response);
+			judgeSensitiveWord(params);
 			Object result = ReflectionUtils.invokeMethod(method, omp.getObject(), params);
 			return method.getReturnType() == void.class || response.isCommitted() ? "" : result;
 
@@ -319,4 +324,48 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
     	}
     	return 0;
     }
+    
+    @SuppressWarnings("unchecked")
+	private void judgeSensitiveWord(Map<String, String[]> paramMap) throws BusinessException {
+    	for (Map.Entry<String, String[]> entry : paramMap.entrySet()) {
+    		Object arg = entry.getValue()[0];
+			if (arg instanceof Map) {
+				Map<String, Object> argMap = (Map<String, Object>) arg;
+				for (Map.Entry<String, Object> argEntry : argMap.entrySet()) {
+					judgeSensitiveWord(argEntry.getValue());
+				}
+			} else {
+				judgeSensitiveWord(arg);
+			}
+    	}
+	}
+    
+    @SuppressWarnings("unchecked")
+	private void judgeSensitiveWord(Object[] args) throws BusinessException {
+		if (null != args && args.length != 0) {
+			for (int i = 0, len = args.length; i < len; i++) {
+				Object arg = args[i];
+				if (arg instanceof Map) {
+					Map<String, Object> map = (Map<String, Object>) arg;
+					for (Map.Entry<String, Object> entry : map.entrySet()) {
+						judgeSensitiveWord(entry.getValue());
+					}
+				} else {
+					judgeSensitiveWord(arg);
+				}
+			}
+		}
+	}
+	
+	private void judgeSensitiveWord(Object arg) throws BusinessException {
+		if (arg instanceof String) {
+			String queryTxt = String.valueOf(arg);
+			String[] keywords = queryTxt.indexOf(" ") == -1 ? new String[]{queryTxt} : queryTxt.split(" ");
+			for (int i = 0, len = keywords.length; i < len; i++) {
+				if (RedisClusterUtils.getInstance().sismember("sensitive_word", keywords[i])) {
+					throw new BusinessException("抱歉!该查询涉及敏感信息");
+				}
+			}
+		}
+	}
 }

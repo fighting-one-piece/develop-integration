@@ -8,7 +8,6 @@ $(document).ready(function () {
 			dataType:"json",
 			data:{"phone":phone},
 			success:function(result){
-				console.log(result);
 				$("#resultWlPhone").empty();
 				var html="";
 				if(result.code == 1){
@@ -139,15 +138,12 @@ $(document).ready(function () {
 			dataType:"json",
 			data:{"phone":phone},
 			success:function(result){
-				console.log(result);
 				var html;
 				if(result.code == 1){
 					$.each(result.data,function(key,value){
 						if(key == "RESULTS"){
 							$.each(value,function(index,values){
-//								console.log(values);
 								$.each(values,function(key1,value1){
-//									console.log(value1);
 									if(key1 == "DATA"){
 										$.each(value1,function(key2,value2){
 											console.log(value2)
@@ -156,7 +152,6 @@ $(document).ready(function () {
 								})
 							});
 						}
-//						console.log(result.data[key]);
 					});
 				}else{
 					html = "未找到相关信息";
@@ -182,17 +177,15 @@ $(document).ready(function () {
 	});
 	$("#submitquery").click(function(){
 		document.getElementById('background').style.display='block';
-		var phone = $("#selPhone").val();
+		var mobile = $("#selPhone").val();
 		$.ajax({
-			url:"query/phoneBank",
-			type:"post",
+			url:"/devplat/bankcards/mobile/" + mobile,
+			type:"get",
 			dataType:"json",
-			data:{"phone":phone},
 			success:function(result){
 				$("#nav_result").show();
 				$("#bank_result").hide();
 				$("#nav_result").empty();
-				console.log(result);
 				if(result.code == 1){
 					var html="";
 					var html_11="";
@@ -416,7 +409,6 @@ $(document).ready(function () {
 							}
 							if(key == "currentOutstandingLoanAmount"){
 								$.each(result.data["loaddata"][key],function(keys,values){
-									console.log(keys);
 									if(keys =="minIncluded"){
 										key2+="<td style='background: #EEE8AA;'>是否包含最小值</td>";
 										value2+="<td>"+values+"</td>";

@@ -40,6 +40,14 @@ public interface IAccessUserService extends IGenericService<AccessUser, Long> {
 	 */
 	public void updateRemainingMoney(String account, double remainingMoney, double incOrDec) 
 			throws BusinessException;
+	
+	/**
+	 * 更新账号的剩余查询金额
+	 * @param account
+	 * @param IncOrDec
+	 * @throws BusinessException
+	 */
+	public void updateRemainingMoney(String account, double incOrDec) throws BusinessException;
 
 	/**
 	 * 根据accessId读取accessKey
@@ -56,6 +64,14 @@ public interface IAccessUserService extends IGenericService<AccessUser, Long> {
 	 * @throws BusinessException
 	 */
 	public AccessUserControl readAccessUserControlByAccount(String account) throws BusinessException;
+	
+	/**
+	 * 根据url读取AccessInterface
+	 * @param url
+	 * @return
+	 * @throws BusinessException
+	 */
+	public AccessInterface readAccessInterfaceByUrl(String url) throws BusinessException;
 	
 	/**
 	 * 根据identity读取AccessInterface

@@ -5,7 +5,7 @@ import javax.annotation.Resource;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.identity.service.IMobileAddressService;
-import org.cisiondata.modules.identity.service.IMobileNameService;
+import org.cisiondata.modules.identity.service.IMobileParseService;
 import org.cisiondata.modules.identity.service.IMobileService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,18 +21,18 @@ public class MobileController  {
 	@Resource(name = "mobileService")
 	private IMobileService mobileService = null;
 	
-	@Resource(name = "mobileNameService")
-	private IMobileNameService mobileNameService = null;
+	@Resource(name = "mobileParseService")
+	private IMobileParseService mobileParseService = null;
 	
 	@Resource(name="mobileAddressService")
 	private IMobileAddressService mobileAddressService = null;
 	
 	@ResponseBody
-	@RequestMapping(value = "/name/{mobile}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{mobile}/info", method = RequestMethod.GET)
 	public WebResult readMobileName(@PathVariable String mobile) {
 		WebResult result = new WebResult();
 		try {
-			result.setData(mobileNameService.readNameFromMobile(mobile));
+			result.setData(mobileParseService.readDataFromImcaller(mobile));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
@@ -42,7 +42,7 @@ public class MobileController  {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/address/{mobile}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{mobile}/address", method = RequestMethod.GET)
 	public WebResult readMobileAddress(@PathVariable String mobile) {
 		WebResult result = new WebResult();
 		try {

@@ -20,16 +20,16 @@ $(function(){
 		if(nowPage == homePage){
 			return;
 		}
-		var page = parseInt(nowPage) - parseInt(1);
+		var page =parseInt(nowPage)-parseInt(1);
 		pagez(page,10);
 	})
 	$("#Accesscenextpage").click(function(){
 		var nowPage = $(this).val();
 		var endPage = $("#Accessendpage").val();
-		if (nowPage >= endPage){
+		if (nowPage == endPage){
 			return;
 		}
-		var page = parseInt(nowPage) + parseInt(1);
+		var page = parseInt(nowPage)+parseInt(1);
 		pagez(page,10);
 	})
 	//修改
@@ -40,7 +40,6 @@ $(function(){
 			type:"get",
 			url:projectName+"/AccessUserInterface"+"/QueryId/"+update_id,    ///AccessUserInterface/QueryId/{id}
 			success:function(result){
-				console.log(result);
 				$.each(result.data,function(x,y){
 					document.getElementById("update_id").value = result.data.id;
 					document.getElementById("update_account").value = result.data.account;
@@ -62,7 +61,6 @@ $(function(){
 			type:"get",
 			url:projectName+"/AccessUserInterface/"+ss+"/"+update_id+"/Interface",				//  /AccessUserInterface/{id}/Number/Interface
 			success:function(result){
-				console.log(result);
 				if(result.code==1){
 					swal("GOOD!", "修改成功！", "success");
 					pagez(1,10);
@@ -80,29 +78,35 @@ $(function(){
 	})
 	//删除
 	$("#Pagination").on("click",".UserInterface_examine",function(){
-		var Dete=$(this).parent().parent().find("td").eq(0).html();
-		var conn;
-		 conn=confirm("你确定删除吗？这是不可逆转的操作");
-		 if(conn==true){
-			 $.ajax({
-				 dataType:"json",
-				 type:"get",
-				 url:projectName+"/AccessUserInterface/RemoveUser/"+Dete,
-				 success:function(result){
-					 console.log(result);
-					 if(result.code==1){
-						 swal("GOOD!", "删除成功！", "success");
-						 pagez(1,10);
-					 }
-					 if(result.code==2){
-						 swal("ERROR!", "删除失败！", "error");
-						 pagez(1,10);
-					 }
-				 }
-			 })
-		 }
-		
-	})
+		var DeId=$(this).parent().parent().find("td").eq(0).html();
+		swal({
+            title: "您确定要删除吗？",
+            text: "您确定要删除这条数据？",
+            type: "warning",
+            showCancelButton:true,
+            closeOnConfirm: false,
+            confirmButtonText: "是的，我要删除",
+            confirmButtonColor: "#ec6c62",
+            animation:"slide-from-top"
+        }).then(function(isConfirm){
+        	if (isConfirm==true) {
+        	    $.ajax({
+   				 dataType:"json",
+   				 type:"get",
+   				 url:projectName+"/AccessUserInterface/RemoveUser/"+DeId,
+   				 success:function(result){
+   					 if(result.code==1){
+   						 swal("GOOD!", "删除成功！", "success");
+   						 pagez(1,10);
+   					 }else{
+   						swal("ERROR!", "删除失败！", "error"); 
+   						pagez(1,10);
+   					 } 
+   				 }
+   			 }) 
+        	  } 
+        });       
+    });
 	//新增用户
 	$("#User_face").click(function(){
 		$.ajax({
@@ -110,7 +114,7 @@ $(function(){
 			type:"get",
 			url:projectName+"/AccessUserInterface/userAccount",
 			success:function(result){
-				console.log(result);
+				$("#add_user").empty();
 				var key="";
 				$.each(result.data,function(t,y){
 					key=key+"<option>"+y.account+"</option>";
@@ -124,10 +128,10 @@ $(function(){
 			type:"get",
 			url:projectName+"/AccessUserInterface/hickey",
 			success:function(result){
-				console.log(result);
+				$("#add_face").empty();
 				var hickey="";
 				$.each(result.data,function(t,x){
-					hickey=hickey+"<option>"+x.id+"</option>";
+					hickey=hickey+"<option value='"+x.id+"'>"+x.identity+"</option>";
 				})
 				hickey= hickey+"</option>"
 				$("#add_face").append(hickey);
@@ -143,12 +147,13 @@ $(function(){
 	//确定整加账号
 	$("#Suerbtn_addUser").click(function(){
 		var zhanghao= $('#add_user option:selected').val();
-		var jiekou =$('#add_face option:selected').val();
+		var jiekou=$('#add_face option:selected').val();
 		var shoufei=$('#add_chargeFlag option:selected').val();
 		$.ajax({
 			dataType:"json",
 			type:"get",
-			url:projectName+"/AccessUserInterface/"+zhanghao+"/"+jiekou+"/"+shoufei,   //	/AccessUserInterface/{account}/{interfaceid}/{chargeFla}
+			url:projectName+"/AccessUserInterface/add",
+			data:{"account":zhanghao,"interfaceId":jiekou,"chargeFlag":shoufei},
 			success:function(result){
 				if(result.code==1){
 					 swal("GOOD!", "新增成功！", "success");
@@ -168,6 +173,8 @@ $(function(){
 	
 });
 function pagez(page,pageSize){
+	console.log(page)
+	console.log(pageSize)
 	$.ajax({
 		dataType:"json",
 		type:"get",
@@ -175,7 +182,6 @@ function pagez(page,pageSize){
 		data:{"page":page,"pageSize":pageSize},
 		success:function(result){
 			$(".Pagination_id").empty();
-			console.log(result);
 			var key="<table class='table table-striped table-bordered' style='text-align: center;'><tr>";
 			var value="</tr>";
 			key=key+"<td width='200px'>"+"序号"+"</td>"+
@@ -187,18 +193,18 @@ function pagez(page,pageSize){
 			if(counts.chargeFlag==true){
 				value=value+"<td>"+counts.id+"</td>"+
 				"<td>"+counts.account+"</td>"+
-				"<td>"+counts.interfaceId+"</td>"+
+				"<td>"+counts.inter_id.identity+"</td>"+
 				"<td>"+"收费"+"</td>"+
 				"<td>"+"<input type='button' value='修改' class='btn btn-sm btn-info UserInterface_updata' id='butns'/>"+"</td>"+
-				"<td>"+"<input type='button' value='查看' class='btn btn-sm btn-info UserInterface_examine' id='butns'/>"+"</td>"+
+				"<td>"+"<input type='button' value='查看' class='btn btn-sm btn-info findAccessBtn' id='findAccessBtn'/>"+"</td>"+
 				"<td>"+"<input type='button' value='删除' class='btn btn-sm btn-info UserInterface_examine' id='butns'/>"+"</td></tr>";
 			}else{
 				value=value+"<td>"+counts.id+"</td>"+
 				"<td>"+counts.account+"</td>"+
-				"<td>"+counts.interfaceId+"</td>"+
+				"<td>"+counts.inter_id.identity+"</td>"+
 				"<td>"+"未收费"+"</td>"+
 				"<td>"+"<input type='button' value='修改' class='btn btn-sm btn-info UserInterface_updata' id='butns'/>"+"</td>"+
-				"<td>"+"<input type='button' value='查看' class='btn btn-sm btn-info UserInterface_examine' id='butns'/>"+"</td>"+
+				"<td>"+"<input type='button' value='查看' class='btn btn-sm btn-info findAccessBtn' id='findAccessBtn'/>"+"</td>"+
 				"<td>"+"<input type='button' value='删除' class='btn btn-sm btn-info UserInterface_examine' id='butns'/>"+"</td></tr>";
 			}
 			})

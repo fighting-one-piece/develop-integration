@@ -12,10 +12,10 @@ import java.util.concurrent.Future;
 
 import javax.annotation.Resource;
 
-import org.cisiondata.modules.identity.dao.MobileAttributionDao;
+import org.cisiondata.modules.identity.dao.MobileAttributionDAO;
 import org.cisiondata.modules.identity.entity.MobileAttributionModel;
 import org.cisiondata.modules.identity.service.IMobileAddressService;
-import org.cisiondata.modules.identity.service.IMobileNameService;
+import org.cisiondata.modules.identity.service.IMobileParseService;
 import org.cisiondata.modules.identity.service.IMobileService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.slf4j.Logger;
@@ -27,13 +27,14 @@ public class MobileServiceImpl implements IMobileService {
 	
 	private Logger LOG = LoggerFactory.getLogger(MobileServiceImpl.class);
 	//读取手机号真实姓名
-	@Resource(name = "mobileNameService")
-	private IMobileNameService mobileNameService = null;
+	@Resource(name = "mobileParseService")
+	private IMobileParseService mobileParseService = null;
 	//读取手机号归属地(readAddressFromMoblie)
 	@Resource(name="mobileAddressService")
 	private IMobileAddressService mobileAddressService=null;
-	@Resource(name = "attributiondao")
-	private MobileAttributionDao dao;
+	@Resource(name = "mobileAttributionDAO")
+	private MobileAttributionDAO mobileAttributionDAO = null;
+	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
 	@Override
@@ -48,7 +49,7 @@ public class MobileServiceImpl implements IMobileService {
 			@Override
 			public Map<String, Object> call() throws Exception {
 				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("姓名", mobileNameService.readNameFromMobile(mobile));
+				map.put("姓名", mobileParseService.readDataFromImcaller(mobile));
 				return map;
 			}
 		});
@@ -76,7 +77,7 @@ public class MobileServiceImpl implements IMobileService {
 	public List<MobileAttributionModel> selByDnseg(String phone) {
 		//截取字符串
 		String mobile = phone.substring(0, 7);
-		return dao.selByDnseg(mobile);
+		return mobileAttributionDAO.selByDnseg(mobile);
 	}
 	
 }

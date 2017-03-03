@@ -1,6 +1,5 @@
 package org.cisiondata.modules.auth.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +10,7 @@ import javax.annotation.Resource;
 
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.auth.entity.AccessInterface;
+import org.cisiondata.modules.auth.entity.AccessUserControl;
 import org.cisiondata.modules.auth.entity.AccessUserInterface;
 import org.cisiondata.modules.auth.entity.AccessUserInterfaceMoney;
 import org.cisiondata.modules.auth.entity.User;
@@ -82,9 +82,24 @@ public class AuthServiceTest {
 	}
 	
 	@Test
-	public void testReadAccessInterface() {
+	public void testReadAccessUserControlByAccount() {
+		AccessUserControl accessUserControl = accessUserService.readAccessUserControlByAccount("34E5A90E71D5eD93");
+		double remainingMoney = accessUserControl.getRemainingMoney();
+		System.out.println("remainingMoney: " + remainingMoney);
+	}
+	
+	@Test
+	public void testReadAccessInterfaceByIdentity() {
 		AccessInterface accessInterface = accessUserService
-				.readAccessInterfaceByIdentity("123");
+				.readAccessInterfaceByIdentity("ESController_readFinancialLogisticsFilterDatas");
+		System.out.println("id: " + accessInterface.getId());
+		System.out.println("url: " + accessInterface.getUrl());
+		System.out.println("money: " + accessInterface.getMoney());
+	}
+	
+	@Test
+	public void testReadAccessInterfaceByUrl() {
+		AccessInterface accessInterface = accessUserService.readAccessInterfaceByUrl("/logistics/search");
 		System.out.println("id: " + accessInterface.getId());
 		System.out.println("url: " + accessInterface.getUrl());
 		System.out.println("money: " + accessInterface.getMoney());
@@ -124,7 +139,7 @@ public class AuthServiceTest {
 							System.out.println("channel: " + new String(channel));
 							try {
 								System.out.println("message: " + SerializerUtils.read(message));
-							} catch (IOException e) {
+							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
@@ -133,7 +148,7 @@ public class AuthServiceTest {
 			Long code = RedisClusterUtils.getInstance().getJedisCluster().publish(
 					SerializerUtils.write("webresult"), SerializerUtils.write(webResult));
 			System.out.println("code: " + code);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -143,13 +158,17 @@ public class AuthServiceTest {
 //		int status = (int) RedisClusterUtils.getInstance().get("education_organizeD");
 //		System.err.println(status);
 //		RedisClusterUtils.getInstance().set("education_organizeD", 1);
-		int status1 = (int) RedisClusterUtils.getInstance().get("education_organizeD");
-		int status2 = (int) RedisClusterUtils.getInstance().get("PhoneBank11_14");
-		int status3 = (int) RedisClusterUtils.getInstance().get("readMultiPlatform");
-		System.err.println(status1);
-		System.err.println(status2);
-		System.err.println(status3);
-
+//		int status1 = (int) RedisClusterUtils.getInstance().get("education_organizeD");
+//		int status2 = (int) RedisClusterUtils.getInstance().get("PhoneBank11_14");
+//		int status3 = (int) RedisClusterUtils.getInstance().get("readMultiPlatform");
+//		System.err.println(status1);
+//		System.err.println(status2);
+//		System.err.println(status3);
+		Set<String> sensitiveWords = RedisClusterUtils.getInstance().getJedisCluster()
+				.smembers("sensitive_word");
+		for (String sensitiveWord : sensitiveWords) {
+			System.out.println(sensitiveWord);
+		}
 	}
 	
 }

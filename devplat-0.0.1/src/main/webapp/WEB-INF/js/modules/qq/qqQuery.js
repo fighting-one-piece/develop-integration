@@ -100,7 +100,6 @@ $(document).ready(function(){
 		function searchQQNick() {
 //			var qqnick = encodeURI($("#query").val());
 			var qqnick = $("#query").val();
-			console.log(qqnick);
 			$("#count").empty();
 				$.ajax({
 					url:"qq/nickname/search",

@@ -15,12 +15,15 @@ public class AccessUserControl implements Serializable{
 	/** 账户 */
 	@Column(name = "ACCOUNT")
 	private String account = null;
-	/** 查询返回条数 */
+	/** 查询返回总条数 */
 	@Column(name = "COUNT")
 	private Long count = null;
-	/** 剩余查询返回条数 */
+	/** 剩余查询返回总条数 */
 	@Column(name = "REMAINING_COUNT")
 	private Long remainingCount = null;
+	/** 查询次数 */
+	@Column(name = "QUERY_COUNT")
+	private Long queryCount = null;
 	/** 查询返回金额 */
 	@Column(name = "MONEY")
 	private Double money = null;
@@ -53,6 +56,14 @@ public class AccessUserControl implements Serializable{
 
 	public void setRemainingCount(Long remainingCount) {
 		this.remainingCount = remainingCount;
+	}
+
+	public Long getQueryCount() {
+		return queryCount;
+	}
+
+	public void setQueryCount(Long queryCount) {
+		this.queryCount = queryCount;
 	}
 
 	public Double getMoney() {

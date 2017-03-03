@@ -77,6 +77,27 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
+		<!--DevPlat Redis依赖包 -->
+		<dependency>
+			<groupId>org.cisiondata</groupId>
+			<artifactId>devplat-redis</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<!--DevPlat Mongo依赖包 -->
+		<dependency>
+			<groupId>org.cisiondata</groupId>
+			<artifactId>devplat-mongo</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<!--DevPlat MyBatis依赖包 -->
+		<dependency>
+			<groupId>org.cisiondata</groupId>
+			<artifactId>devplat-mybatis</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
 		<!--DevPlat Auth依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>

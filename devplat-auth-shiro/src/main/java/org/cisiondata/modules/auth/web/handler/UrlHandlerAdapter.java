@@ -18,16 +18,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.auth.entity.AccessUserControl;
 import org.cisiondata.modules.auth.service.IAccessUserService;
+import org.cisiondata.modules.auth.service.IChargingService;
 import org.cisiondata.modules.auth.web.handler.ClassScanner.ClassResourceHandler;
 import org.cisiondata.modules.auth.web.handler.UrlMappingStorage.Mapper;
 import org.cisiondata.modules.auth.web.handler.UrlMappingStorage.ObjectMethodParams;
 import org.cisiondata.utils.date.DateFormatter;
 import org.cisiondata.utils.endecrypt.SHAUtils;
+import org.cisiondata.utils.exception.BusinessException;
+import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -56,6 +58,8 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	private ApplicationContext ctx = null;
 	
 	private IAccessUserService accessUserService = null;
+	
+	private IChargingService chargingService = null;
 	
 	public void setApplicationContext(ApplicationContext ctx) throws BeansException {
 		this.ctx = ctx;
@@ -109,13 +113,16 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			}
 		}).scan();
 		this.accessUserService = (IAccessUserService) ctx.getBean("accessUserService");
+		this.chargingService = (IChargingService) ctx.getBean("moneyChargingService");
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		try {
 			String path = request.getRequestURI().replace("/devplat", "");
 			LOG.info("url handler adapter request path: {}", path);
+			judgeSensitiveWord(request.getParameterMap());
 			if (path.startsWith("/app")) {
 				if (authenticationAppRequest(request, response)) {
 					Object result = handleExternalRequest(path.replace("/app", ""), request, response);
@@ -188,15 +195,14 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String account = request.getParameter("accessId");
 		AccessUserControl accessUserControl = accessUserService.readAccessUserControlByAccount(account);
-		long remainingCount = accessUserControl.getRemainingCount();
-		if (remainingCount <= 0) {
-			writeResponse(response, wrapperFailureWebResult(ResultCode.FAILURE, "账户剩余查询条数不足"));
+		double remainingMoney = accessUserControl.getRemainingMoney();
+		if (remainingMoney <= 0) {
+			writeResponse(response, wrapperFailureWebResult(ResultCode.FAILURE, "账户剩余查询余额不足"));
+			return;
 		}
 		Object result = handleExternalRequest(interfaceUrl, request, response);
-		long incOrDec = parseReturnResultCount(result);
-		LOG.info("incOrDec : {}", incOrDec);
-		accessUserService.updateRemainingCount(account, remainingCount, -incOrDec);
-		writeResponse(response, result);
+		boolean isSuccess = chargingService.charge(account, interfaceUrl, result);
+		if (isSuccess) writeResponse(response, result);
 	}
 	
 	private Object handleExternalRequest(String interfaceUrl, HttpServletRequest request, HttpServletResponse response)
@@ -220,14 +226,12 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			ParameterBinder parameterBinder = new ParameterBinder(ctx);
 			paramMap.putAll(omp.getParams());
 			Object[] params = parameterBinder.bindParameters(omp, paramMap, request, response);
+			judgeSensitiveWord(params);
 			Object result = ReflectionUtils.invokeMethod(method, omp.getObject(), params);
 			return method.getReturnType() == void.class || response.isCommitted() ? "" : result;
-
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			if (e.getCause() != null) {
-				e = (Exception) e.getCause();
-			}
+			if (e.getCause() != null) e = (Exception) e.getCause();
 			return wrapperFailureWebResult(ResultCode.FAILURE, e.getMessage());
 		}
 	}
@@ -293,28 +297,48 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		return true;
     }
     
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	private long parseReturnResultCount(Object result) {
-    	if (result instanceof WebResult) {
-    		WebResult webResult = (WebResult) result;
-    		Object data = webResult.getData();
-    		if (data instanceof List) {
-    			return ((List) data).size();
-    		} else if (data instanceof QueryResult) {
-    			QueryResult queryResult = (QueryResult) data;
-    			return queryResult.getResultList().size();
-    		} else if (data instanceof Map) {
-    			Map<String, Object> map = (Map<String, Object>) data;
-    			long count = 0;
-    			for (Map.Entry<String, Object> entry : map.entrySet()) {
-    				Object value = entry.getValue();
-    				if (value instanceof List) {
-    					count += ((List) value).size();
-    				}
-    			}
-    			return count;
-    		}
+    @SuppressWarnings("unchecked")
+	private void judgeSensitiveWord(Map<String, String[]> paramMap) throws BusinessException {
+    	for (Map.Entry<String, String[]> entry : paramMap.entrySet()) {
+    		Object arg = entry.getValue()[0];
+			if (arg instanceof Map) {
+				Map<String, Object> argMap = (Map<String, Object>) arg;
+				for (Map.Entry<String, Object> argEntry : argMap.entrySet()) {
+					judgeSensitiveWord(argEntry.getValue());
+				}
+			} else {
+				judgeSensitiveWord(arg);
+			}
     	}
-    	return 0;
-    }
+	}
+    
+    @SuppressWarnings("unchecked")
+	private void judgeSensitiveWord(Object[] args) throws BusinessException {
+		if (null != args && args.length != 0) {
+			for (int i = 0, len = args.length; i < len; i++) {
+				Object arg = args[i];
+				if (arg instanceof Map) {
+					Map<String, Object> map = (Map<String, Object>) arg;
+					for (Map.Entry<String, Object> entry : map.entrySet()) {
+						judgeSensitiveWord(entry.getValue());
+					}
+				} else {
+					judgeSensitiveWord(arg);
+				}
+			}
+		}
+	}
+	
+	private void judgeSensitiveWord(Object arg) throws BusinessException {
+		if (arg instanceof String) {
+			String queryTxt = String.valueOf(arg);
+			String[] keywords = queryTxt.indexOf(" ") == -1 ? new String[]{queryTxt} : queryTxt.split(" ");
+			for (int i = 0, len = keywords.length; i < len; i++) {
+				if (RedisClusterUtils.getInstance().sismember("sensitive_word", keywords[i])) {
+					throw new BusinessException("抱歉!该查询涉及敏感信息");
+				}
+			}
+		}
+	}
+    
 }

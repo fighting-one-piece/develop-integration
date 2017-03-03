@@ -43,6 +43,7 @@ public class ESClient {
 		esServerAddress.add(new EsServerAddress("192.168.0.11", 9300));
 		esServerAddress.add(new EsServerAddress("192.168.0.12", 9300));
 		esServerAddress.add(new EsServerAddress("192.168.0.13", 9300));
+		esServerAddress.add(new EsServerAddress("192.168.0.13", 9300));
 		for (EsServerAddress address : esServerAddress) {
 			client.addTransportAddress(new InetSocketTransportAddress(
 					new InetSocketAddress(address.getHost(), address.getPort())));

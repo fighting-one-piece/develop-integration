@@ -43,6 +43,7 @@ $(document).ready(function () {
 				 	html += 	"<td>剩余条数</td>";
 				 	html += 	"<td>查询总金额</td>";
 				 	html += 	"<td>剩余金额</td>";
+				 	html += 	"<td>查询次数</td>";
 				 	html += 	"<td>修改/删除</td>";
 				 	html += 	"<td>添加功能</td>";
 				 	html += "</tr></thead>";
@@ -66,6 +67,7 @@ $(document).ready(function () {
 					var remainingCount = "";
 					var money = "";
 					var remainingMoney = "";
+					var queryCount = ""
 					if (data.aUser[i].accessUserControl.count){
 						count = data.aUser[i].accessUserControl.count;
 						remainingCount = data.aUser[i].accessUserControl.remainingCount
@@ -79,6 +81,11 @@ $(document).ready(function () {
 					} else {
 						money = 0.0;
 						remainingMoney = 0.0;
+					}
+					if(data.aUser[i].accessUserControl.queryCount){
+						queryCount = data.aUser[i].accessUserControl.queryCount
+					} else {
+						queryCount = 0;
 					}
 					html += "<tr align='center'>";
 					html += 	"<td>"+data.aUser[i].id+"</td>";
@@ -94,6 +101,7 @@ $(document).ready(function () {
 					html += 	"<td>"+remainingCount+"</td>";
 					html += 	"<td>"+money+"</td>";
 					html += 	"<td>"+remainingMoney+"</td>";
+					html += 	"<td>"+queryCount+"</td>";
 					html += 	"<td><button class='btn btn-sm btn-info update-accessUserControl' style='margin-right: 1%;'>修改剩余条数</button><button class='btn btn-sm btn-info update-remainingMoney' style='margin-right: 1%;'>修改剩余金额</button><button id='updateauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>修改</button>";
 					html +=		"<button id='deleteauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>删除</button></td>";
 					html += 	"<td><button id='addgroup' class='btn btn-sm btn-info' style='margin-right: 1%;'>组</button>";
@@ -156,6 +164,7 @@ $(document).ready(function () {
 				 	html += 	"<td>剩余条数</td>";
 				 	html += 	"<td>查询总金额</td>";
 				 	html += 	"<td>剩余金额</td>";
+				 	html += 	"<td>查询次数</td>";
 				 	html += 	"<td>修改/删除</td>";
 				 	html += 	"<td>添加功能</td>";
 				 	html += "</tr></thead>";
@@ -173,6 +182,7 @@ $(document).ready(function () {
 					var remainingCount = "";
 					var money = "";
 					var remainingMoney = "";
+					var queryCount = "";
 					if (result.data.accessUserControl.count){
 						count = result.data.accessUserControl.count;
 						remainingCount = result.data.accessUserControl.remainingCount
@@ -187,10 +197,16 @@ $(document).ready(function () {
 						money = 0.0;
 						remainingMoney = 0.0;
 					}
+					if(result.data.accessUserControl.queryCount){
+						queryCount = result.data.accessUserControl.queryCount;
+					} else {
+						queryCount = 0;
+					}
 					html += 	"<td>"+count+"</td>";
 					html += 	"<td>"+remainingCount+"</td>";
 					html += 	"<td>"+money+"</td>";
 					html += 	"<td>"+remainingMoney+"</td>";
+					html += 	"<td>"+queryCount+"</td>";
 					html += 	"<td><button class='btn btn-sm btn-info update-accessUserControl' style='margin-right: 1%;'>修改剩余条数</button><button class='btn btn-sm btn-info update-remainingMoney' style='margin-right: 1%;'>修改剩余金额</button><button id='updateauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>修改</button>";
 					html += 	"<button id='deleteauser' class='btn btn-sm btn-info' style='margin-right: 1%;'>删除</button></td>";
 					html += 	"<td><button id='addgroup' class='btn btn-sm btn-info' style='margin-right: 1%;'>组</button>";

@@ -23,7 +23,7 @@ public interface ILMInternetService {
 	public Map<String, String> readLoanInfo(String phone) throws BusinessException;
 	
 	//37、学历查询（D机构）
-	public Map<String, String> education_organizeD(String idCard, String name) throws BusinessException;
+	public Map<String, Object> education_organizeD(String idCard, String name) throws BusinessException;
 	
 	//36、搜索黑名单blacklist_search
 	public Map<String, Map<String, String>> blacklist_search(String idCard,String name,String phone) throws BusinessException;
@@ -80,11 +80,11 @@ public interface ILMInternetService {
 	public Map<String, Map<String, String>> readCaseReportInfo(String phone, String idCard, String caseType) throws BusinessException;
 	
 	//18 银行卡消费信息查询
-	public Map<String, Map<String, String>> readqueryQuota1(String bankCard, String idCard,  String phone, String name) throws BusinessException;
-	public Map<String, Map<String, String>> readqueryQuota2(String bankCard, String idCard,  String phone, String name) throws BusinessException;
-	public Map<String, Map<String, String>> readqueryQuota3(String bankCard, String idCard,  String phone, String name) throws BusinessException;
-	public Map<String, Map<String, String>> readqueryQuota4(String bankCard, String idCard,  String phone, String name) throws BusinessException;
-	public Map<String, Map<String, String>> readqueryQuota5(String bankCard, String idCard,  String phone, String name) throws BusinessException;
+	public Map<String, Map<String, String>> readqueryQuota1(String bankCard) throws BusinessException;
+//	public Map<String, Map<String, String>> readqueryQuota2(String bankCard) throws BusinessException;
+//	public Map<String, Map<String, String>> readqueryQuota3(String bankCard) throws BusinessException;
+//	public Map<String, Map<String, String>> readqueryQuota4(String bankCard) throws BusinessException;
+//	public Map<String, Map<String, String>> readqueryQuota5(String bankCard) throws BusinessException;
 	
 	//17、逾期短信信息查询 
 	public Map<String, Map<String, String>> phoneIsInBlacklist(String phone) throws BusinessException;

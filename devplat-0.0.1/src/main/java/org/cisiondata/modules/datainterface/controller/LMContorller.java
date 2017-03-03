@@ -8,12 +8,14 @@ import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.datainterface.service.ILMInternetService;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
+@RequestMapping(value = "/")
 public class LMContorller {
 
 	@Resource(name = "lmInternetService")
@@ -21,11 +23,11 @@ public class LMContorller {
 	
 	//11-14接口整合
 	@ResponseBody
-	@RequestMapping(value="/query/phoneBank")
-	public WebResult readBankCard(String phone){
+	@RequestMapping(value="/bankcards/mobile/{mobile}",method = RequestMethod.GET)
+	public WebResult readBankCard(@PathVariable String mobile){
 		WebResult result = new WebResult();
 		try {
-			Map<String, Object> mapdata = lmInternetService.readBankPhone(phone);
+			Map<String, Object> mapdata = lmInternetService.readBankPhone(mobile);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(mapdata);
 		} catch (Exception e) {
@@ -59,7 +61,6 @@ public class LMContorller {
 	@ResponseBody
 	@RequestMapping(value = "/education/organizeF")
 	public WebResult organizeF(String idCard, String name) {
-		System.err.println(idCard+"----idCard--"+name+"--name--");
 		WebResult result = new WebResult();
 		try {
 			Map<String, String> data = lmInternetService.education_organizeF(idCard, name);
@@ -125,7 +126,7 @@ public class LMContorller {
 	public WebResult educationorganizeD(String idCard, String name) {
 		WebResult result = new WebResult();
 		try {
-			Map<String, String> data = lmInternetService.education_organizeD(idCard, name);
+			Map<String, Object> data = lmInternetService.education_organizeD(idCard, name);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
@@ -145,7 +146,6 @@ public class LMContorller {
 	@RequestMapping(value = "/blacklist/search")
 	public WebResult asd(String idCard, String name, String phone) {
 		WebResult result = new WebResult();
-		System.out.println(36);
 		try {
 			Map<String, Map<String, String>> data = lmInternetService.blacklist_search(idCard, name, phone);
 			result.setCode(ResultCode.SUCCESS.getCode());
@@ -526,11 +526,11 @@ public class LMContorller {
 
 	// 18、 银行卡消费信息查询1
 		@ResponseBody
-		@RequestMapping(value = "/query/quota1")
-		public WebResult queryQuota1(String bankCard, String idCard, String phone, String name) {
+		@RequestMapping(value = "/bankcards/{bankcard}",method = RequestMethod.GET)
+		public WebResult queryQuota1(@PathVariable String bankcard) {
 			WebResult result = new WebResult();
 			try {
-				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota1(bankCard, idCard, phone, name);
+				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota1(bankcard);
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
 			} catch (Exception e) {
@@ -540,74 +540,74 @@ public class LMContorller {
 			return result;
 		}
 		
-		// 18、 银行卡消费信息查询2
-		@ResponseBody
-		@RequestMapping(value = "/query/quota2")
-		public WebResult queryQuota2(String bankCard, String idCard, String phone, String name) {
-			WebResult result = new WebResult();
-			try {
-				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota2(bankCard, idCard, phone, name);
-				result.setCode(ResultCode.SUCCESS.getCode());
-				result.setData(data);
-			} catch (Exception e) {
-				result.setCode(ResultCode.FAILURE.getCode());
-				result.setFailure(e.getMessage());
-			}
-			return result;
-		}
-		
-		// 18、 银行卡消费信息查询3
-		@ResponseBody
-		@RequestMapping(value = "/query/quota3")
-		public WebResult queryQuota3(String bankCard, String idCard, String phone, String name) {
-			WebResult result = new WebResult();
-			try {
-				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota3(bankCard, idCard, phone, name);
-				result.setCode(ResultCode.SUCCESS.getCode());
-				result.setData(data);
-			} catch (Exception e) {
-				result.setCode(ResultCode.FAILURE.getCode());
-				result.setFailure(e.getMessage());
-			}
-			return result;
-		}
-		
-		// 18、 银行卡消费信息查询4
-		@ResponseBody
-		@RequestMapping(value = "/query/quota4")
-		public WebResult queryQuota4(String bankCard, String idCard, String phone, String name) {
-			WebResult result = new WebResult();
-			try {
-				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota4(bankCard, idCard, phone, name);
-				result.setCode(ResultCode.SUCCESS.getCode());
-				result.setData(data);
-			} catch (Exception e) {
-				result.setCode(ResultCode.FAILURE.getCode());
-				result.setFailure(e.getMessage());
-			}
-			return result;
-		}
-		
-		// 18、 银行卡消费信息查询5
-		@ResponseBody
-		@RequestMapping(value = "/query/quota5")
-		public WebResult queryQuota5(String bankCard, String idCard, String phone, String name) {
-			WebResult result = new WebResult();
-			try {
-				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota5(bankCard, idCard, phone, name);
-				result.setCode(ResultCode.SUCCESS.getCode());
-				result.setData(data);
-			} catch (Exception e) {
-				result.setCode(ResultCode.FAILURE.getCode());
-				result.setFailure(e.getMessage());
-			}
-			return result;
-		}
-		
-		@RequestMapping(value = "queryQuota")
-		public String queryquota() {
-			return "lemoncome/queryQuota";
-		}
+//		// 18、 银行卡消费信息查询2
+//		@ResponseBody
+//		@RequestMapping(value = "/query/quota2")
+//		public WebResult queryQuota2(String bankCard) {
+//			WebResult result = new WebResult();
+//			try {
+//				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota2(bankCard);
+//				result.setCode(ResultCode.SUCCESS.getCode());
+//				result.setData(data);
+//			} catch (Exception e) {
+//				result.setCode(ResultCode.FAILURE.getCode());
+//				result.setFailure(e.getMessage());
+//			}
+//			return result;
+//		}
+//		
+//		// 18、 银行卡消费信息查询3
+//		@ResponseBody
+//		@RequestMapping(value = "/query/quota3")
+//		public WebResult queryQuota3(String bankCard) {
+//			WebResult result = new WebResult();
+//			try {
+//				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota3(bankCard);
+//				result.setCode(ResultCode.SUCCESS.getCode());
+//				result.setData(data);
+//			} catch (Exception e) {
+//				result.setCode(ResultCode.FAILURE.getCode());
+//				result.setFailure(e.getMessage());
+//			}
+//			return result;
+//		}
+//		
+//		// 18、 银行卡消费信息查询4
+//		@ResponseBody
+//		@RequestMapping(value = "/query/quota4")
+//		public WebResult queryQuota4(String bankCard) {
+//			WebResult result = new WebResult();
+//			try {
+//				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota4(bankCard);
+//				result.setCode(ResultCode.SUCCESS.getCode());
+//				result.setData(data);
+//			} catch (Exception e) {
+//				result.setCode(ResultCode.FAILURE.getCode());
+//				result.setFailure(e.getMessage());
+//			}
+//			return result;
+//		}
+//		
+//		// 18、 银行卡消费信息查询5
+//		@ResponseBody
+//		@RequestMapping(value = "/query/quota5")
+//		public WebResult queryQuota5(String bankCard) {
+//			WebResult result = new WebResult();
+//			try {
+//				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota5(bankCard);
+//				result.setCode(ResultCode.SUCCESS.getCode());
+//				result.setData(data);
+//			} catch (Exception e) {
+//				result.setCode(ResultCode.FAILURE.getCode());
+//				result.setFailure(e.getMessage());
+//			}
+//			return result;
+//		}
+//		
+//		@RequestMapping(value = "queryQuota")
+//		public String queryquota() {
+//			return "lemoncome/queryQuota";
+//		}
 
 	// 17、逾期短信信息查询
 	@ResponseBody
@@ -804,7 +804,6 @@ public class LMContorller {
 //	@ResponseBody
 //	@RequestMapping(value = "/lemoneducation")
 //	public WebResult education(String idCard, String name, String levelNo) {
-//		System.err.println(7);
 //		WebResult result = new WebResult();
 //		try {
 //			Map<String, String> data = lmInternetService.verify_education(idCard, name, levelNo);

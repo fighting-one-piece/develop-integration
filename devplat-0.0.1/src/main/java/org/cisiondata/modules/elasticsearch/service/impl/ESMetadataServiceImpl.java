@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Resource;
-
 import org.cisiondata.modules.elasticsearch.client.ESClient;
 import org.cisiondata.modules.elasticsearch.service.IESMetadataService;
 import org.cisiondata.utils.exception.BusinessException;
@@ -28,17 +26,12 @@ import com.carrotsearch.hppc.ObjectLookupContainer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 
-import redis.clients.jedis.JedisCluster;
-
 @Service("esMetadataService")
 public class ESMetadataServiceImpl implements IESMetadataService, InitializingBean {
 
 	private Logger LOG = LoggerFactory.getLogger(ESMetadataServiceImpl.class);
 
 	private Map<String, List<Map<String, Map<String, String>>>> metadatas = null;
-
-	@Resource(name = "jedisCluster")
-	private JedisCluster jedisCluster = null;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {

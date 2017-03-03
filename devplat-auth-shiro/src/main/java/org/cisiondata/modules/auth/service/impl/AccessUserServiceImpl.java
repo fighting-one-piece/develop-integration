@@ -33,7 +33,7 @@ public class AccessUserServiceImpl extends GenericServiceImpl<AccessUser, Long> 
 	
 	@Resource(name = "accessUserInterfaceDAO")
 	private AccessUserInterfaceDAO accessUserInterfaceDAO = null;
-
+	
 	@Override
 	public GenericDAO<AccessUser, Long> obtainDAOInstance() {
 		return accessUserDAO;
@@ -77,6 +77,14 @@ public class AccessUserServiceImpl extends GenericServiceImpl<AccessUser, Long> 
 	}
 	
 	@Override
+	public void updateRemainingMoney(String account, double incOrDec) throws BusinessException {
+		AccessUserControl accessUserControl = new AccessUserControl();
+		accessUserControl.setAccount(account);
+		accessUserControl.setRemainingMoney(incOrDec);
+		accessUserControlDAO.updateRemainingMoneyIncOrDec(accessUserControl);
+	}
+	
+	@Override
 	public String readAccessKeyByAccessId(String accessId) throws BusinessException {
 		if (StringUtils.isBlank(accessId)) throw new BusinessException("accessId不能为空");
 		Query query = new Query();
@@ -99,9 +107,23 @@ public class AccessUserServiceImpl extends GenericServiceImpl<AccessUser, Long> 
 	}
 	
 	@Override
+	public AccessInterface readAccessInterfaceByUrl(String url) throws BusinessException {
+		if (StringUtils.isBlank(url)) throw new BusinessException("URL不能为空");
+		String interfaceCacheKey = genInterfaceUrlCacheKey(url);
+		Object interfaceCacheObject = RedisClusterUtils.getInstance().get(interfaceCacheKey);
+		if (null != interfaceCacheObject) return (AccessInterface) interfaceCacheObject;
+		Query query = new Query();
+		query.addCondition("url", url);
+		query.addCondition("deleteFlag", false);
+		AccessInterface accessInterface = accessInterfaceDAO.readDataByCondition(query);
+		if (null != accessInterface) RedisClusterUtils.getInstance().set(interfaceCacheKey, accessInterface);
+		return accessInterface;
+	}
+	
+	@Override
 	public AccessInterface readAccessInterfaceByIdentity(String identity) throws BusinessException {
 		if (StringUtils.isBlank(identity)) throw new BusinessException("标识不能为空");
-		String interfaceCacheKey = genInterfaceCacheKey(identity);
+		String interfaceCacheKey = genInterfaceIdentityCacheKey(identity);
 		Object interfaceCacheObject = RedisClusterUtils.getInstance().get(interfaceCacheKey);
 		if (null != interfaceCacheObject) return (AccessInterface) interfaceCacheObject;
 		Query query = new Query();
@@ -123,13 +145,15 @@ public class AccessUserServiceImpl extends GenericServiceImpl<AccessUser, Long> 
 		userInterface.setInterfaceId(interfaceId);
 		userInterface.setChargeFlag(true);
 		userInterface.setDeleteFlag(false);
-		AccessUserInterface accessUserInterface = accessUserInterfaceDAO.readDataByUserInterface(userInterface);
-		if (null == accessUserInterface) throw new BusinessException("访问接口不存在");
-		return accessUserInterface;
+		return accessUserInterfaceDAO.readDataByUserInterface(userInterface);
 	}
 	
-	private String genInterfaceCacheKey(String identity) {
+	private String genInterfaceIdentityCacheKey(String identity) {
 		return "interface:identity:" + identity;
+	}
+	
+	private String genInterfaceUrlCacheKey(String url) {
+		return "interface:url:" + url;
 	}
 
 }

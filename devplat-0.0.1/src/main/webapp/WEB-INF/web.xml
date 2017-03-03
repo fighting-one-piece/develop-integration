@@ -156,7 +156,7 @@
 	<session-config>
   		<session-timeout>30</session-timeout>
  	</session-config>
-	
+ 	
 	<!-- Error -->
 	<error-page>
 		<error-code>400</error-code>

@@ -39,6 +39,9 @@ public class User extends PKAutoEntity<Long> {
 	/** 手机号码*/
 	@Column(name="MOBILE_PHONE")
 	private String mobilePhone = null;
+	/** MAC地址*/
+	@Column(name="MAC_ADDRESS")
+	private String macAddress = null;
 	/** 用户邮箱*/
 	@Column(name="EMAIL")
 	private String email = null;
@@ -126,6 +129,14 @@ public class User extends PKAutoEntity<Long> {
 
 	public void setMobilePhone(String mobilePhone) {
 		this.mobilePhone = mobilePhone;
+	}
+
+	public String getMacAddress() {
+		return macAddress;
+	}
+
+	public void setMacAddress(String macAddress) {
+		this.macAddress = macAddress;
 	}
 
 	public String getEmail() {

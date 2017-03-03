@@ -2,6 +2,7 @@ package org.cisiondata.modules.auth.web.filter;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.Filter;
@@ -58,6 +59,10 @@ public class UserAccessFilter implements Filter {
 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 		String requestUrl = httpServletRequest.getServletPath();
 		LOG.info("client request url: {}", requestUrl);
+		Map<String, String[]> params = httpServletRequest.getParameterMap();
+		for (Map.Entry<String, String[]> entry : params.entrySet()) {
+			LOG.info("param key : " + entry.getKey() + " value: " + entry.getValue()[0]);
+		}
 		LOG.info("current access account: {}", WebUtils.getCurrentAccout());
 		LOG.info("ipAddress: {} macAddress: {}", IPUtils.getIPAddress(WebContext.get().getRequest()), 
 				IPUtils.getMACAddress(WebContext.get().getRequest()));

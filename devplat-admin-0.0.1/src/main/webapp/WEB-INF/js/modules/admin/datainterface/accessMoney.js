@@ -10,7 +10,6 @@ $(document).ready(function() {
 			dataType:"json",
 			data:{"userInterfaceId":userInterfaceId},
 			success:function(result){
-				console.log(result)
 				if (result.code == 1) {
 					var access = "<tr id='"+userInterfaceId+"'>";
 						access += "<td  width='200'>ID</td>";
@@ -91,6 +90,8 @@ $(document).ready(function() {
 		
 	//添加
 	$("#addAccessMoney").click(function() {
+		$("#asetRponeCode").val("");
+		$("#asetMoney").val("");
 		hide();
 		addAccessMoney();
 		$("#closeAAccessMoney").click(function() {
@@ -100,12 +101,9 @@ $(document).ready(function() {
 	});
 	//添加确定
 	$("#addSureAccessMoney").click(function() {
-		var userInterfaceId = $("#asetUserID").val();
+		var userInterfaceId = $("#accessMoneyResult tr").attr("id");
 		var responseCode = $("#asetRponeCode").val();
 		var money = $("#asetMoney").val();
-		console.log(userInterfaceId)
-		console.log(responseCode)
-		console.log(money)
 		swal({
 			title:"",  
 			text:"确定添加吗？",  
@@ -124,14 +122,16 @@ $(document).ready(function() {
 			dataType:"json",
 			data:{"userInterfaceId":userInterfaceId,"responseCode":responseCode,"money":money},
 			success:function(result){
-					if (result.code == 1) {
-						alert("添加成功");
-						hide();
-						findAccessMoney();
-						load();
-					}else {
-						alert("添加失败");
-					}
+				if(result.code == 1){
+					alert(result.data);
+					hide();
+					findAccessMoney();
+					load();
+				}else if(result.data == undefined) {
+					alert(result.failure);
+				}else {
+					alert("添加失败");
+				}
 			}
 		});
 		}
@@ -204,7 +204,6 @@ $(document).ready(function() {
 		}else if(deleteFlag == "已删除"){
 			deleteFlag = true;
 		}
-		console.log(deleteFlag)
 		swal({
 			title:"",  
 			text:"确定更新吗？",  

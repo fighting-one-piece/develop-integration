@@ -51,6 +51,13 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
+		<!--DevPlat redis依赖包 -->
+		<dependency>
+			<groupId>org.cisiondata</groupId>
+			<artifactId>devplat-redis</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
 		<!-- Jcaptcha依赖包 -->
 		<dependency>
 			<groupId>com.octo.captcha</groupId>

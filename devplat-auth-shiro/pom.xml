@@ -52,6 +52,13 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
+		<!--DevPlat Redis依赖包 -->
+		<dependency>
+			<groupId>org.cisiondata</groupId>
+			<artifactId>devplat-redis</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
 		<!-- SHIRO依赖包 -->
 		<dependency>
 			<groupId>org.apache.shiro</groupId>

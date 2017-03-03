@@ -23,7 +23,7 @@ import com.mongodb.client.result.UpdateResult;
 @Service("mobileAddressService")
 public class MoblieAddressServiceImpl implements IMobileAddressService {
 													//真实名字类
-	private Logger LOG = LoggerFactory.getLogger(MobileNameServiceImpl.class);
+	private Logger LOG = LoggerFactory.getLogger(MobileParseServiceImpl.class);
 	
 	/**
 	 * 根据手机号码读取MongoDB记录，如果记录存在，分为两种情况：

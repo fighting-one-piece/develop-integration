@@ -22,4 +22,11 @@ public interface AccessUserControlDAO extends GenericDAO<AccessUserControl, Long
 	 */
 	public void updateRemainingMoney(AccessUserControl accessUserControl) throws DataAccessException;
 	
+	/**
+	 * 更新用户剩余查询金额
+	 * @param accessUserControl
+	 * @throws DataAccessException
+	 */
+	public void updateRemainingMoneyIncOrDec(AccessUserControl accessUserControl) throws DataAccessException;
+	
 }

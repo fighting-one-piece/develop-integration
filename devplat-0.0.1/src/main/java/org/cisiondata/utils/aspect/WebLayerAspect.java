@@ -16,6 +16,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
+import org.cisiondata.modules.auth.service.IChargingService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.slf4j.Logger;
@@ -100,7 +101,6 @@ public class WebLayerAspect {
 					throw new BusinessException("抱歉!该查询涉及敏感信息");
 				}
 			}
-					
 		}
 	}
 	

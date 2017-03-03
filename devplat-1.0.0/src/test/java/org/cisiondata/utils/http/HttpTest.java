@@ -20,7 +20,7 @@ public class HttpTest {
 	@Test
 	public void testProvince() {
 		String url = "http://localhost:8080/devplat/provinceCity/province";
-		String response = HttpUtils.sendGet(url, new String[]{"accessToken", "c0eb7435e2eecc35e4579b4af2a302e2"});
+		String response = HttpUtils.sendGet(url, new String[]{"accessToken", "df6a53b392494cb24292550a33feb84f"});
 		System.out.println(response);
 	}
 	

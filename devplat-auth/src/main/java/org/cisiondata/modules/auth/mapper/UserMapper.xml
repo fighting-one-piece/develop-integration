@@ -12,6 +12,7 @@
         <result property="realname" column="REAL_NAME"/> 
         <result property="idCard" column="ID_CARD"/> 
         <result property="mobilePhone" column="MOBILE_PHONE"/> 
+        <result property="macAddress" column="MAC_ADDRESS"/> 
         <result property="email" column="EMAIL"/> 
         <result property="status" column="STATUS"/> 
         <result property="createTime" column="CREATE_TIME"/> 
@@ -24,8 +25,8 @@
     
     <sql id="columnClause">
     	ID, ACCOUNT, PASSWORD, SALT, IDENTITY, NICK_NAME, REAL_NAME, ID_CARD, 
-    	MOBILE_PHONE, EMAIL, STATUS, CREATE_TIME, EXPIRE_TIME, QUESTION,
-    	ANSWER, FIRST_LOGIN_FLAG, DELETE_FLAG
+    	MOBILE_PHONE, MAC_ADDRESS, EMAIL, STATUS, CREATE_TIME, EXPIRE_TIME, 
+    	QUESTION, ANSWER, FIRST_LOGIN_FLAG, DELETE_FLAG
     </sql>
     
     <sql id="whereClause">
@@ -71,9 +72,9 @@
     
      <insert id="insert" parameterType="User">
 	    INSERT INTO T_USER(ACCOUNT, PASSWORD, SALT, IDENTITY, NICK_NAME, REAL_NAME, ID_CARD, MOBILE_PHONE, 
-	    EMAIL, CREATE_TIME, EXPIRE_TIME, QUESTION, ANSWER, FIRST_LOGIN_FLAG, DELETE_FLAG) 
+	    MAC_ADDRESS, EMAIL, CREATE_TIME, EXPIRE_TIME, QUESTION, ANSWER, FIRST_LOGIN_FLAG, DELETE_FLAG) 
 	    VALUES(#{account},#{password},#{salt},#{identity},#{nickname},#{realname},#{idCard},#{mobilePhone},
-	    #{email},#{createTime},#{expireTime},#{question},#{answer},#{firstLoginFlag},#{deleteFlag})  
+	    #{macAddress}, #{email},#{createTime},#{expireTime},#{question},#{answer},#{firstLoginFlag},#{deleteFlag})  
     </insert>
     
     <update id="update" parameterType="User">

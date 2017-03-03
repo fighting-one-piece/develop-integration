@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.user.dao.AUserAGroupDAO">
+	<resultMap type="AUserAGroup" id="userGroupMap">
+		<id property="id" column="ID"/>
+		<result property="auser" column="USER_ID"/>
+		<result property="agroup" column="GROUP_ID"/>
+		<result property="priority" column="PRIORITY"/>
+	</resultMap>
+	<!-- 向群组新增用户 -->
+    <insert id="addGUser" parameterType="AUserAGroup">
+    	INSERT INTO T_USER_GROUP(USER_ID,GROUP_ID) VALUES(#{auser},#{agroup})
+    </insert>
+    <!-- 移除用户 -->
+    <delete id="delGUser">
+    	DELETE FROM T_USER_GROUP WHERE USER_ID = #{0} AND GROUP_ID = #{1}
+    </delete>
+</mapper>

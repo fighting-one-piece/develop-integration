@@ -1,6 +1,5 @@
 package org.cisiondata.modules.identity.controller;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,13 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping("/qq")
+@RequestMapping(value="/")
 public class QQController {
 	
 	private Logger LOG = LoggerFactory.getLogger(QQController.class);
@@ -36,19 +33,14 @@ public class QQController {
 	@Resource(name = "esBizService")
 	private IESBizService esBizService = null;
 	@ResponseBody
-	@RequestMapping(value = "/search")
+	@RequestMapping(value = "/qqs/{qq}/base")
 	//根据QQ号码查询基础信息和对应的群信息
-	public WebResult readQQ(@RequestParam String qqNum){
+	public WebResult readQQ(@RequestParam String qq){
 		WebResult result = new WebResult();
-		Map<String, Object> map = new HashMap<String,Object>();
 		try {
 			//得到基本信息
-			List<Map<String, Object>> listBase = qqService.readQQData(qqNum);
-			//得到群信息
-			List<Map<String, Object>> qun = qqService.readQQDatas(qqNum);
-			map.put("qqBase", listBase);
-			map.put("qun", qun);
-			result.setData(map);
+			List<Map<String, Object>> listBase = qqService.readQQData(qq);
+			result.setData(listBase);
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
@@ -58,20 +50,20 @@ public class QQController {
 	}
 	
 	
-//	//根据QQ号码查询对应的群信息
-//	@ResponseBody
-//	@RequestMapping(value="/qq/search")
-//	public WebResult readQQDatas(@RequestParam String qqNum){
-//		WebResult result = new WebResult();
-//		try {
-//			result.setData(qqService.readQQDatas(qqNum));
-//			result.setCode(ResultCode.SUCCESS.getCode());
-//		} catch (Exception e) {
-//			result.setCode(ResultCode.FAILURE.getCode());
-//			result.setFailure(e.getMessage());
-//		}
-//		return result;
-//	}
+	//根据QQ号码查询对应的群信息
+	@ResponseBody
+	@RequestMapping(value="/qqs/{qq}/quns")
+	public WebResult readQQqunData(@RequestParam String qq){
+		WebResult result = new WebResult();
+		try {
+			result.setData(qqService.readQQDatas(qq));
+			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+	}
 	
 	@ResponseBody
 	@RequestMapping(value="/nickname/search")
@@ -90,26 +82,12 @@ public class QQController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/base/search")
-	public WebResult readQQData(@RequestParam String qqNum){
+	@RequestMapping(value="/quns/{qun}/members")
+	//根据QQ群号得到群信息
+	public WebResult readQQqunDatas(@RequestParam String qun){
 		WebResult result = new WebResult();
 		try {
-			result.setData(qqService.readQQData(qqNum));
-			result.setCode(ResultCode.SUCCESS.getCode());
-		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
-		}
-		return result;
-	}
-	
-	@ResponseBody
-	@RequestMapping(value="/qun/search")
-	//得到群信息
-	public WebResult readQQqunDatas(@RequestParam String qunNum){
-		WebResult result = new WebResult();
-		try {
-			result.setData(qqService.readQQqunDatas(qunNum));
+			result.setData(qqService.readQQqunDatas(qun));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
@@ -131,26 +109,5 @@ public class QQController {
 			result.setFailure(e.getMessage());
 		}
 		return result;
-	}
-	
-	//根据QQ号码查询对应的群全部信息
-	@ResponseBody
-	@RequestMapping(value="/qq/quns/search")
-	public WebResult readQQDatas(String qqNum){
-		WebResult result = new WebResult();
-		try {
-			result.setData(qqService.readQQAndQunDatas(qqNum));
-			result.setCode(ResultCode.SUCCESS.getCode());
-		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
-		}
-		return result;
-	}
-	
-	//QQ查询页面
-	@RequestMapping(method=RequestMethod.GET)
-	public ModelAndView toMoblie(){
-		return new ModelAndView("/qq/qqQuery");
 	}
 }

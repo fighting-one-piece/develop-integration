@@ -125,7 +125,7 @@ public class LMContorller {
 	public WebResult educationorganizeD(String idCard, String name) {
 		WebResult result = new WebResult();
 		try {
-			Map<String, String> data = lmInternetService.education_organizeD(idCard, name);
+			Map<String, Object> data = lmInternetService.education_organizeD(idCard, name);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {

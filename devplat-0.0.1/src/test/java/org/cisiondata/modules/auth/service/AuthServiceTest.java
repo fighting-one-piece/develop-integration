@@ -14,6 +14,7 @@ import org.cisiondata.modules.auth.entity.AccessUserControl;
 import org.cisiondata.modules.auth.entity.AccessUserInterface;
 import org.cisiondata.modules.auth.entity.AccessUserInterfaceMoney;
 import org.cisiondata.modules.auth.entity.User;
+import org.cisiondata.modules.identity.service.IMobileAddressService;
 import org.cisiondata.utils.endecrypt.EndecryptUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.cisiondata.utils.serde.SerializerUtils;
@@ -41,6 +42,14 @@ public class AuthServiceTest {
 	
 	@Resource(name = "accessUserService")
 	private IAccessUserService accessUserService = null;
+	
+	@Resource(name = "mobileAddressService")
+	private IMobileAddressService mobileAddressService = null;
+	
+	@Test
+	public void a1() {
+		mobileAddressService.readAddressFromMoblie("13000000015");
+	}
 	
 	@Test
 	public void testUserServiceReadUserByAccount() {

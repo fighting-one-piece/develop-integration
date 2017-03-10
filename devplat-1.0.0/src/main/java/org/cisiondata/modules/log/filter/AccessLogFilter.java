@@ -70,16 +70,14 @@ public class AccessLogFilter implements Filter {
         		String regExp = "^[1]([3][0-9]{1}|59|58|88|89)[0-9]{8}$"; 
         		Pattern p = Pattern.compile(regExp); 
         		UserAccessLog logModel = new UserAccessLog();
-    			String session = httpServletRequest.getSession().getId();
     			String IP = getIPAddress(httpServletRequest);
     			String keyword = url.substring(url.lastIndexOf("/")+1, url.length());
 //    			String account = (String) SecurityUtils.getSubject().getPrincipal();
     			Matcher m = p.matcher(keyword);
     			if(!IP.equals("0:0:0:0:0:0:0:1")){
-    				logModel.setSessionId(session);
     				logModel.setIp(IP);
     				logModel.setAccessTime(new Date());
-    				logModel.setKeyword(keyword);
+    				logModel.setParams(keyword);
     				logModel.setAccount(account);
     				if(m.matches()){
     					userAccessLogDAO.addLog(logModel);
@@ -99,15 +97,13 @@ public class AccessLogFilter implements Filter {
         		map.remove("estype");
         		for (Map.Entry<String, Object> entry: map.entrySet()) {
         			UserAccessLog logModel = new UserAccessLog();
-        			String session = httpServletRequest.getSession().getId();
         			String keyword = entry.getValue().toString();
         			String IP = getIPAddress(httpServletRequest);
 //        			String account = (String) SecurityUtils.getSubject().getPrincipal();
         			if(!IP.equals("0:0:0:0:0:0:0:1")){
-        				logModel.setSessionId(session);
         				logModel.setIp(IP);
         				logModel.setAccessTime(new Date());
-        				logModel.setKeyword(keyword.substring(1,keyword.length()-1));
+        				logModel.setParams(keyword.substring(1,keyword.length()-1));
         				logModel.setAccount(account);
         				userAccessLogDAO.addLog(logModel);
         			}

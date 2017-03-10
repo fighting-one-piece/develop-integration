@@ -96,6 +96,16 @@ public class ESServiceTest {
 		System.out.println(qr.getTotalRowNum());
 	}
 	
+	@Test
+	public void test() {
+		QueryResult<Map<String, Object>> qr = esBizService.readPaginationDataListByCondition(
+				"financial", "logistics", "滕正涛", null, 100, false);
+		System.out.println("total row num: " + qr.getTotalRowNum());
+		for (Map<String, Object> result : qr.getResultList()) {
+			System.out.println(result);
+		}
+	}
+	
 	@Resource(name = "jedisCluster")
 	private JedisCluster jedisCluster = null;
 	

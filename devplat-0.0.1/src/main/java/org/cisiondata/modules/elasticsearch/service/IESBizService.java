@@ -102,10 +102,12 @@ public interface IESBizService extends IESService {
 	/**
 	 * 根据条件读取物流数据列表
 	 * @param query
+	 * @param isHighLight 返回是否高亮
 	 * @return
 	 * @throws BusinessException
 	 */
-	public List<Map<String, Object>> readLogisticsDataList(String query) throws BusinessException;
+	public List<Map<String, Object>> readLogisticsDataList(String query, boolean isHighLight) 
+			throws BusinessException;
 	
 	/**
 	 * 根据条件读取公积金过滤数据列表

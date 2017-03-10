@@ -1,24 +1,20 @@
 package org.cisiondata.modules.elasticsearch.controller;
 
-import java.util.Map;
-
 import javax.annotation.Resource;
 
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.elasticsearch.service.IESBizService;
+import org.cisiondata.utils.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping(value = "/")
 public class ESController {
 	
 	private Logger LOG = LoggerFactory.getLogger(ESController.class);
@@ -51,43 +47,30 @@ public class ESController {
 	}
 	
 	/**
-	 * 多字段查询界面
-	 * @return
-	 */
-	@RequestMapping(value="/search/multi")
-	public ModelAndView readIndexTypeDatasByMultiFieldsView (){
-		return new ModelAndView("es/multi");
-	}
-	
-	/**
 	 * 多字段查询
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping(value="/search/multi/scroll")
+	@RequestMapping(value="/advanced/search")
 	@ResponseBody
-	public WebResult readIndexTypeDatasByMultiFields(@RequestParam Map<String,String> map){
+	public WebResult readIndexTypeDatasByMultiFields(String scrollId,Integer rowNumPerPage,String index,String type,String query){
 		WebResult result = new WebResult();
 		try {
-			result.setData(esBizService.readPaginationDataListByMultiCondition(map));
+			result.setData(esBizService.readPaginationDataListByMultiCondition(scrollId, rowNumPerPage, index, type, query));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		} catch (BusinessException bu) {
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+			LOG.error(bu.getDefaultMessage(),bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
 			LOG.error(e.getMessage(), e);
 		}
 		return result;
+		
 	}
-	
-	/**
-	 * 物流信息查询界面
-	 * @return
-	 */
-	@RequestMapping(value="/logistics/search/view")
-	public ModelAndView readFinancialLogisticsDatasView(){
-		return new ModelAndView("user/amap");
-	}
-	
+
 	/**
 	 * 物流信息查询(未分页)
 	 * @param query
@@ -99,7 +82,7 @@ public class ESController {
 		LOG.info("query:{}", query);
 		WebResult result = new WebResult();
 		try {
-			Object data = esBizService.readLogisticsDataList(query);
+			Object data = esBizService.readLogisticsDataList(query, true);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
@@ -121,7 +104,7 @@ public class ESController {
 		LOG.info("query:{}", query);
 		WebResult result = new WebResult();
 		try {
-			Object data = esBizService.readLogisticsDataList(query);
+			Object data = esBizService.readLogisticsDataList(query, false);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
@@ -132,36 +115,6 @@ public class ESController {
 		return result;
 	}
 	
-	/**
-	 * 标签查询视图
-	 * @return
-	 */
-	@RequestMapping(value ="/labels/search/view", method = RequestMethod.GET)
-	public ModelAndView readLabelsAndHitsView(){
-		return new ModelAndView("/es/labels");
-	}
-	
-	/**
-	 * 标签查询
-	 * @param query
-	 * @return
-	 */
-	@ResponseBody
-	@RequestMapping(value = "/labels/search")
-	public WebResult readLabelsAndHits(String query) {
-		LOG.info("query:{}", query);
-		WebResult result = new WebResult();
-		try {
-			Object data = esBizService.readLabelsAndHitsIncludeTypes(query);
-			result.setCode(ResultCode.SUCCESS.getCode());
-			result.setData(data);
-		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
-			LOG.error(e.getMessage(), e);
-		}
-		return result;
-	} 
 	
 	/**
 	 * 指定标签查询
@@ -209,6 +162,33 @@ public class ESController {
 		return result;
 	} 
 	
+
+	/**
+	 * 标签查询
+	 * @param query
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/labels",method = RequestMethod.GET)
+	public WebResult readLabelsAndHits(String query) {
+		LOG.info("query:{}", query);
+		WebResult result = new WebResult();
+		try {
+			Object data = esBizService.readLabelsAndHitsIncludeTypes(query);
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(data);
+		} catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+			LOG.error(bu.getDefaultMessage(),bu);
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+			LOG.error(e.getMessage(), e);
+		}
+		return result;
+	} 
+	
 	/**
 	 * 指定库表查询
 	 * @param index
@@ -219,7 +199,7 @@ public class ESController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/index/{index}/type/{type}/search")
+	@RequestMapping(value = "/labels/indices/{index}/types/{type}",method = RequestMethod.GET)
 	public WebResult readLabelPaginationDataList(@PathVariable String index, @PathVariable String type,
 			String query, String scrollId, int rowNumPerPage) {
 		LOG.info("index:{} type:{} query:{} scrollId:{} rowNumPerPage:{}", index, type,
@@ -229,6 +209,10 @@ public class ESController {
 			Object data = esBizService.readLabelPaginationDataList(index, type, query, scrollId, rowNumPerPage);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
+		} catch(BusinessException bu) {
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+			LOG.error(bu.getDefaultMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());

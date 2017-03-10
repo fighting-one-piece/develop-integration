@@ -14,8 +14,6 @@ public class UserAccessLog extends PKAutoEntity<Long> {
 	
 	private static final long serialVersionUID = 1L;
 	
-	/** 会话ID */
-	private String sessionId = null;
 	/** IP地址 */
 	private String ip = null;
 	/** 用户账号 */
@@ -24,19 +22,29 @@ public class UserAccessLog extends PKAutoEntity<Long> {
 	private String url = null;
 	/** 访问时间 */
 	private Date accessTime = null;
-	/** 访问关键字/参数 */
-	private String keyword = null;
-	/** 统计 */
+	/** 请求参数 */
+	private String params = null;
+	/*请求结果*/
+	private String result = null;
+	/**统计关键字*/
 	private transient int count = 0;
 	
-	public String getSessionId() {
-		return sessionId;
+	public int getCount() {
+		return count;
 	}
-	
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
+
+	public void setCount(int count) {
+		this.count = count;
 	}
-	
+
+	public String getResult() {
+		return result;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+
 	public String getIp() {
 		return ip;
 	}
@@ -69,19 +77,12 @@ public class UserAccessLog extends PKAutoEntity<Long> {
 		this.accessTime = accessTime;
 	}
 	
-	public String getKeyword() {
-		return keyword;
+	public String getParams() {
+		return params;
 	}
 	
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
+	public void setParams(String params) {
+		this.params = params;
 	}
 	
-	public int getCount() {
-		return count;
-	}
-
-	public void setCount(int count) {
-		this.count = count;
-	}
 }

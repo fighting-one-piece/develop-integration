@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.cisiondata.modules.datainterface.dao.AccessUserControlDao;
+import org.cisiondata.modules.datainterface.entity.AccessUserControl;
 import org.cisiondata.modules.datainterface.service.IAccessUserInterfaceService;
 import org.cisiondata.modules.user.dao.AUserDao;
 import org.cisiondata.modules.user.entity.AUser;
@@ -23,6 +25,9 @@ public class AUserServiceImpl implements IAUserService{
 	
 	@Resource(name="aUserDao")
 	private AUserDao aUserDao;
+	
+	@Resource(name = "aaccessUserControlDao")
+	private AccessUserControlDao accessUserControlDao;
 	
 	@Resource(name = "accessUserInterfaceService")
 	private IAccessUserInterfaceService accessUserInterfaceService = null;
@@ -59,6 +64,15 @@ public class AUserServiceImpl implements IAUserService{
 		Date createTime = new Date();
 		auser.setCreateTime(createTime);
 		aUserDao.addAUser(auser);
+		//增加用户控制
+		AccessUserControl accessUserControl = new AccessUserControl();
+		accessUserControl.setAccount(auser.getAccount());
+		accessUserControl.setCount(0L);
+		accessUserControl.setRemainingCount(0L);
+		accessUserControl.setMoney(0.0);
+		accessUserControl.setRemainingMoney(0.0);
+		accessUserControl.setSource(1);
+		accessUserControlDao.addAccessUserControl(accessUserControl);
 		//给用户赋所有接口价格
 		
 	}

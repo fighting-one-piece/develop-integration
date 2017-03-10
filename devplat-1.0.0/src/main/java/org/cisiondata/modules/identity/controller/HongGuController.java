@@ -6,25 +6,34 @@ import javax.annotation.Resource;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.identity.service.IHongGuService;
+import org.cisiondata.utils.exception.BusinessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/honggu")
 public class HongGuController {
+	
+	private Logger LOG = LoggerFactory.getLogger(HongGuController.class);
 	
 	@Resource(name="hongGuService")
 	private IHongGuService hongGuService;
 	
 	//朋友网url查找qq号，编号为1的操作
-	@RequestMapping("/pywtoqq")
 	@ResponseBody
+	@RequestMapping(value="/qqs/penyou",method=RequestMethod.GET)
 	public WebResult pywtoqq(String url){
 		WebResult result = new WebResult();
 		try {
 			result.setData(hongGuService.pywToQQ(url));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		}catch (BusinessException bu) {
+			result.setCode((bu.getCode()));
+			result.setFailure(bu.getMessage());
+			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -33,13 +42,17 @@ public class HongGuController {
 	}
 		
 	//微博url查找qq号，编号为2的操作
-	@RequestMapping("/wbtoqq")
 	@ResponseBody
+	@RequestMapping(value="/qqs/tweibo",method=RequestMethod.GET)
 	public WebResult wbtoqq(String url){
 		WebResult result = new WebResult();
 		try {
 			result.setData(hongGuService.wbToQQ(url));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		}catch (BusinessException bu) {
+			result.setCode((bu.getCode()));
+			result.setFailure(bu.getMessage());
+			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -48,13 +61,17 @@ public class HongGuController {
 	}
 		
 	// qq查找朋友网，编号为3的操作
-	@RequestMapping("/qqtopyw")
 	@ResponseBody
+	@RequestMapping(value="/qqs/{qq}/pengyou",method=RequestMethod.GET)
 	public WebResult qqtopyw(String qq){
 		WebResult result = new WebResult();
 		try {
 			result.setData(hongGuService.qqToPyw(qq));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		}catch (BusinessException bu) {
+			result.setCode((bu.getCode()));
+			result.setFailure(bu.getMessage());
+			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -63,13 +80,17 @@ public class HongGuController {
 	}
 	
 	//qq反找微博，编号为4的操作
-	@RequestMapping("/qqtowb")
 	@ResponseBody
+	@RequestMapping(value="/qqs/{qq}/tweibo",method=RequestMethod.GET)
 	public WebResult qqtowb(String qq){
 		WebResult result = new WebResult();
 		try {
 			result.setData(hongGuService.qqTowb(qq));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		}catch (BusinessException bu) {
+			result.setCode((bu.getCode()));
+			result.setFailure(bu.getMessage());
+			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -78,13 +99,17 @@ public class HongGuController {
 	}
 	
 	//对查找qq发起临时会话，编号为5的操作
-	@RequestMapping("/qqtosession")
 	@ResponseBody
+	@RequestMapping(value="/qqs/{qq}/tsession",method=RequestMethod.GET)
 	public WebResult qqtosession(String qq){
 		WebResult result = new WebResult();
 		try {
 			result.setData(hongGuService.temporaryWindow(qq));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		}catch (BusinessException bu) {
+			result.setCode((bu.getCode()));
+			result.setFailure(bu.getMessage());
+			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -93,13 +118,17 @@ public class HongGuController {
 	}
 	
 	//qq查找最后说说，编号为6的操作
-	@RequestMapping("/qqtotalk")
 	@ResponseBody
+	@RequestMapping(value="/qqs/{qq}/lasttalk",method=RequestMethod.GET)
 	public WebResult qqtotalk(String qq){
 		WebResult result = new WebResult();
 		try {
 			result.setData(hongGuService.qqLastShuoShuo(qq));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		}catch (BusinessException bu) {
+			result.setCode((bu.getCode()));
+			result.setFailure(bu.getMessage());
+			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -108,13 +137,17 @@ public class HongGuController {
 	}
 	
 	//手机号找qq，编号为7的操作
-	@RequestMapping("/phonetoqq")
 	@ResponseBody
+	@RequestMapping(value="/qqs/phone/{phone}",method=RequestMethod.GET)
 	public WebResult phonetoqq(String phone){
 		WebResult result = new WebResult();
 		try {
 			result.setData(hongGuService.phoneNumToQQ(phone));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		}catch (BusinessException bu) {
+			result.setCode((bu.getCode()));
+			result.setFailure(bu.getMessage());
+			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());

@@ -6,8 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
+import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.elasticsearch.client.ESClient;
 import org.cisiondata.modules.elasticsearch.service.IESMetadataService;
 import org.cisiondata.utils.exception.BusinessException;
@@ -23,8 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
-import redis.clients.jedis.JedisCluster;
-
 import com.carrotsearch.hppc.ObjectLookupContainer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
@@ -35,9 +32,6 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 	private Logger LOG = LoggerFactory.getLogger(ESMetadataServiceImpl.class);
 
 	private Map<String, List<Map<String, Map<String, String>>>> metadatas = null;
-
-	@Resource(name = "jedisCluster")
-	private JedisCluster jedisCluster = null;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -102,6 +96,7 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 		for (Map.Entry<String, List<Map<String, Map<String, String>>>> entry : metadatas.entrySet()) {
 			indices.put(entry.getKey(), MessageUtils.getInstance().getMessage(entry.getKey()));
 		}
+		if (null == indices || indices.size() == 0) throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 		return indices;
 	}
 
@@ -119,6 +114,7 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 				}
 			}
 		}
+		if (null == types || types.size() == 0) throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 		return types;
 	}
 
@@ -151,9 +147,11 @@ public class ESMetadataServiceImpl implements IESMetadataService, InitializingBe
 			String typeName = new ArrayList<String>(typeMappings.keySet()).get(0);
 			if (!typeName.equalsIgnoreCase(type))
 				continue;
-			return typeMappings.get(type);
+			Map<String, String> typeMapping = typeMappings.get(type);
+			if (null == typeMapping || typeMapping.size() == 0) throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
+			return typeMapping;
 		}
-		return new HashMap<String, String>();
+		throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 	}
 
 	@Override

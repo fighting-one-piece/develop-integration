@@ -99,7 +99,7 @@ public class ESController {
 		LOG.info("query:{}", query);
 		WebResult result = new WebResult();
 		try {
-			Object data = esBizService.readLogisticsDataList(query);
+			Object data = esBizService.readLogisticsDataList(query, true);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
@@ -165,7 +165,7 @@ public class ESController {
 		LOG.info("query:{}", query);
 		WebResult result = new WebResult();
 		try {
-			Object data = esBizService.readLogisticsDataList(query);
+			Object data = esBizService.readLogisticsDataList(query, false);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {

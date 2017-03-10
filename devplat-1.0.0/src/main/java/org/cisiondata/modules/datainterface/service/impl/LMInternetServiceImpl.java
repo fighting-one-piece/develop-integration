@@ -333,8 +333,8 @@ public class LMInternetServiceImpl implements ILMInternetService{
 	 * 37、学历查询（D机构）
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, String> education_organizeD(String idCard, String name){
-		Map<String, String> data = new HashMap<String, String>();
+	public Map<String, Object> education_organizeD(String idCard, String name){
+		Map<String, Object> data = new HashMap<String, Object>();
 		Map<String ,String> map=new HashMap<String,String>();
 		map.put("name", name);
 		map.put("idCard", idCard);
@@ -356,7 +356,7 @@ public class LMInternetServiceImpl implements ILMInternetService{
 			}
 //			String kk = HttpUtils.sendPost(Constants.NORMAL_URL + "/education/organizeD", map, Constants.APP_KEY, Constants.APP_KEY_VALUE);
 			Gson gson =new Gson();
-			Map<String,Map<String,String>> re=gson.fromJson(kk, Map.class);
+			Map<String,Map<String,Object>> re=gson.fromJson(kk, Map.class);
 			Map<String,Object> gg=gson.fromJson(kk,Map.class);
 			int sss=(int)(Double.parseDouble(gg.get("errorCode").toString()));
 			if(sss==200){

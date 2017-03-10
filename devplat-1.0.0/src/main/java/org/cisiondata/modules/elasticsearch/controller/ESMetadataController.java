@@ -3,6 +3,7 @@ package org.cisiondata.modules.elasticsearch.controller;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.elasticsearch.service.IESMetadataService;
+import org.cisiondata.utils.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@RequestMapping(value = "/metadatas")
 public class ESMetadataController {
 	
 	private Logger LOG = LoggerFactory.getLogger(ESMetadataController.class);
@@ -43,6 +45,10 @@ public class ESMetadataController {
 			Object data = esMetadataService.readIndices();
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
+		} catch (BusinessException bu) {
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+			LOG.error(bu.getDefaultMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -52,13 +58,17 @@ public class ESMetadataController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/{index}/types")
+	@RequestMapping(value = "/indices/{index}/types")
 	public WebResult readIndexTypes(@PathVariable String index) {
 		WebResult result = new WebResult();
 		try {
 			Object data = esMetadataService.readIndexTypes(index);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
+		} catch (BusinessException bu) {
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+			LOG.error(bu.getDefaultMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
@@ -84,13 +94,17 @@ public class ESMetadataController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/{index}/{type}/attributes")
+	@RequestMapping(value = "/indices/{index}/types/{type}/fields")
 	public WebResult readIndexTypeAttributes(@PathVariable String index, @PathVariable String type) {
 		WebResult result = new WebResult();
 		try {
 			Object data = esMetadataService.readIndexTypeAttributes(index, type);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
+		} catch (BusinessException bu) {
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+			LOG.error(bu.getDefaultMessage(), bu);
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());

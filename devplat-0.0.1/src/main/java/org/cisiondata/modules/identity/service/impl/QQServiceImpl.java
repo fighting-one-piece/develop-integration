@@ -50,6 +50,14 @@ public class QQServiceImpl implements IQQService {
 				}
 			}
 		}
+		for (int i = 0,len = list.size(); i < len; i++) {
+			list.get(i).remove("更新时间");
+			list.get(i).remove("源文件");
+			list.get(i).remove("录入时间");
+			list.get(i).remove("index");
+			list.get(i).remove("type");
+			list.get(i).remove("clazz");
+		}
 		return list;
 	}
 	//根据QQ群号获取QQ群名称、QQ群通知字段

@@ -12,6 +12,8 @@ public class UserDTO implements Serializable {
 	private String nickname = null;
 	/** 访问令牌*/
 	private String accessToken = null;
+	/** 是否首次登录标志 */
+	private Boolean firstLoginFlag = Boolean.FALSE;
 	
 	public String getAccount() {
 		return account;
@@ -37,6 +39,15 @@ public class UserDTO implements Serializable {
 		this.accessToken = accessToken;
 	}
 
+	public Boolean getFirstLoginFlag() {
+		return firstLoginFlag;
+	}
+
+	public void setFirstLoginFlag(Boolean firstLoginFlag) {
+		this.firstLoginFlag = firstLoginFlag;
+	}
+
+	
 	
 	
 }

@@ -4,8 +4,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.datainterface.URLUtil;
 import org.cisiondata.modules.datainterface.service.IWLService;
+import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.http.HttpUtils;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +53,9 @@ public class WLServiceImpl implements IWLService {
 		if(code == 1200){
 			map.put("resultCode", code);
 			map.put("result", mapResult.get("data").get("info_list"));
+		}
+		if(map.size() == 0){
+			throw new BusinessException(ResultCode.NOT_FOUNT_DATA.getCode(),ResultCode.NOT_FOUNT_DATA.getDesc());
 		}
 		return map;
 	}

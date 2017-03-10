@@ -23,7 +23,7 @@ public interface ILMInternetService {
 	public Map<String, String> readLoanInfo(String phone) throws BusinessException;
 	
 	//37、学历查询（D机构）
-	public Map<String, String> education_organizeD(String idCard, String name) throws BusinessException;
+	public Map<String, Object> education_organizeD(String idCard, String name) throws BusinessException;
 	
 	//36、搜索黑名单blacklist_search
 	public Map<String, Map<String, String>> blacklist_search(String idCard,String name,String phone) throws BusinessException;

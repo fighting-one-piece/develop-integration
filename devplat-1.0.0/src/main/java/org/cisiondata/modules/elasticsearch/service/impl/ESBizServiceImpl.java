@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
+import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.elasticsearch.service.IESBizService;
 import org.cisiondata.utils.endecrypt.MD5Utils;
 import org.cisiondata.utils.exception.BusinessException;
@@ -75,25 +76,31 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	}
 	
 	@Override
-	public QueryResult<Map<String, Object>> readPaginationDataListByMultiCondition(Map<String, String> map)
+	public QueryResult<Map<String, Object>> readPaginationDataListByMultiCondition(String scrollId,Integer rowNumPerPage,String index,String type,String query)
 			throws BusinessException {
-		String scrollId = map.remove("scrollId");
-		Integer size = Integer.parseInt(map.remove("pageSize"));
-		String index = map.remove("esindex");
-		String type = map.remove("estype");
-		
+		if(StringUtils.isBlank(query)){
+			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
+		}
+		String[] qus = query.split(",");
+		if(qus.length < 1 || rowNumPerPage == null || StringUtils.isBlank(index) || StringUtils.isBlank(type)){
+			throw new BusinessException(ResultCode.PARAM_ERROR);
+		}
 		BoolQueryBuilder qb = QueryBuilders.boolQuery();
 		Pattern pattern = Pattern.compile(CN_REG);
-		for (Map.Entry<String, String> entry : map.entrySet()){
-			if(entry.getValue()==""||entry.getValue()==null) continue;
-			boolean isChinese = pattern.matcher(entry.getValue()).find();
+		for(int i = 0; i < qus.length; i++){
+			String[] qu = qus[i].split(":");
+			if(qu.length != 2) throw new BusinessException(ResultCode.PARAM_ERROR);
+			boolean isChinese = pattern.matcher(qu[0]).find();
 			if (isChinese) {
-				qb.must(QueryBuilders.matchPhraseQuery(entry.getKey(), entry.getValue()));
+				qb.must(QueryBuilders.matchPhraseQuery(qu[0], qu[1]));
 			} else{
-				qb.must(QueryBuilders.termQuery(entry.getKey(), entry.getValue()));
+				qb.must(QueryBuilders.termQuery(qu[0], qu[1]));
 			}
 		}
-		return readPaginationDataListByCondition(index, type, qb, scrollId, size);
+		QueryResult<Map<String, Object>> qr = readPaginationDataListByCondition(index, type, qb, scrollId, rowNumPerPage);
+		if(qr.getResultList() == null || qr.getResultList().size() == 0)
+			throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
+		return qr;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -104,6 +111,8 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		String labelsHitCacheKey = genLabelHitCacheKey(query, includeTypes);
 		Object cacheObject = RedisClusterUtils.getInstance().get(labelsHitCacheKey);
 		if (null != cacheObject) {
+			List<Map<String, Object>> resultList = (List<Map<String, Object>>) cacheObject;
+			if(resultList.size() == 0) throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 			return (List<Map<String, Object>>) cacheObject;
 		}
 		LOG.info("read labels and hits method with cache not hit");
@@ -132,6 +141,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 			if (!result.isEmpty()) resultList.add(result);
 		}
 		RedisClusterUtils.getInstance().set(labelsHitCacheKey, resultList, 180);
+		if(resultList.size() == 0) throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 		return resultList;
 	}
 	
@@ -152,8 +162,11 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	@Override
 	public QueryResult<Map<String, Object>> readLabelPaginationDataList(String index, String type, String query,
 			String scrollId, int size) throws BusinessException {
-		String label = MessageUtils.getInstance().getMessage(index + "." + type);
-		String labelDatasCacheKey = genLabelDatasCacheKey(index, type, label, query);
+		if(StringUtils.isBlank(index) || StringUtils.isBlank(type) || size <=0)
+			throw new BusinessException(ResultCode.PARAM_ERROR);
+		if(StringUtils.isBlank(query))
+			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
+		String labelDatasCacheKey = genLabelDatasCacheKey(index, type, query);
 		Object cacheObject = RedisClusterUtils.getInstance().get(labelDatasCacheKey);
 		QueryResult<Map<String, Object>> qr = new QueryResult<Map<String,Object>>();
 		if (null != cacheObject) {
@@ -163,6 +176,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 			qr.setResultList(new ArrayList<Map<String, Object>>(qr.getResultList()));
 			RedisClusterUtils.getInstance().set(labelDatasCacheKey, qr, 120);
 		}
+		System.out.println("result size: " + qr.getResultList().size());
 		long totalRowNum = qr.getTotalRowNum();
 		int from = StringUtils.isBlank(scrollId) ? 1 : Integer.parseInt(scrollId);
 		qr.setScrollId(String.valueOf(from + 1));
@@ -172,12 +186,14 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		List<Map<String, Object>> resultList = fromIndex <= toIndex ? 
 				qr.getResultList().subList(fromIndex, toIndex) : new ArrayList<Map<String, Object>>();
 		wrapperQQQunInformation(type, resultList);
+		if(null == resultList || resultList.size() == 0) throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 		qr.setResultList(resultList);
 		return qr;
 	}
 	
 	@Override
-	public List<Map<String, Object>> readLogisticsDataList(String query) throws BusinessException {
+	public List<Map<String, Object>> readLogisticsDataList(String query, boolean isHighLight) 
+			throws BusinessException {
 		BoolQueryBuilder queryBuilder = null;
 		if (query.trim().indexOf(" ") == -1) {
 			queryBuilder = buildLogisticsSBoolQuery(query);
@@ -188,13 +204,13 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 				queryBuilder.must(buildLogisticsSBoolQuery(keywords[i]));
 			}
 		}
-		return readDataListByCondition("financial", "logistics", queryBuilder);
+		return readDataListByCondition("financial", "logistics", queryBuilder, isHighLight);
 	}
 	
 	@Override
 	public List<Map<String, Object>> readLogisticsFilterDataList(String query) throws BusinessException {
 		List<Map<String, Object>> logisticsFilterDataList = new ArrayList<Map<String, Object>>();
-		List<Map<String, Object>> logisticsDataList = readLogisticsDataList(query);
+		List<Map<String, Object>> logisticsDataList = readLogisticsDataList(query, false);
 		Map<String, Object> logisticsFilterData = null;
 		Map<String, Object> logisticsData = null;
 		Set<String> locations = new HashSet<String>();
@@ -237,7 +253,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	
 	@Override
 	public List<Map<String, Object>> readLogisticsRelationsDataList(String query) throws BusinessException {
-		List<Map<String, Object>> dataList = readLogisticsDataList(query);
+		List<Map<String, Object>> dataList = readLogisticsDataList(query, false);
 		Map<String, Object> data = null;
 		String sName, sMobilePhone, rName, rMobilePhone = null;
 		for (int i = 0, len = dataList.size(); i < len; i++) {
@@ -412,8 +428,8 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		return "labels:hit:" + MD5Utils.hash(sb.toString());
 	}
 	
-	private String genLabelDatasCacheKey(String index, String type, String label, String query) {
-		return index + ":" + type + ":" + label + ":" + MD5Utils.hash(query);
+	private String genLabelDatasCacheKey(String index, String type, String query) {
+		return index + ":" + type + ":" + MD5Utils.hash(query);
 	}
 	
 	class ReadPaginationDataListThread implements Callable<QueryResult<Map<String, Object>>> {
@@ -473,7 +489,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 			String label = MessageUtils.getInstance().getMessage(index + "." + type);
 			result.put("label", label);
 			qr.setResultList(new ArrayList<Map<String, Object>>(qr.getResultList()));
-			RedisClusterUtils.getInstance().set(genLabelDatasCacheKey(index, type, label, query), qr, 120);
+			RedisClusterUtils.getInstance().set(genLabelDatasCacheKey(index, type, query), qr, 120);
 			return result;
 		}
 	}

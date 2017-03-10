@@ -243,8 +243,18 @@ public class ESServiceImpl implements IESService {
 	}
 	
 	@Override
+	public Set<String> readNameAttributes() throws BusinessException {
+		return name_attributes;
+	}
+	
+	@Override
 	public Set<String> readIdentityAttributes() throws BusinessException {
 		return identity_attributes;
+	}
+	
+	@Override
+	public Set<String> readLocationAttributes() throws BusinessException {
+		return location_attributes;
 	}
 	
 	@Override

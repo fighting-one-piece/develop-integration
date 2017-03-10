@@ -91,7 +91,6 @@ public class UserAccessLogServiceImpl implements IUserAccessLogService{
 
 	@Override
 	public int selLogCount(String keyword) {
-		
 		return userAccessLogDAO.selLogCount(keyword);
 	}
 
@@ -111,13 +110,13 @@ public class UserAccessLogServiceImpl implements IUserAccessLogService{
 		List<UserAccessLog> list = userAccessLogDAO.count();
 		for (int i = 0; i < list.size(); i++) {
 			UserAccessLog logModel = new UserAccessLog();
-			logModel.setKeyword(list.get(i).getKeyword());
+			logModel.setParams(list.get(i).getParams());
 			logModel.setCount(list.get(i).getCount());
 			logModel.setAccessTime(new Date());
-			if(selLogCount(list.get(i).getKeyword()) == 0){
+			if(selLogCount(list.get(i).getParams()) == 0){
 				addLogCount(logModel);
 			}
-			if(selLogCount(list.get(i).getKeyword()) == 1){
+			if(selLogCount(list.get(i).getParams()) == 1){
 				upLogCount(logModel);
 			}
 		}

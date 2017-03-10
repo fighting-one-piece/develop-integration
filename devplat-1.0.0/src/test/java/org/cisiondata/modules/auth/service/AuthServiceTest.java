@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import org.cisiondata.modules.auth.dto.UserDTO;
 import org.cisiondata.modules.auth.entity.User;
+import org.cisiondata.modules.login.service.ILoginService;
 import org.cisiondata.utils.endecrypt.EndecryptUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.junit.Test;
@@ -17,7 +18,7 @@ import junit.framework.Assert;
 
 @SuppressWarnings("deprecation")
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring/applicationContext.xml"})
+@ContextConfiguration(locations = {"classpath*:spring/applicationContext.xml"})
 public class AuthServiceTest {
 
 	@Resource(name = "userService")

@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.datainterface.service.IWLService;
+import org.cisiondata.utils.exception.BusinessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +23,9 @@ public class WLContorller {
 		try {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(service.readData(phone));
+		}catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());

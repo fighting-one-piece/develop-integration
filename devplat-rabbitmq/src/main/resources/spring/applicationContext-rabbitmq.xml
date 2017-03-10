@@ -18,11 +18,12 @@
     						   username="${rabbitmq.manager.user}" 
     						   password="${rabbitmq.manager.password}"
                                host="${rabbitmq.ip}"
-                               port="5672"
+                               port="${rabbitmq.post}"
+                               publisher-confirms="true"  
                                virtual-host="/"/>
 
     <!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成-->
-    <rabbit:admin connection-factory="connectionFactory"/>
+    <rabbit:admin id="amqpAdmin" connection-factory="connectionFactory"/>
 
     <!--定义queue-->
     <rabbit:queue id="defaultQueue" name="defaultQueue" durable="true" auto-delete="false" exclusive="false"/>
@@ -47,18 +48,38 @@
     </rabbit:topic-exchange>
     
     <!--定义rabbit template用于数据的接收和发送-->
-    <rabbit:template id="rAmqpTemplate" connection-factory="connectionFactory" exchange="directExChange"/>
+    <rabbit:template id="rAmqpTemplate" connection-factory="connectionFactory" 
+    	exchange="directExChange" 
+    	message-converter="serializerMessageConverter"
+    	confirm-callback="confirmCallBackListener"  
+        return-callback="returnCallBackListener"   
+        mandatory="true" />
    
-    <rabbit:template id="tAmqpTemplate" connection-factory="connectionFactory" exchange="topicExChange"/>
+    <rabbit:template id="tAmqpTemplate" connection-factory="connectionFactory" 
+    	exchange="topicExChange"
+    	message-converter="serializerMessageConverter"
+    	confirm-callback="confirmCallBackListener"  
+        return-callback="returnCallBackListener"   
+        mandatory="true" />
+
+   	<!--  
+    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="manual" concurrency="10" max-concurrency="20">
+        <rabbit:listener queues="defaultQueue,requestAccessQueue,responseResultQueue,defaultTopicQueue" ref="customMessageListener"/>
+    </rabbit:listener-container>
+    -->
     
-    <rabbit:listener-container connection-factory="connectionFactory">
-        <rabbit:listener queues="defaultQueue" ref="mqMiddleware"/>
-        <rabbit:listener queues="requestAccessQueue" ref="mqMiddleware"/>
-        <rabbit:listener queues="responseResultQueue" ref="mqMiddleware"/>
-        <rabbit:listener queues="defaultTopicQueue" ref="mqMiddleware"/>
+    
+    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="manual" concurrency="10" max-concurrency="20">
+        <!--  
+        <rabbit:listener queues="defaultQueue,requestAccessQueue,responseResultQueue,defaultTopicQueue" ref="customMessageListener"/>
+        -->
+        <rabbit:listener queues="defaultQueue,requestAccessQueue,responseResultQueue,defaultTopicQueue" ref="receiveConfirmListener"/>
     </rabbit:listener-container>
     
-    <!-- 创建消息转换器为SimpleMessageConverter -->    
+    <!-- 消息转换器SimpleMessageConverter -->    
     <bean id="serializerMessageConverter"  class="org.springframework.amqp.support.converter.SimpleMessageConverter"/>   
+    
+    <!-- 消息对象json转换类 -->
+    <bean id="jsonMessageConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter" />  
 	  
 </beans>

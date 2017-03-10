@@ -51,6 +51,14 @@
 			<scope>system</scope>
             <systemPath>${JAVA_HOME}/lib/tools.jar</systemPath>
   		</dependency>
+  		
+  		<!--JUnit依赖包 -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
 		
 		<!-- RabbitMQ依赖报 -->
        	<dependency>

@@ -24,7 +24,7 @@ public class HongGuServiceImpl implements IHongGuService {
 	@Override
 	public Map<String,String> pywToQQ(String url) throws BusinessException {
 		Map<String,String> map = new HashMap<String, String>();
-		String pywtoqq = HongGuUtils.requestPCHonggu(url, 1).split("朋友网")[0].trim();
+		String pywtoqq = HongGuUtils.requestPCHonggu(url, 1).split("朋友网")[0].trim().split("机器码")[0].trim();
 		if (pywtoqq == null || "".equals(pywtoqq)) {
 			throw new BusinessException(ResultCode.NOT_FOUNT_DATA.getCode(), ResultCode.NOT_FOUNT_DATA.getDesc());
 		}

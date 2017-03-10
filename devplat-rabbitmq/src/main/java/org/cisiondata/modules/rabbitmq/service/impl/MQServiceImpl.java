@@ -2,12 +2,20 @@ package org.cisiondata.modules.rabbitmq.service.impl;
 
 import javax.annotation.Resource;
 
+import org.cisiondata.modules.rabbitmq.entity.MQueue;
 import org.cisiondata.modules.rabbitmq.service.IMQService;
+import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.stereotype.Service;
 
 @Service("mqService")
 public class MQServiceImpl implements IMQService {
+	
+	@Resource(name="amqpAdmin")
+	private AmqpAdmin amqpAdmin = null;
 
 	@Resource(name="rAmqpTemplate")
     private AmqpTemplate rAmqpTemplate = null;
@@ -15,9 +23,24 @@ public class MQServiceImpl implements IMQService {
 	@Resource(name="tAmqpTemplate")
     private AmqpTemplate tAmqpTemplate = null;
 	
+    @Override
+	public void declareExchange(Exchange exchange) {
+		amqpAdmin.declareExchange(exchange);
+	}
+    
+    @Override
+    public String declareQueue(Queue queue) {
+    	return amqpAdmin.declareQueue(queue);
+    }
+    
+    @Override
+    public void declareBinding(Binding binding) {
+    	amqpAdmin.declareBinding(binding);
+    }
+    
 	@Override
 	public void sendMessage(Object message) {
-		rAmqpTemplate.convertAndSend(message);
+		rAmqpTemplate.convertAndSend(MQueue.DEFAULT_QUEUE.getRoutingKey(), message);
 	}
 	
 	@Override
@@ -27,6 +50,7 @@ public class MQServiceImpl implements IMQService {
 
 	@Override
 	public void sendMessage(String routingKey, Object message) {
+		System.out.println("routingKey: " + routingKey + " message: " + message);
 		rAmqpTemplate.convertAndSend(routingKey, message);
 	}
 	

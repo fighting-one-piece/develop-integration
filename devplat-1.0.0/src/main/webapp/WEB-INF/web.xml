@@ -131,26 +131,6 @@
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 	
-	<servlet>
-		<servlet-name>SpringExternalMVC</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>classpath:spring/spring-mvc-ext-config.xml</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	
-	<servlet-mapping>
-		<servlet-name>SpringExternalMVC</servlet-name>
-		<url-pattern>/ext/*</url-pattern>
-	</servlet-mapping>
-	
-	<servlet-mapping>
-		<servlet-name>SpringExternalMVC</servlet-name>
-		<url-pattern>/app/*</url-pattern>
-	</servlet-mapping>
-	
 	<session-config>
   		<session-timeout>30</session-timeout>
  	</session-config>

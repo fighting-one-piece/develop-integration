@@ -1,7 +1,30 @@
 package org.cisiondata.modules.rabbitmq.service;
 
-public interface IMQService {
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.Queue;
 
+public interface IMQService {
+	
+	/**
+	 * 定义声明Exchange
+	 * @param exchange
+	 */
+	public void declareExchange(Exchange exchange);
+
+	/**
+	 * 定义声明Queue
+	 * @param queue
+	 * @return
+	 */
+	public String declareQueue(Queue queue);
+	
+	/**
+	 * 定义声明Binding
+	 * @param binding
+	 */
+	public void declareBinding(Binding binding);
+	
 	/**
 	 * 发送消息,默认队列
 	 * @param message

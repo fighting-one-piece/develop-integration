@@ -20,6 +20,8 @@
 		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
 	</context:component-scan>
 	
+	<bean id="urlHandlerAdapter" class="org.cisiondata.modules.auth.web.handler.UrlHandlerAdapter"/>
+	
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
         <property name="messageConverters">
             <list>

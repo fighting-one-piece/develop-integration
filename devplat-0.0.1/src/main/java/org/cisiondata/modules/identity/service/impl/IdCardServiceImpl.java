@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.datainterface.service.IDatadaService;
 import org.cisiondata.modules.datainterface.service.ILMInternetService;
 import org.cisiondata.modules.elasticsearch.service.IESService;
@@ -105,35 +106,40 @@ public class IdCardServiceImpl implements IIdCardService {
 					listReslut.add(ss);
 				}
 			}
-			if(name != null){
-				Map<String, Object> map = lmService.education_organizeD(name, idcard);
-				Map<String, Object> map1 = (Map<String, Object>) map.get("checkResult");
-				Map<String,Object> mapdegree = (Map<String, Object>) map1.get("degree");
-				Map<String,Object> mappersonBase = (Map<String, Object>) map1.get("personBase");
-				Map<String,Object> newMap = new HashMap<String,Object>();
-				for (Map.Entry<String, Object> entry : mapdegree.entrySet()) {
-					if(entry.getKey().equals("startTime")){
-						newMap.put("入学时间", entry.getValue());
+			if(StringUtils.isNotBlank(name)){
+				try {
+					Map<String, Object> map = lmService.education_organizeD(name, idcard);
+					Map<String, Object> map1 = (Map<String, Object>) map.get("checkResult");
+					Map<String,Object> mapdegree = (Map<String, Object>) map1.get("degree");
+					Map<String,Object> mappersonBase = (Map<String, Object>) map1.get("personBase");
+					Map<String,Object> newMap = new HashMap<String,Object>();
+					for (Map.Entry<String, Object> entry : mapdegree.entrySet()) {
+						if(entry.getKey().equals("startTime")){
+							newMap.put("入学时间", entry.getValue());
+						}
+						if(entry.getKey().equals("specialty")){
+							newMap.put("专业", entry.getValue());
+						}
+						if(entry.getKey().equals("college")){
+							newMap.put("毕业学校", entry.getValue());
+						}
 					}
-					if(entry.getKey().equals("specialty")){
-						newMap.put("专业", entry.getValue());
+					for (Map.Entry<String, Object> entry : mappersonBase.entrySet()) {
+						if(entry.getKey().equals("name")){
+							newMap.put("姓名", entry.getValue());
+						}
+						if(entry.getKey().equals("degree")){
+							newMap.put("学历", entry.getValue());
+						}
 					}
-					if(entry.getKey().equals("college")){
-						newMap.put("毕业学校", entry.getValue());
+					if(newMap.size() == 5){
+						newMap.put("院系", "");
+						newListMap.add(newMap);
 					}
+				} catch (Exception e) {
+					e.getMessage();
 				}
-				for (Map.Entry<String, Object> entry : mappersonBase.entrySet()) {
-					if(entry.getKey().equals("name")){
-						newMap.put("姓名", entry.getValue());
-					}
-					if(entry.getKey().equals("degree")){
-						newMap.put("学历", entry.getValue());
-					}
-				}
-				if(newMap.size() == 5){
-					newMap.put("院系", "");
-					newListMap.add(newMap);
-				}
+				
 			}
 		}
 		for (Map<String, Object> maps : listReslut) {

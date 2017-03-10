@@ -39,11 +39,11 @@ public class ESClient {
 				.put("client.transport.sniff", true).build();
 		client = TransportClient.builder().settings(settings).build();
 		List<EsServerAddress> esServerAddress = new ArrayList<EsServerAddress>();
-		esServerAddress.add(new EsServerAddress("192.168.0.10", 9300));
-		esServerAddress.add(new EsServerAddress("192.168.0.11", 9300));
-		esServerAddress.add(new EsServerAddress("192.168.0.12", 9300));
-		esServerAddress.add(new EsServerAddress("192.168.0.13", 9300));
-		esServerAddress.add(new EsServerAddress("192.168.0.13", 9300));
+		esServerAddress.add(new EsServerAddress("192.168.0.10", 9030));
+		esServerAddress.add(new EsServerAddress("192.168.0.11", 9030));
+		esServerAddress.add(new EsServerAddress("192.168.0.12", 9030));
+		esServerAddress.add(new EsServerAddress("192.168.0.13", 9030));
+		esServerAddress.add(new EsServerAddress("192.168.0.14", 9030));
 		for (EsServerAddress address : esServerAddress) {
 			client.addTransportAddress(new InetSocketTransportAddress(
 					new InetSocketAddress(address.getHost(), address.getPort())));

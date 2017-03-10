@@ -64,13 +64,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
 			String query, String scrollId, int size, boolean isHighLight) throws BusinessException {
-		BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-		for (String attribute : identity_attributes) {
-			queryBuilder.should(QueryBuilders.termQuery(attribute, query));
-		}
-		for (String attribute : name_attributes) {
-			queryBuilder.should(QueryBuilders.termQuery(attribute, query));
-		}
+		BoolQueryBuilder queryBuilder = buildBoolQuery(index, type, query);
 		return readPaginationDataListByCondition(index, type, queryBuilder, scrollId, size, isHighLight);
 	}
 	
@@ -152,8 +146,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	@Override
 	public QueryResult<Map<String, Object>> readLabelPaginationDataList(String index, String type, String query,
 			String scrollId, int size) throws BusinessException {
-		String label = MessageUtils.getInstance().getMessage(index + "." + type);
-		String labelDatasCacheKey = genLabelDatasCacheKey(index, type, label, query);
+		String labelDatasCacheKey = genLabelDatasCacheKey(index, type, query);
 		Object cacheObject = RedisClusterUtils.getInstance().get(labelDatasCacheKey);
 		QueryResult<Map<String, Object>> qr = new QueryResult<Map<String,Object>>();
 		if (null != cacheObject) {
@@ -168,7 +161,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		qr.setScrollId(String.valueOf(from + 1));
 		int fromIndex = (from - 1) * size;
 		int toIndex = (fromIndex + size) > totalRowNum ? (int) totalRowNum : (fromIndex + size);
-		LOG.info("fromIndex {} toIndex {}", fromIndex, toIndex);
+		LOG.info("fromIndex {} toIndex {} totalRowNum {}", fromIndex, toIndex, totalRowNum);
 		List<Map<String, Object>> resultList = fromIndex <= toIndex ? 
 				qr.getResultList().subList(fromIndex, toIndex) : new ArrayList<Map<String, Object>>();
 		wrapperQQQunInformation(type, resultList);
@@ -177,7 +170,8 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	}
 	
 	@Override
-	public List<Map<String, Object>> readLogisticsDataList(String query) throws BusinessException {
+	public List<Map<String, Object>> readLogisticsDataList(String query, boolean isHighLight) 
+			throws BusinessException {
 		BoolQueryBuilder queryBuilder = null;
 		if (query.trim().indexOf(" ") == -1) {
 			queryBuilder = buildLogisticsSBoolQuery(query);
@@ -188,13 +182,13 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 				queryBuilder.must(buildLogisticsSBoolQuery(keywords[i]));
 			}
 		}
-		return readDataListByCondition("financial", "logistics", queryBuilder);
+		return readDataListByCondition("financial", "logistics", queryBuilder, isHighLight);
 	}
 	
 	@Override
 	public List<Map<String, Object>> readLogisticsFilterDataList(String query) throws BusinessException {
 		List<Map<String, Object>> logisticsFilterDataList = new ArrayList<Map<String, Object>>();
-		List<Map<String, Object>> logisticsDataList = readLogisticsDataList(query);
+		List<Map<String, Object>> logisticsDataList = readLogisticsDataList(query, false);
 		Map<String, Object> logisticsFilterData = null;
 		Map<String, Object> logisticsData = null;
 		Set<String> locations = new HashSet<String>();
@@ -237,7 +231,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	
 	@Override
 	public List<Map<String, Object>> readLogisticsRelationsDataList(String query) throws BusinessException {
-		List<Map<String, Object>> dataList = readLogisticsDataList(query);
+		List<Map<String, Object>> dataList = readLogisticsDataList(query, false);
 		Map<String, Object> data = null;
 		String sName, sMobilePhone, rName, rMobilePhone = null;
 		for (int i = 0, len = dataList.size(); i < len; i++) {
@@ -408,8 +402,8 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		return "labels:hit:" + MD5Utils.hash(sb.toString());
 	}
 	
-	private String genLabelDatasCacheKey(String index, String type, String label, String query) {
-		return index + ":" + type + ":" + label + ":" + MD5Utils.hash(query);
+	private String genLabelDatasCacheKey(String index, String type, String query) {
+		return index + ":" + type + ":" + MD5Utils.hash(query);
 	}
 	
 	class ReadPaginationDataListThread implements Callable<QueryResult<Map<String, Object>>> {
@@ -469,7 +463,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 			String label = MessageUtils.getInstance().getMessage(index + "." + type);
 			result.put("label", label);
 			qr.setResultList(new ArrayList<Map<String, Object>>(qr.getResultList()));
-			RedisClusterUtils.getInstance().set(genLabelDatasCacheKey(index, type, label, query), qr, 120);
+			RedisClusterUtils.getInstance().set(genLabelDatasCacheKey(index, type, query), qr, 120);
 			return result;
 		}
 	}

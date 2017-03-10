@@ -37,7 +37,7 @@ function checkContactNumber() {
 				$("#submits").attr("disabled", true); 
 				$("#submits").attr("style", "color:gray;"); 
 				var moblie = $("#query").val();
-				var url = "mobile/" + moblie;
+				var url ="mobile/"+moblie;
 				document.getElementById('background').style.display='block';
 				$.ajax({
 					type:"get",
@@ -47,12 +47,14 @@ function checkContactNumber() {
 						$("#results").empty();
 						var str = "<table class='table table-striped table-bordered'>";
 						$.each(result.data,function(resultKey,resultValue){
+							if(result.code==3){
+								$("#results").append(result.failure);
+							}
 							if (result.code == 2) {
 								$("#results").append(result.failure);
 							} else if(result.code == 1) {
 								 str += "<tr><td>"+resultKey+"</td>"+
-										"<td>"+resultValue+"</td></tr>";
-								
+										"<td>"+resultValue+"</td></tr>";								
 							} else {
 								var  name =result.data["name"];
 								var msg = result.data["msg"];
@@ -60,8 +62,7 @@ function checkContactNumber() {
 								"<td>"+name+"</td></tr>"+
 								"<tr><td>"+"归属地"+"</td>"+
 								"<td>"+msg+"</td></tr></table>";
-								$("#results").append(str1);
-								
+								$("#results").append(str1);	
 							}
 						});
 						$("#results").append(str+"</table>");
@@ -71,7 +72,6 @@ function checkContactNumber() {
 					document.getElementById('background').style.display='none';
 					},
 					error:function(){
-						console.log("ajax发送请求失败！");
 						document.getElementById('background').style.display='none';
 						$("#submits").attr("disabled", false); 
 						$("#submits").attr("style", "color:black;"); 

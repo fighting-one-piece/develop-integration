@@ -12,11 +12,25 @@ import org.elasticsearch.index.query.QueryBuilder;
 public interface IESService {
 	
 	/**
+	 * 读取名字属性
+	 * @return
+	 * @throws BusinessException
+	 */
+	public Set<String> readNameAttributes() throws BusinessException;
+	
+	/**
 	 * 读取标识属性
 	 * @return
 	 * @throws BusinessException
 	 */
 	public Set<String> readIdentityAttributes() throws BusinessException;
+	
+	/**
+	 * 读取位置属性
+	 * @return
+	 * @throws BusinessException
+	 */
+	public Set<String> readLocationAttributes() throws BusinessException;
 	
 	/**
 	 * 根据条件全索引读取数据

@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.dao.GenericDAO;
 import org.cisiondata.modules.abstr.entity.Query;
 import org.cisiondata.modules.abstr.service.impl.GenericServiceImpl;
+import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.auth.dao.UserDAO;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.auth.service.IUserService;
@@ -63,12 +64,15 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements I
 	@Override
 	public User readUserByAccountAndPassword(String account, String password) throws BusinessException {
 		if (StringUtils.isBlank(account) || StringUtils.isBlank(password)) {
-			throw new BusinessException("账号或密码不能为空");
+			throw new BusinessException(ResultCode.PARAM_NULL.getCode(), "账号或密码不能为空");
 		}
 		User user = readUserByAccount(account);
+		if (null == user) {
+			throw new BusinessException(ResultCode.ACCOUNT_NOT_EXIST);
+		}
 		String encryptPassword = EndecryptUtils.encryptPassword(password, user.getSalt());
 		if (!encryptPassword.equals(user.getPassword())) {
-			throw new BusinessException("账号密码不匹配!");
+			throw new BusinessException(ResultCode.ACCOUNT_PASSWORD_NOT_MATCH);
 		}
 		return user;
 	}

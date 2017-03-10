@@ -80,7 +80,7 @@ public interface ILMInternetService {
 	public Map<String, Map<String, String>> readCaseReportInfo(String phone, String idCard, String caseType) throws BusinessException;
 	
 	//18 银行卡消费信息查询
-	public Map<String, Map<String, String>> readqueryQuota1(String bankCard) throws BusinessException;
+	public Map<String, String> readqueryQuota1(String bankCard) throws BusinessException;
 //	public Map<String, Map<String, String>> readqueryQuota2(String bankCard) throws BusinessException;
 //	public Map<String, Map<String, String>> readqueryQuota3(String bankCard) throws BusinessException;
 //	public Map<String, Map<String, String>> readqueryQuota4(String bankCard) throws BusinessException;

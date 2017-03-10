@@ -27,8 +27,8 @@
     </update>
 
 	<insert id="addAccessUserControl" parameterType="org.cisiondata.modules.datainterface.entity.AccessUserControl">
-    	insert into T_ACCESS_USER_CONTROL (ACCOUNT,COUNT,REMAINING_COUNT,MONEY,REMAINING_MONEY)
-    	values (#{account},#{count},#{remainingCount},#{money},#{remainingMoney})
+    	insert into T_ACCESS_USER_CONTROL (ACCOUNT,COUNT,REMAINING_COUNT,MONEY,REMAINING_MONEY,SOURCE)
+    	values (#{account},#{count},#{remainingCount},#{money},#{remainingMoney},#{source})
     </insert>
     
     <select id="findAccessControlAll" resultMap="AccessControlResultMap">

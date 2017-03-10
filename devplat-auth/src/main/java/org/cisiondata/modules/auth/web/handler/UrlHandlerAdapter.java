@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,12 @@ import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.auth.entity.AccessUserControl;
+import org.cisiondata.modules.auth.entity.RequestMessage;
 import org.cisiondata.modules.auth.service.IAccessUserService;
+import org.cisiondata.modules.auth.web.WebUtils;
 import org.cisiondata.modules.auth.web.handler.UrlMappingStorage.Mapper;
+import org.cisiondata.modules.rabbitmq.entity.MQueue;
+import org.cisiondata.modules.rabbitmq.service.IMQService;
 import org.cisiondata.utils.clazz.ClassScanner;
 import org.cisiondata.utils.clazz.ClassScanner.ClassResourceHandler;
 import org.cisiondata.utils.clazz.ObjectMethodParams;
@@ -32,18 +37,21 @@ import org.cisiondata.utils.date.DateFormatter;
 import org.cisiondata.utils.endecrypt.SHAUtils;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.redis.RedisClusterUtils;
+import org.cisiondata.utils.web.IPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
 import org.springframework.util.ReflectionUtils.MethodCallback;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.HandlerAdapter;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -60,6 +68,8 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	private ApplicationContext ctx = null;
 	
 	private IAccessUserService accessUserService = null;
+	
+	private IMQService mqService = null;
 	
 	public void setApplicationContext(ApplicationContext ctx) throws BeansException {
 		this.ctx = ctx;
@@ -81,8 +91,10 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			public void handle(MetadataReader metadata) {
 				String className = metadata.getClassMetadata().getClassName();
 				String[] baseUrl = null;
-				if (!metadata.getAnnotationMetadata().hasAnnotation(Controller.class.getName()) || 
-						!metadata.getAnnotationMetadata().hasAnnotation(RequestMapping.class.getName())) return;
+				AnnotationMetadata annotationMetadata = metadata.getAnnotationMetadata();
+				if (!annotationMetadata.hasAnnotation(Controller.class.getName()) &&
+						!annotationMetadata.hasAnnotation(RestController.class.getName())) 
+					return;
 				Map<String, Object> attributes = metadata.getAnnotationMetadata()
 						.getAnnotationAttributes(RequestMapping.class.getName());
 				if (attributes != null) {
@@ -113,24 +125,35 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			}
 		}).scan();
 		this.accessUserService = (IAccessUserService) ctx.getBean("accessUserService");
+		this.mqService = (IMQService) ctx.getBean("mqService");
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		try {
-			String path = request.getRequestURI().replace("/devplat", "");
+			String path = request.getServletPath();
 			LOG.info("url handler adapter request path: {}", path);
 			judgeSensitiveWord(request.getParameterMap());
 			if (path.startsWith("/app")) {
 				if (authenticationAppRequest(request, response)) {
-					Object result = handleExternalRequest(path.replace("/app", ""), request, response);
+					path = path.replace("/app", "");
+					Object result = handleExternalRequest(path, request, response);
 					writeResponse(response, result);
 				}
 			} else if (path.startsWith("/ext")) {
 				if (authenticationExternalRequest(request, response)) {
-					handleExternalRequestWithUserAccessControl(path.replace("/ext", ""), request, response);
+					path = path.replace("/ext", "");
+					Object result = handleExternalRequestWithUserAccessControl(path, request, response);
+					writeResponse(response, result);
 				}
+			} else if (path.startsWith("/api/v1")) {
+				path = path.replace("/api/v1", "");
+				Object result = handleNormalRequest(path, request, response);
+				writeResponse(response, result);
+				/**
+				sendMessage(request, path, result);
+				**/
 			} else {
 				Object result = handleNormalRequest(path, request, response);
 				writeResponse(response, result);
@@ -190,7 +213,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		}
 	}
 	
-	private void handleExternalRequestWithUserAccessControl(String interfaceUrl, 
+	private Object handleExternalRequestWithUserAccessControl(String interfaceUrl, 
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String account = request.getParameter("accessId");
 		AccessUserControl accessUserControl = accessUserService.readAccessUserControlByAccount(account);
@@ -202,7 +225,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		long incOrDec = parseReturnResultCount(result);
 		LOG.info("incOrDec : {}", incOrDec);
 		accessUserService.updateRemainingCount(account, remainingCount, -incOrDec);
-		writeResponse(response, result);
+		return result;
 	}
 	
 	private Object handleExternalRequest(String interfaceUrl, HttpServletRequest request, HttpServletResponse response)
@@ -368,4 +391,23 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			}
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	private RequestMessage wrapperRequestMessage(HttpServletRequest request, String requestUrl, Object result) {
+		RequestMessage requestMessage = new RequestMessage();
+		requestMessage.setUrl(requestUrl);
+		requestMessage.setParams(request.getParameterMap());
+		requestMessage.setIpAddress(IPUtils.getIPAddress(request));
+		requestMessage.setAccount(WebUtils.getCurrentAccout());
+		requestMessage.setTime(new Date());
+		requestMessage.setReturnResult(result);
+		return requestMessage;
+	}
+	
+	@SuppressWarnings("unused")
+	private void sendMessage(HttpServletRequest request, String requestUrl, Object result) {
+		mqService.sendMessage(MQueue.REQUEST_ACCESS_QUEUE.getName(), 
+				wrapperRequestMessage(request, requestUrl, result));
+	}
+	
 }

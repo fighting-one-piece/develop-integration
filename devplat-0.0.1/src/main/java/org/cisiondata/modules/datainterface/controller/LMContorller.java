@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.datainterface.service.ILMInternetService;
+import org.cisiondata.utils.exception.BusinessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +31,10 @@ public class LMContorller {
 			Map<String, Object> mapdata = lmInternetService.readBankPhone(mobile);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(mapdata);
-		} catch (Exception e) {
+		}catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+		}  catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
 		}
@@ -530,10 +534,13 @@ public class LMContorller {
 		public WebResult queryQuota1(@PathVariable String bankcard) {
 			WebResult result = new WebResult();
 			try {
-				Map<String, Map<String, String>> data = lmInternetService.readqueryQuota1(bankcard);
+				Map<String, String> data = lmInternetService.readqueryQuota1(bankcard);
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
-			} catch (Exception e) {
+			}catch (BusinessException bu){
+				result.setCode(ResultCode.NOT_FOUNT_DATA.getCode());
+				result.setFailure(bu.getMessage());
+			}catch (Exception e) {
 				result.setCode(ResultCode.FAILURE.getCode());
 				result.setFailure(e.getMessage());
 			}

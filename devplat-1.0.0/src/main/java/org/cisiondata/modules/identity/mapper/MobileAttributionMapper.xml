@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.cisiondata.modules.identity.dao.MobileAttributionDao">
+<mapper namespace="org.cisiondata.modules.identity.dao.MobileAttributionDAO">
 
 	<resultMap type="org.cisiondata.modules.identity.entity.MobileAttributionModel" id="attributionMap">
 		<result column="PROVINCE" property="province"/>

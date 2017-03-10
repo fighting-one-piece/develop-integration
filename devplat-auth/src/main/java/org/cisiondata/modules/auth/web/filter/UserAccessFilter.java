@@ -2,7 +2,6 @@ package org.cisiondata.modules.auth.web.filter;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.Filter;
@@ -58,11 +57,8 @@ public class UserAccessFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 		String requestUrl = httpServletRequest.getServletPath();
+		if (requestUrl.startsWith("/api/v1")) requestUrl = requestUrl.replace("/api/v1", "");
 		LOG.info("client request url: {}", requestUrl);
-		Map<String, String[]> params = httpServletRequest.getParameterMap();
-		for (Map.Entry<String, String[]> entry : params.entrySet()) {
-			LOG.info("param key : " + entry.getKey() + " value: " + entry.getValue()[0]);
-		}
 		LOG.info("current access account: {}", WebUtils.getCurrentAccout());
 		LOG.info("ipAddress: {} macAddress: {}", IPUtils.getIPAddress(WebContext.get().getRequest()), 
 				IPUtils.getMACAddress(WebContext.get().getRequest()));
@@ -112,6 +108,7 @@ public class UserAccessFilter implements Filter {
 		filteredRequestUrls.add("/login");
 		filteredRequestUrls.add("/jcaptcha.jpg");
 		filteredRequestUrls.add("/jcaptcha-validate");
+		filteredRequestUrls.add("/verificationCode.jpg");
 	}
 	
 	private void writeResponse(HttpServletResponse response, Object result) 

@@ -11,8 +11,10 @@ import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.dao.GenericDAO;
 import org.cisiondata.modules.abstr.entity.Query;
 import org.cisiondata.modules.abstr.service.impl.GenericServiceImpl;
+import org.cisiondata.modules.datainterface.dao.AccessUserControlDao;
 import org.cisiondata.modules.datainterface.dao.AccessUserDAO;
 import org.cisiondata.modules.datainterface.entity.AccessUser;
+import org.cisiondata.modules.datainterface.entity.AccessUserControl;
 import org.cisiondata.modules.datainterface.service.IAccessUserService;
 import org.cisiondata.utils.endecrypt.MD5Utils;
 import org.cisiondata.utils.endecrypt.SHAUtils;
@@ -24,6 +26,9 @@ public class AccessUserServiceImpl extends GenericServiceImpl<AccessUser, Long> 
 	
 	@Resource(name = "aaccessUserDAO")
 	private AccessUserDAO accessUserDAO;
+	
+	@Resource(name = "aaccessUserControlDao")
+	private AccessUserControlDao accessUserControlDao;
 	
 	@Override
 	public GenericDAO<AccessUser, Long> obtainDAOInstance() {
@@ -47,7 +52,19 @@ public class AccessUserServiceImpl extends GenericServiceImpl<AccessUser, Long> 
 			
 			accessControl.setAccessKey(accessKey);
 			accessControl.setAccessId(accessId);
-			return accessUserDAO.addAccessUser(accessControl);
+			int num = accessUserDAO.addAccessUser(accessControl);
+			AccessUserControl accessUserControl = new AccessUserControl();
+			accessUserControl.setAccount(accessControl.getAccessId());
+			accessUserControl.setCount(0L);
+			accessUserControl.setRemainingCount(0L);
+			accessUserControl.setMoney(0.0);
+			accessUserControl.setRemainingMoney(0.0);
+			accessUserControl.setDeleteFlag("0");
+			accessUserControl.setQueryCount(0L);
+			accessUserControl.setSource(2);
+			accessUserControlDao.addAccessUserControl(accessUserControl);
+			return num;
+					
 		} else {
 			return 0;
 		}

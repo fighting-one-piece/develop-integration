@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.cisiondata.modules.identity.entity.MobileAttributionModel;
 import org.springframework.stereotype.Repository;
-@Repository("attributiondao")
-public interface MobileAttributionDao {
+
+@Repository("mobileAttributionDAO")
+public interface MobileAttributionDAO {
+	
 	public List<MobileAttributionModel> selByDnseg(String phone);
 }

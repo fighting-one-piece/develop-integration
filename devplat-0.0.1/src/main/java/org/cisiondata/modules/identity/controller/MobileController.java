@@ -7,6 +7,7 @@ import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.identity.service.IMobileAddressService;
 import org.cisiondata.modules.identity.service.IMobileParseService;
 import org.cisiondata.modules.identity.service.IMobileService;
+import org.cisiondata.utils.exception.BusinessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,7 +63,11 @@ public class MobileController  {
 		try {
 			result.setData(mobileService.readMobileInfo(mobile));
 			result.setCode(ResultCode.SUCCESS.getCode());
-		} catch (Exception e) {
+		} catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+		}
+		catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
 		}

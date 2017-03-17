@@ -128,15 +128,15 @@ public class UrlMappingStorage {
 					key = key.substring(0, key.indexOf("\b"));
 					if (url.matches(key)) {
 						ObjectMethod value = entry.getValue();
-						Map<String, String> param = new HashMap<String, String>();
+						Map<String, String> params = new HashMap<String, String>();
 						for (int i = 0; i < names.length; i++) {
-							String tmp=url.replaceAll(key, "$" + (i + 1));
-							if(tmp!=null&&tmp.contains("%")){
-								tmp=URLDecoder.decode(tmp,"UTF-8");
+							String tmp = url.replaceAll(key, "$" + (i + 1));
+							if(tmp != null && tmp.contains("%")){
+								tmp = URLDecoder.decode(tmp,"UTF-8");
 							}
-							param.put(names[i], tmp);
+							params.put(names[i], tmp);
 						}
-						treeMap.put(names.length, new ObjectMethodParams(value, param));
+						treeMap.put(names.length, new ObjectMethodParams(value, params));
 					}
 				}
 				if (treeMap.size() > 0) {

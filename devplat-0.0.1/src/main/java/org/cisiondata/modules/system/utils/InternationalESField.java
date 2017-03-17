@@ -27,8 +27,8 @@ public class InternationalESField {
 	}
 	
 	private static void writeToFile() throws Exception{
-		File fileCN = new File("src\\main\\resources\\locale\\ESMetadata_zh_CN.properties");
-		File fileEN = new File("src\\main\\resources\\locale\\ESMetadata_en_US.properties");
+		File fileCN = new File("src\\main\\resources\\locale\\esmetadata_zh_CN.properties");
+		File fileEN = new File("src\\main\\resources\\locale\\esmetadata_en_US.properties");
 		if(fileCN.exists()){
 			fileCN.delete();
 		}

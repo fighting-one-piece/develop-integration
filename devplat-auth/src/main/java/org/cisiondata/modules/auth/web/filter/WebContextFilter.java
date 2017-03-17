@@ -22,7 +22,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class WebContextFilter implements Filter {
 	
-	private Logger LOG = LoggerFactory.getLogger(WebContextFilter.class);
+	public Logger LOG = LoggerFactory.getLogger(WebContextFilter.class);
 	
 	private ServletContext ctx = null;
 	private SessionManager sessionManager = null;
@@ -35,9 +35,16 @@ public class WebContextFilter implements Filter {
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) 
 			throws IOException, ServletException {
-		Session session = sessionManager.getSession((HttpServletRequest) request, (HttpServletResponse) response);
-		LOG.info("current session id : {}", session.getId());
-		WebContext instance = new WebContext((HttpServletRequest) request, (HttpServletResponse) response, session, ctx);
+		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+		HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+		httpServletResponse.addHeader("Access-Control-Max-Age", "1800");
+		httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
+		httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE, PUT");
+		httpServletResponse.addHeader("Access-Control-Allow-Credentials", "true");
+		httpServletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type, "
+				+ "Access-Control-Allow-Headers, Authorization, X-Requested-With, accessToken");
+		Session session = sessionManager.getSession(httpServletRequest, httpServletResponse);
+		WebContext instance = new WebContext(httpServletRequest, httpServletResponse, session, ctx);
 		try {
 			WebContext.set(instance);
 			chain.doFilter(request, response);

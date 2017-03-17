@@ -65,14 +65,15 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
 			String query, String scrollId, int size, boolean isHighLight) throws BusinessException {
-		BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-		for (String attribute : identity_attributes) {
-			queryBuilder.should(QueryBuilders.termQuery(attribute, query));
-		}
-		for (String attribute : name_attributes) {
-			queryBuilder.should(QueryBuilders.termQuery(attribute, query));
-		}
-		return readPaginationDataListByCondition(index, type, queryBuilder, scrollId, size, isHighLight);
+		return readPaginationDataListByCondition(index, type, query, scrollId, size, isHighLight, false);
+	}
+	
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
+			String query, String scrollId, int size, boolean isHighLight, boolean isMessageSource) 
+					throws BusinessException {
+		BoolQueryBuilder queryBuilder = buildBoolQuery(index, type, query);
+		return readPaginationDataListByCondition(index, type, queryBuilder, 
+				scrollId, size, isHighLight, isMessageSource);
 	}
 	
 	@Override
@@ -307,10 +308,6 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 		boolean isChineseWord = isChineseWord(keyword);
 		Set<String> attributes = isChineseWord ? q_chinese_attributes : q_identity_attributes;
-//		for (String attribute : attributes) {
-//			boolQueryBuilder.should(isChineseWord ? QueryBuilders.matchPhraseQuery(attribute, keyword)
-//					: QueryBuilders.termQuery(attribute, keyword));
-//		}
 		for (String attribute : attributes) {
 			if (isChineseWord && attribute.indexOf("name") == -1) {
 				boolQueryBuilder.should(QueryBuilders.matchPhraseQuery(attribute, keyword));

@@ -99,5 +99,6 @@
     <!-- Import Resource -->
     <import resource="classpath:spring/applicationContext-task.xml"/>
     <import resource="classpath:spring/applicationContext-redis.xml"/>
+    <import resource="classpath:spring/applicationContext-rabbitmq.xml"/>
     
 </beans>

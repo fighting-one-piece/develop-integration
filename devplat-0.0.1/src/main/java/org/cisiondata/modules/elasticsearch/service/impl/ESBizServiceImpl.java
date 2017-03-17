@@ -479,7 +479,7 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 				queryBuilder.must(buildAccumulationFundBoolQuery(keywords[i]));
 			}
 		}
-		return readDataListByCondition("work", "accumulationfund", queryBuilder);
+		return readDataListByCondition("work", "accumulationfund", queryBuilder,false);
 	}
 	
 	private BoolQueryBuilder buildAccumulationFundBoolQuery(String keyword) {

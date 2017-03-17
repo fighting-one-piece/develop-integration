@@ -7,17 +7,24 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
+import org.cisiondata.modules.abstr.web.ResultCode;
+import org.cisiondata.modules.auth.Constants.SessionName;
 import org.cisiondata.modules.auth.entity.Group;
 import org.cisiondata.modules.auth.entity.Permission;
 import org.cisiondata.modules.auth.entity.Role;
 import org.cisiondata.modules.auth.entity.User;
+import org.cisiondata.modules.auth.service.IAccessUserService;
 import org.cisiondata.modules.auth.service.IAuthService;
 import org.cisiondata.modules.auth.service.IGroupService;
 import org.cisiondata.modules.auth.service.IPermissionService;
 import org.cisiondata.modules.auth.service.IResourceService;
 import org.cisiondata.modules.auth.service.IRoleService;
 import org.cisiondata.modules.auth.service.IUserService;
+import org.cisiondata.modules.auth.web.WebContext;
 import org.cisiondata.utils.exception.BusinessException;
+import org.cisiondata.utils.redis.RedisClusterUtils;
+import org.cisiondata.utils.token.TokenUtils;
+import org.cisiondata.utils.web.IPUtils;
 import org.springframework.stereotype.Service;
 
 @Service("authService")
@@ -35,6 +42,9 @@ public class AuthServiceImpl implements IAuthService {
 	@Resource(name = "resourceService")
 	private IResourceService resourceService = null;
 	
+	@Resource(name = "accessUserService")
+	private IAccessUserService accessUserService = null;
+
 	@Resource(name = "permissionService")
 	private IPermissionService permissionService = null;
 	
@@ -49,9 +59,22 @@ public class AuthServiceImpl implements IAuthService {
 	}
 	
 	@Override
-	public User readUserLoginInfoByAccountAndPassowrd(String account, String password) throws BusinessException {
+	public User readUserAuthenticationInfo(String account, String password) throws BusinessException {
 		User user = userService.readUserByAccountAndPassword(account, password);
+		if (!user.isValid()) throw new BusinessException(ResultCode.ACCOUNT_EXPIRED_OR_DELETED);
+		String macAddress = IPUtils.getMACAddress(WebContext.get().getRequest());
+		String accessToken = TokenUtils.genMD5Token(account, user.getPassword(), macAddress);
+		user.setAccessToken(accessToken);
+		WebContext.get().getSession().getManager().setCookieSecure(true);
+		WebContext.get().getSession().setAttribute(SessionName.CURRENT_USER, user);
+		WebContext.get().getSession().setAttribute(SessionName.CURRENT_USER_ACCOUNT, account);
+		RedisClusterUtils.getInstance().set(accessToken, WebContext.get().getSession().getId(), 1800);
 		return user;
+	}
+	
+	@Override
+	public boolean readUserAuthorizationInfo(String account, String url) throws BusinessException {
+		return false;
 	}
 
 	@Override
@@ -111,9 +134,19 @@ public class AuthServiceImpl implements IAuthService {
 	}
 	
 	@Override
+	public Set<String> readPermissionIdentitiesByAccount(String account) throws BusinessException {
+		return null;
+	}
+	
+	@Override
 	public String readResourceReadIdentityByUrl(String url) throws BusinessException {
 		String identity = resourceService.readIdentityByUrl(url);
 		return StringUtils.isBlank(identity) ? null : identity + ":" + Permission.READ;
+	}
+	
+	@Override
+	public String readUserAccessKeyByAccessId(String accessId) throws BusinessException {
+		return accessUserService.readAccessKeyByAccessId(accessId);
 	}
 	
 }

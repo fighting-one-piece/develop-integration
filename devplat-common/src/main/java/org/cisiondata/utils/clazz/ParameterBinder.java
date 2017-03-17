@@ -1,6 +1,11 @@
 package org.cisiondata.utils.clazz;
 
+import java.io.BufferedReader;
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -10,11 +15,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -23,30 +26,25 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.context.ApplicationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.alibaba.fastjson.JSONArray;
+import com.google.gson.Gson;
 
 @SuppressWarnings("unchecked")
 public class ParameterBinder {
 
-	private static Log log = LogFactory.getLog(ParameterBinder.class);
+	private Logger LOG = LoggerFactory.getLogger(ParameterBinder.class);
 	
-	@SuppressWarnings("unused")
-	private ApplicationContext ctx = null;
 	private static final MultipartResolver MULTIPARTRESOLVER = new CommonsMultipartResolver();
 	private static Map<String, Object> classMethodParamNames = new HashMap<String, Object>();
-
-	public ParameterBinder(ApplicationContext ctx) {
-		this.ctx = ctx;
-	}
 
 	private String getParam(Map<String, String> params, HttpServletRequest request, String name) {
 		if (params != null && params.get(name) != null) {
@@ -66,38 +64,46 @@ public class ParameterBinder {
 		if (MULTIPARTRESOLVER.isMultipart(request)) {
 			request = MULTIPARTRESOLVER.resolveMultipart(request);
 		}
-		List<String> parameterNames = this.parseMethodParamNames(omp.getMethod());
-		Class[] parameterTypes = omp.getMethod().getParameterTypes();
+		Method method = omp.getMethod();
+		List<String> parameterNames = this.parseMethodParamNames(method);
+		Class[] parameterTypes = method.getParameterTypes();
+		Class[] parameterAnnotationTypes = getMethodParamsAnnotationType(method);
 		Object paramTarget[] = new Object[parameterTypes.length];
-		for (int i = 0; i < parameterTypes.length; i++) {
-			Class typeClasz = parameterTypes[i];
-			if (typeClasz.isArray()) {
-				String arr = getParam(params, request, parameterNames.get(i));
+		for (int i = 0, iLen = parameterTypes.length; i < iLen; i++) {
+			Class typeClazz = parameterTypes[i];
+			Class annotaionTypeClazz = parameterAnnotationTypes[i];
+			if (null != annotaionTypeClazz && RequestBody.class.isAssignableFrom(annotaionTypeClazz)) {
+				String requestBody = extractRequestBody(request);
+				paramTarget[i] = new Gson().fromJson(requestBody, typeClazz);
+				continue;
+			}
+			if (typeClazz.isArray()) {
+				String arrayString = getParam(params, request, parameterNames.get(i));
 				String[] value = null;
-				if (arr == null) {
+				if (arrayString == null) {
 					value = new String[0];
 				} else {
-					if (arr.contains("\b") || !arr.matches("\\s*\\[.*\\]\\s*")) {
-						value = arr.split("\b");
+					if (arrayString.contains("\b") || !arrayString.matches("\\s*\\[.*\\]\\s*")) {
+						value = arrayString.split("\b");
 					} else {
-						JSONArray ja = JSONArray.parseArray(arr);
+						JSONArray ja = JSONArray.parseArray(arrayString);
 						value = new String[ja.size()];
 						for (int j = 0; j < ja.size(); j++) {
 							value[j] = ja.getString(j);
 						}
 					}
 				}
-				Object r = Array.newInstance(typeClasz.getComponentType(), value.length);
-				for (int j = 0; j < value.length; j++) {
+				Object newArray = Array.newInstance(typeClazz.getComponentType(), value.length);
+				for (int j = 0, jLen = value.length; j < jLen; j++) {
 					try {
-						Array.set(r, j, BeanUtil.directConvert(value[j], typeClasz.getComponentType()));
+						Array.set(newArray, j, BeanUtil.directConvert(value[j], typeClazz.getComponentType()));
 					} catch (Exception e) {
 					}
 				}
-				paramTarget[i] = r;
-			} else if (typeClasz.isPrimitive() || typeClasz == String.class || Number.class.isAssignableFrom(typeClasz)||Boolean.class==typeClasz) {
-				paramTarget[i] = BeanUtil.directConvert(getParam(params, request, parameterNames.get(i)), typeClasz);
-			} else if (typeClasz == Date.class) {
+				paramTarget[i] = newArray;
+			} else if (typeClazz.isPrimitive() || typeClazz == String.class || Number.class.isAssignableFrom(typeClazz)||Boolean.class==typeClazz) {
+				paramTarget[i] = BeanUtil.directConvert(getParam(params, request, parameterNames.get(i)), typeClazz);
+			} else if (typeClazz == Date.class) {
 				String pattern = "yyyy-MM-dd";
 				String key = parameterNames.get(i);
 				if (key.indexOf("\b") != -1) {
@@ -105,21 +111,21 @@ public class ParameterBinder {
 					key = key.substring(0, key.indexOf("\b"));
 				}
 				String strConvertDate = getParam(params, request, key);
-				SimpleDateFormat simpledateformat = new SimpleDateFormat(pattern);
+				SimpleDateFormat format = new SimpleDateFormat(pattern);
 				if (strConvertDate != null && !"".equals(strConvertDate)) {
-					paramTarget[i] = simpledateformat.parse(strConvertDate);
+					paramTarget[i] = format.parse(strConvertDate);
 				}
-			} else if (ServletRequest.class.isAssignableFrom(typeClasz)) {
+			} else if (ServletRequest.class.isAssignableFrom(typeClazz)) {
 				paramTarget[i] = request;
-			} else if (ServletResponse.class.isAssignableFrom(typeClasz)) {
+			} else if (ServletResponse.class.isAssignableFrom(typeClazz)) {
 				paramTarget[i] = response;
-			} else if (HttpSession.class.isAssignableFrom(typeClasz)) {
+			} else if (HttpSession.class.isAssignableFrom(typeClazz)) {
 				paramTarget[i] = request.getSession(false);
-			} else if (HttpHeaders.class.isAssignableFrom(typeClasz)) {
+			} else if (HttpHeaders.class.isAssignableFrom(typeClazz)) {
 				HttpHeaders headers = new HttpHeaders();
-				Enumeration en = request.getHeaderNames();
-				while (en.hasMoreElements()) {
-					String name = (String) en.nextElement();
+				Enumeration enumeration = request.getHeaderNames();
+				while (enumeration.hasMoreElements()) {
+					String name = (String) enumeration.nextElement();
 					List<String> values = new LinkedList<String>();
 					Enumeration ve = request.getHeaders(name);
 					while (ve.hasMoreElements()) {
@@ -128,7 +134,7 @@ public class ParameterBinder {
 					headers.put(name, values);
 				}
 				paramTarget[i] = headers;
-			} else if (MultipartFile.class.isAssignableFrom(typeClasz)) {
+			} else if (MultipartFile.class.isAssignableFrom(typeClazz)) {
 				String fileName = parameterNames.get(i);
 				paramTarget[i] = ((MultipartHttpServletRequest) request).getFile(fileName);
 			} else {
@@ -138,9 +144,12 @@ public class ParameterBinder {
 					Class actualClass = getGenericClass(omp.getObject(), omp.getMethod(), i);
 					paramTarget[i] = BeanUtil.directConvert(value, actualClass);
 				} else {
-					paramTarget[i] = getEntityParameter(typeClasz, parameterNames.get(i), params, request);
+					paramTarget[i] = getEntityParameter(typeClazz, parameterNames.get(i), params, request);
 				}
 			}
+		}
+		for (Object t : paramTarget) {
+			LOG.info("target param {}", t);
 		}
 		return paramTarget;
 	}
@@ -167,12 +176,10 @@ public class ParameterBinder {
 			for (int i = 0; i < arr.length; i++) {
 				actualClassArr[i] = getClassByType(arr[i]);
 			}
-
 			TypeVariable[] genericTypeArr = obj.getClass().getSuperclass().getTypeParameters();
 			for (int i = 0; i < genericTypeArr.length; i++) {
 				genericStringMap.put(genericTypeArr[i].toString(), i);
 			}
-
 			Type paramType = method.getGenericParameterTypes()[index];
 			if (paramType instanceof Class) {
 				return (Class<T>) paramType;
@@ -189,11 +196,8 @@ public class ParameterBinder {
 
 	/**
 	 * 从request中获取参数，并转换成目标类型
-	 * 
-	 * @param type
-	 *            目标类型
-	 * @param bind
-	 *            参数信息
+	 * @param type 目标类型
+	 * @param bind 参数信息
 	 * @param request
 	 * @return
 	 * @throws UnsupportedEncodingException
@@ -205,26 +209,20 @@ public class ParameterBinder {
 		try {
 			obj = type.newInstance();
 		} catch (InstantiationException e) {
-			log.debug("InstantiationException happened when initializing bussiness object", e);
+			LOG.debug("InstantiationException happened when initializing bussiness object", e);
 			return null;
 		} catch (IllegalAccessException e) {
-			log.debug("IllegalAccessException happened when initializing bussiness object", e);
+			LOG.debug("IllegalAccessException happened when initializing bussiness object", e);
 			return null;
 		}
-		Map m = request.getParameterMap();
-		Map m2 = new HashMap();
-		Iterator it = m.entrySet().iterator();
-		while (it.hasNext()) {
-			Entry entry = (Entry) it.next();
-			String[] arr = ((String[]) entry.getValue());
-			if (arr.length == 1)
-				m2.put(entry.getKey(), arr[0]);
-			else
-				m2.put(entry.getKey(), arr);
+		Map<String, String[]> paramMap = request.getParameterMap();
+		Map map = new HashMap();
+		for (Map.Entry<String, String[]> entry : paramMap.entrySet()) {
+			String[] array = entry.getValue();
+			map.put(entry.getKey(), array.length == 1 ? array[0] : array);
 		}
-		m2.putAll(params);
-
-		BeanUtil.copyProperties(m2, obj);
+		map.putAll(params);
+		BeanUtil.copyProperties(map, obj);
 		return obj;
 	}
 
@@ -239,15 +237,52 @@ public class ParameterBinder {
 	}
 	
 	private static String getMethodLongName(Method method) {
-		StringBuilder sb=new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		sb.append(method.getName()).append("(");
-		for(Class<?> type:method.getParameterTypes()){
+		for(Class<?> type : method.getParameterTypes()){
 			sb.append(type.getName()).append(",");
 		}
-		if(method.getParameterTypes().length>0)
-			sb.delete(sb.length()-1, sb.length());
+		if(method.getParameterTypes().length>0) sb.delete(sb.length()-1, sb.length());
 		sb.append(")");
 		return sb.toString();
+	}
+	
+	private Class<?>[] getMethodParamsAnnotationType(Method method) {
+		Annotation[][] annotationss = method.getParameterAnnotations();
+		Class<?>[] annotationTypes = new Class[annotationss.length];
+		for (int i = 0, len = annotationss.length; i < len; i++) {
+			Annotation[] annotations = annotationss[i];
+			if (annotations.length == 0) {
+				annotationTypes[i] = null;
+			} else if (annotations.length == 1) {
+				annotationTypes[i] = annotations[0].annotationType();
+			}
+		}
+		return annotationTypes;
+	}
+	
+	private String extractRequestBody(HttpServletRequest request) {
+		String charset = request.getCharacterEncoding();   
+		if (charset == null)  charset = "UTF-8";   
+		CharArrayWriter bodyData = new CharArrayWriter();   
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(request.getInputStream(), charset));
+			char[] buf = new char[8192];   
+			int length;   
+			while ((length = br.read(buf, 0, 8192)) != -1) {   
+				bodyData.write(buf, 0, length);   
+			}   
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		} finally {
+			try {
+				if (null != br) br.close();
+			} catch (IOException e) {
+				LOG.error(e.getMessage(), e);
+			}
+		}
+		return bodyData.toString();
 	}
 
 }

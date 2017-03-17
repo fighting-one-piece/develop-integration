@@ -35,10 +35,10 @@ public class WebUtils {
 				SessionManager sessionManager = SpringBeanFactory.getBean(SessionManager.class);
 				Object accountObject = sessionManager.getStorageHandler().getAttribute(sessionId, 
 						webContext.getRequest(), webContext.getResponse(), SessionName.CURRENT_USER_ACCOUNT);
-				LOG.info("WebUtils account: ", accountObject);
+				LOG.info("WebUtils account: {}", accountObject);
 				Object userObject = sessionManager.getStorageHandler().getAttribute(sessionId, 
 						webContext.getRequest(), webContext.getResponse(), SessionName.CURRENT_USER);
-				LOG.info("WebUtils user: ", userObject);
+				LOG.info("WebUtils user: {}", userObject);
 				if (null != accountObject) {
 					IUserService userService = SpringBeanFactory.getBean(IUserService.class);
 					user = userService.readUserByAccount((String) accountObject);
@@ -49,7 +49,7 @@ public class WebUtils {
 				LOG.error(e.getMessage(), e);
 			}
 		}
-		return null;
+		return user;
 	}
 	
 	public static void setCurrentUser(User user) {

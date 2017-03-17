@@ -1,6 +1,6 @@
 package org.cisiondata.modules.login.service;
 
-import org.cisiondata.modules.auth.dto.UserDTO;
+import org.cisiondata.modules.login.dto.LoginDTO;
 import org.cisiondata.utils.exception.BusinessException;
 
 public interface ILoginService {
@@ -12,6 +12,12 @@ public interface ILoginService {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public UserDTO readUserLoginInfoByAccountAndPassowrd(String account, String password) throws BusinessException;
+	public LoginDTO readUserLoginInfoByAccountAndPassowrd(String account, String password) throws BusinessException;
+	
+	/**
+	 * 用户登出
+	 * @throws BusinessException
+	 */
+	public void doUserLogout() throws BusinessException;
 	
 }

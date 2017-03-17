@@ -4,8 +4,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
+import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.auth.web.jcaptcha.JCaptcha;
 import org.cisiondata.modules.login.service.ILoginService;
 import org.cisiondata.modules.system.service.ISecCodeService;
@@ -14,9 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -32,12 +36,17 @@ public class LoginController {
     
     @Resource(name = "secCodeService")
     private ISecCodeService secCodeService = null;
-
-    @RequestMapping(value = {"/{login:login;?.*}"}, method = RequestMethod.POST)
-    public WebResult login(HttpServletRequest request, String account, String password,
-    		String verificationCode) {
+    
+    @ResponseBody
+    @RequestMapping(value = {"/{login:login;?.*}"}, method = RequestMethod.POST, headers = "Accept=application/json")
+    public WebResult login(HttpServletRequest request, String account, String password, String verificationCode,
+    		@RequestBody User user) {
         WebResult webResult = new WebResult();
         try {
+        	if (StringUtils.isBlank(account) && StringUtils.isBlank(password)) {
+        		account = user.getAccount();
+        		password = user.getPassword();
+        	}
 //        	boolean verifySuccess = secCodeService.secCode(request.getSession(), verificationCode);
 //        	LOG.info("verify success: {}", verifySuccess);
         	webResult.setData(loginService.readUserLoginInfoByAccountAndPassowrd(account, password));
@@ -54,6 +63,26 @@ public class LoginController {
         return webResult;
     }
     
+    @ResponseBody
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public WebResult logout(HttpServletRequest request) {
+        WebResult webResult = new WebResult();
+        try {
+        	loginService.doUserLogout();
+        	webResult.setResultCode(ResultCode.SUCCESS);
+        } catch (BusinessException be) {
+        	LOG.error(be.getMessage(), be);
+        	webResult.setCode(be.getCode());
+        	webResult.setFailure(be.getMessage());
+        } catch (Exception e) {
+        	LOG.error(e.getMessage(), e);
+        	webResult.setResultCode(ResultCode.FAILURE);
+        	webResult.setFailure(e.getMessage());
+        }
+        return webResult;
+    }
+    
+    @ResponseBody
     @RequestMapping(value = "/jcaptcha-validate", method = RequestMethod.GET)
     public WebResult jqueryValidationEngineValidate(HttpServletRequest request, HttpServletResponse response,
     		@RequestParam(value = "verificationCode", required = true) String verificationCode) {
@@ -73,5 +102,5 @@ public class LoginController {
         }
         return webResult;
     }
-
+    
 }

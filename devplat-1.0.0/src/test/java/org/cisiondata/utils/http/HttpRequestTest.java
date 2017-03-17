@@ -19,6 +19,14 @@ public class HttpRequestTest {
 	}
 	
 	@Test
+	public void testLogout() {
+		String url = "http://localhost:8080/devplat/api/v1/logout";
+		Map<String, String> params = new HashMap<String, String>();
+		String response = HttpUtils.sendPost(url, params, "accessToken", "df6a53b392494cb24292550a33feb84f");
+		System.out.println(response);
+	}
+	
+	@Test
 	public void testMetadatasIndices() {
 		String url = "http://localhost:8080/devplat/api/v1/metadatas/indices";
 		String[] headers = new String[]{"accessToken", "df6a53b392494cb24292550a33feb84f"};
@@ -28,7 +36,7 @@ public class HttpRequestTest {
 	
 	@Test
 	public void testIndexTypeSearch() {
-		String url = "http://localhost:8080/devplat/api/v1/index/operator/type/telecom/search?query=13512345678&scrollId=3&rowNumPerPage=40";
+		String url = "http://localhost:8080/devplat/api/v1/labels/indices/operator/types/telecom?query=13512345678&scrollId=1&rowNumPerPage=40";
 		String[] headers = new String[]{"accessToken", "df6a53b392494cb24292550a33feb84f"};
 		String response = HttpUtils.sendGet(url, headers);
 		System.out.println(response);

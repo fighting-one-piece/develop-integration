@@ -13,4 +13,13 @@ public interface IChargingService {
 	 */
 	public Object charge(ProceedingJoinPoint proceedingJoinPoint) throws BusinessException;
 	
+	/**
+	 * 计费
+	 * @param account
+	 * @param requestUrl
+	 * @param result
+	 * @return
+	 * @throws BusinessException
+	 */
+	public boolean charge(String account, String requestUrl, Object result) throws BusinessException;
 }

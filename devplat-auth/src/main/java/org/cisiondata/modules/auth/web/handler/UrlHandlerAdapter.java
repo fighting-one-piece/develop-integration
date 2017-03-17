@@ -86,7 +86,6 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	@Override
 	public void afterPropertiesSet() {
 		new ClassScanner(new String[]{"org.cisiondata.modules"}, new ClassResourceHandler() {
-			
 			@SuppressWarnings("rawtypes")
 			public void handle(MetadataReader metadata) {
 				String className = metadata.getClassMetadata().getClassName();
@@ -136,17 +135,13 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			LOG.info("url handler adapter request path: {}", path);
 			judgeSensitiveWord(request.getParameterMap());
 			if (path.startsWith("/app")) {
-				if (authenticationAppRequest(request, response)) {
-					path = path.replace("/app", "");
-					Object result = handleExternalRequest(path, request, response);
-					writeResponse(response, result);
-				}
+				path = path.replace("/app", "");
+				Object result = handleExternalRequest(path, request, response);
+				writeResponse(response, result);
 			} else if (path.startsWith("/ext")) {
-				if (authenticationExternalRequest(request, response)) {
-					path = path.replace("/ext", "");
-					Object result = handleExternalRequestWithUserAccessControl(path, request, response);
-					writeResponse(response, result);
-				}
+				path = path.replace("/ext", "");
+				Object result = handleExternalRequestWithUserAccessControl(path, request, response);
+				writeResponse(response, result);
 			} else if (path.startsWith("/api/v1")) {
 				path = path.replace("/api/v1", "");
 				Object result = handleNormalRequest(path, request, response);
@@ -173,27 +168,10 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		return wrapperFailureWebResult(resultCode.getCode(), failure);
 	}
 
-	@SuppressWarnings("unused")
-	private Map<String, String> getParams(List<String> names, Map<String, String> params, HttpServletRequest request) {
-		Map<String, String> result = new HashMap<String, String>();
-		for (String name : names) {
-			if (params != null && params.get(name) != null) {
-				result.put(name, params.get(name));
-			} else {
-				String[] arr = request.getParameterValues(name);
-				if (arr != null) {
-					result.put(name, StringUtils.join(arr, "\b"));
-				}
-			}
-		}
-		return result;
-	}
-
 	private Object handleNormalRequest(String path, HttpServletRequest request, HttpServletResponse response) 
 			throws UnsupportedEncodingException {
-		String requestMethod = request.getMethod();
 		String interfaceUrl = path.replaceAll("/+", "/").replaceAll("^/app", "").replaceAll("^/ext", "");
-		ObjectMethodParams omp = UrlMappingStorage.getObjectMethod(interfaceUrl, requestMethod);
+		ObjectMethodParams omp = UrlMappingStorage.getObjectMethod(interfaceUrl, request.getMethod());
 		if (omp == null) {
 			return wrapperFailureWebResult(ResultCode.URL_ERROR, "No mapping found for HTTP request with URI " + path);
 		}
@@ -202,7 +180,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			return wrapperFailureWebResult(ResultCode.URL_ERROR, "No mapping found for HTTP request with URI " + path);
 		}
 		try {
-			ParameterBinder parameterBinder = new ParameterBinder(ctx);
+			ParameterBinder parameterBinder = new ParameterBinder();
 			Object[] params = parameterBinder.bindParameters(omp, omp.getParams(), request, response);
 			Object result = ReflectionUtils.invokeMethod(method, omp.getObject(), params);
 			return method.getReturnType() == void.class || response.isCommitted() ? "" : result;
@@ -246,7 +224,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 					"No mapping found for HTTP request with URI " + interfaceUrl);
 		}
 		try {
-			ParameterBinder parameterBinder = new ParameterBinder(ctx);
+			ParameterBinder parameterBinder = new ParameterBinder();
 			paramMap.putAll(omp.getParams());
 			Object[] params = parameterBinder.bindParameters(omp, paramMap, request, response);
 			judgeSensitiveWord(params);
@@ -270,6 +248,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		response.getWriter().write(objectMapper.writeValueAsString(result));
 	}
 	
+	@SuppressWarnings("unused")
 	private boolean authenticationAppRequest(HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
     	String token = request.getParameter("token");
@@ -280,7 +259,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		return true;
     }
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "unused" })
 	private boolean authenticationExternalRequest(HttpServletRequest request, 
 			HttpServletResponse response) throws Exception {
     	Map<String, String[]> requestParams = request.getParameterMap();

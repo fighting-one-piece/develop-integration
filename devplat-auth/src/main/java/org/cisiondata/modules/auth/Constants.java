@@ -67,8 +67,9 @@ public class Constants {
     }
     
     public interface CookieName {
-        public static final String USER_ACCOUNT = "_user_account_";
+        public static final String USER_ACCOUNT = "_ua_";
         public static final String USER_SESSION = "_session_";
+        public static final String USER_ACCESS_TOKEN = "accessToken";
     }
     
 }

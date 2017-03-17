@@ -30,6 +30,7 @@ public enum ResultCode {
 	
 	ACCOUNT_NOT_EXIST(540, "账号不存在"),
 	ACCOUNT_PASSWORD_NOT_MATCH(550, "账号密码不匹配"),
+	ACCOUNT_EXPIRED_OR_DELETED(551, "账户已过期或已删除"),
 	
 	SECURITY_ANSWER_ERROR(560, "密保答案错误"),
 	

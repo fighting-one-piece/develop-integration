@@ -95,6 +95,19 @@ public interface IESService {
 			QueryBuilder query, boolean isHighLight) throws BusinessException;
 	
 	/**
+	 * 根据条件指定索引读取数据
+	 * @param index
+	 * @param type
+	 * @param query
+	 * @param isHighLight 是否高亮
+	 * @param isMessageSource 是否国际化
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<Map<String, Object>> readDataListByCondition(String index, String type, 
+			QueryBuilder query, boolean isHighLight, boolean isMessageSource) throws BusinessException;
+	
+	/**
 	 * 根据属性值列表指定索引读取数据
 	 * @param index
 	 * @param type
@@ -129,6 +142,19 @@ public interface IESService {
 	 */
 	public List<Map<String, Object>> readDataListByCondition(String index, String[] types, 
 			QueryBuilder query, boolean isHighLight) throws BusinessException;
+	
+	/**
+	 * 根据条件指定索引读取数据
+	 * @param index
+	 * @param type
+	 * @param query
+	 * @param isHighLight 是否高亮
+	 * @param isMessageSource 是否国际化
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<Map<String, Object>> readDataListByCondition(String index, String[] types, 
+			QueryBuilder query, boolean isHighLight, boolean isMessageSource) throws BusinessException;
 	
 	/**
 	 * 根据条件全索引读取分页数据
@@ -167,6 +193,22 @@ public interface IESService {
 	 */
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
 			QueryBuilder query, String scrollId, int size, boolean isHighLight) throws BusinessException;
+	
+	/**
+	 * 根据条件指定索引读取分页数据
+	 * @param index
+	 * @param type
+	 * @param query
+	 * @param scrollId
+	 * @param size 返回结果集条数
+	 * @param isHighLight 是否高亮
+	 * @param isMessageSource 是否国际化
+	 * @return
+	 * @throws BusinessException
+	 */
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
+			QueryBuilder query, String scrollId, int size, boolean isHighLight, boolean isMessageSource) 
+					throws BusinessException;
 	
 	/**
 	 * 根据条件指定索引读取分页数据
@@ -223,6 +265,22 @@ public interface IESService {
 	 */
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String[] types, 
 			QueryBuilder query, String scrollId, int size, boolean isHighLight) throws BusinessException;
+	
+	/**
+	 * 根据条件读取分页数据
+	 * @param index
+	 * @param type
+	 * @param query
+	 * @param scrollId
+	 * @param size 返回结果集条数
+	 * @param isHighLight 是否高亮
+	 * @param isMessageSource 是否国际化
+	 * @return
+	 * @throws BusinessException
+	 */
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String[] types, 
+			QueryBuilder query, String scrollId, int size, boolean isHighLight, boolean isMessageSource) 
+					throws BusinessException;
 	
 	/**
 	 * 根据条件读取分页数据

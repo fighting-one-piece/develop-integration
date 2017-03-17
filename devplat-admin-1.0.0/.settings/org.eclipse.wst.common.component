@@ -24,10 +24,10 @@
         <dependent-module archiveName="devplat-auth-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-auth/devplat-auth">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="devplat-rabbitmq-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-rabbitmq/devplat-rabbitmq">
+        <dependent-module archiveName="devplat-elasticsearch-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-elasticsearch/devplat-elasticsearch">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="devplat-elasticsearch-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-elasticsearch/devplat-elasticsearch">
+        <dependent-module archiveName="devplat-rabbitmq-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-rabbitmq/devplat-rabbitmq">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="java-output-path" value="/devplat-admin/target/classes"/>

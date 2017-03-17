@@ -106,8 +106,9 @@ $(document).ready(function () {
 			if (result.code == 2) {
 				$("#resultsIndex").append(result.failure);
 			} else if (result.code == 1) {
+				console.log(result)
 				if (result.data) {
-					es = result.data.es;
+//					es = result.data.es;
 					scrollId = result.data.scrollId;
 					var rowNumPerPage = 40;
 					totalRowNum = result.data.totalRowNum;
@@ -212,14 +213,17 @@ $(document).ready(function () {
 									continue;
 								}
 								
-								if (item.data[keys[i]] && item.data[keys[i]] != 'NA'){
-									if (keys[i] == '源文件'){
-										flag = true;
-										continue;
-									}
-									valueStr += "<td style='background: white;'>"+item.data[keys[i]]+"</td>";
+								if (keys[i] == '源文件'){
+									flag = true;
+									continue;
 								} else {
-									valueStr += "<td style='background: white;'></td>";
+									
+									if (item.data[keys[i]] && item.data[keys[i]] != 'NA'){
+										valueStr += "<td style='background: white;'>"+item.data[keys[i]]+"</td>";
+										console.log(keys[i]+":"+item.data[keys[i]])
+									} else {
+										valueStr += "<td style='background: white;'></td>";
+									}
 								}
 							}
 							if (flag){
@@ -250,6 +254,8 @@ $(document).ready(function () {
 							tables += "</tr>";
 							tables += valueStrArr[i];
 							tables += "</table>";
+							console.log(keyArr[i])
+							console.log(valueStrArr[i])
 						}
 						$("#resultsIndex").append(tables);
 						$("#resultsLable").append("搜索共" + totalRowNum + "结果</br><br/>")
@@ -374,14 +380,16 @@ $(document).ready(function () {
 									continue;
 								}
 								
-								if (item.data[keys[i]] && item.data[keys[i]] != 'NA'){
-									if (keys[i] == '源文件'){
-										flag = true;
-										continue;
-									}
-									valueStr += "<td style='background: white;'>"+item.data[keys[i]]+"</td>";
+								if (keys[i] == '源文件'){
+									flag = true;
+									continue;
 								} else {
-									valueStr += "<td style='background: white;'></td>";
+									
+									if (item.data[keys[i]] && item.data[keys[i]] != 'NA'){
+										valueStr += "<td style='background: white;'>"+item.data[keys[i]]+"</td>";
+									} else {
+										valueStr += "<td style='background: white;'></td>";
+									}
 								}
 							}
 							if (flag){

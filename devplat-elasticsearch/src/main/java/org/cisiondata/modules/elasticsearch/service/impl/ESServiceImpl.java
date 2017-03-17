@@ -149,6 +149,12 @@ public class ESServiceImpl implements IESService {
 		} else if (attributeLowerCase.indexOf("phone") != -1) {
 			phone_attributes.add(attribute);
 			identity_attributes.add(attribute);
+		} else if (attributeLowerCase.indexOf("clientcode") != -1) {
+			phone_attributes.add(attribute);
+			identity_attributes.add(attribute);
+		} else if (attributeLowerCase.indexOf("idcode") != -1) {
+			phone_attributes.add(attribute);
+			identity_attributes.add(attribute);
 		} else if (attributeLowerCase.indexOf("email") != -1) {
 			identity_attributes.add(attribute);
 		} else if (attributeLowerCase.indexOf("idcard") != -1) {
@@ -277,7 +283,7 @@ public class ESServiceImpl implements IESService {
 	@Override
 	public List<Map<String, Object>> readDataListByCondition(QueryBuilder query, int size, 
 			boolean isHighLight) throws BusinessException {
-		return readDataList(null, new String[0], query, size, isHighLight);
+		return readDataList(null, new String[0], query, size, isHighLight, true);
 	}
 
 	@Override
@@ -290,6 +296,12 @@ public class ESServiceImpl implements IESService {
 	public List<Map<String, Object>> readDataListByCondition(String index, String type, 
 			QueryBuilder query, boolean isHighLight) throws BusinessException {
 		return readDataListByCondition(index, new String[]{type}, query, isHighLight);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readDataListByCondition(String index, String type, QueryBuilder query,
+			boolean isHighLight, boolean isMessageSource) throws BusinessException {
+		return readDataListByCondition(index, new String[]{type}, query, isHighLight, isMessageSource);
 	}
 	
 	@Override
@@ -331,7 +343,13 @@ public class ESServiceImpl implements IESService {
 	@Override
 	public List<Map<String, Object>> readDataListByCondition(String index, String[] types, 
 			QueryBuilder query, boolean isHighLight) throws BusinessException {
-		return readDataList(index, types, query, 200, isHighLight);
+		return readDataList(index, types, query, 200, isHighLight, true);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readDataListByCondition(String index, String[] types, 
+			QueryBuilder query, boolean isHighLight, boolean isMessageSource) throws BusinessException {
+		return readDataList(index, types, query, 200, isHighLight, isMessageSource);
 	}
 	
 	@Override
@@ -353,6 +371,14 @@ public class ESServiceImpl implements IESService {
 	}
 	
 	@Override
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type,
+			QueryBuilder query, String scrollId, int size, boolean isHighLight, boolean isMessageSource)
+				throws BusinessException {
+		return readPaginationDataListByCondition(index, new String[]{type}, query, 
+				scrollId, size, isHighLight, isMessageSource);
+	}
+	
+	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String type, 
 			QueryBuilder query, SearchType searchType, String scrollId, int size, boolean isHighLight) 
 				throws BusinessException {
@@ -369,27 +395,34 @@ public class ESServiceImpl implements IESService {
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String[] types, 
 			QueryBuilder query, String scrollId, int size) throws BusinessException {
-		return readPaginationDataList(index, types, query, scrollId, size, true, false);
+		return readPaginationDataList(index, types, query, scrollId, size, true, false, true);
 	}
 	
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String[] types,
 			QueryBuilder query, String scrollId, int size, boolean isHighLight) throws BusinessException {
-		return readPaginationDataList(index, types, query, scrollId, size, isHighLight, false);
+		return readPaginationDataList(index, types, query, scrollId, size, isHighLight, false, true);
+	}
+	
+	@Override
+	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String[] types,
+			QueryBuilder query, String scrollId, int size, boolean isHighLight, boolean isMessageSource)
+			throws BusinessException {
+		return readPaginationDataList(index, types, query, scrollId, size, isHighLight, false, isMessageSource);
 	}
 	
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(String index, String[] types,
 			QueryBuilder query, SearchType searchType, String scrollId, int size, 
 				boolean isHighLight) throws BusinessException {
-		return readPaginationDataList(index, types, query, searchType, scrollId, size, isHighLight, false);
+		return readPaginationDataList(index, types, query, searchType, scrollId, size, isHighLight, false, true);
 	}
 	
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByConditionWithScore(String index, 
 			String[] types, QueryBuilder query, String scrollId, int size) throws BusinessException {
 		return readPaginationDataList(index, types, query, SearchType.DFS_QUERY_AND_FETCH, 
-				scrollId, size, true, true);
+				scrollId, size, true, true, true);
 	}
 	
 	private String[] buildIndices(String index, Set<String> defaultIndices) {
@@ -422,8 +455,8 @@ public class ESServiceImpl implements IESService {
 		return indicesExistsResponse.isExists();
 	}
 	
-	private List<Map<String, Object>> readDataList(String index, String[] types, 
-			QueryBuilder query, int size, boolean isHighLight) throws BusinessException {
+	private List<Map<String, Object>> readDataList(String index, String[] types, QueryBuilder query, 
+			int size, boolean isHighLight, boolean isMessageSource) throws BusinessException {
 		if (!indicesExists(index)) return new ArrayList<Map<String,Object>>();
 		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(index, types);
 		searchRequestBuilder.setQuery(query);
@@ -432,19 +465,19 @@ public class ESServiceImpl implements IESService {
 		searchRequestBuilder.setSize(size);
 		SearchResponse response = searchRequestBuilder.execute().actionGet();
 		SearchHit[] hitArray = response.getHits().getHits();
-		return buildResultList(hitArray, false, isHighLight, false);
+		return buildResultList(hitArray, false, isHighLight, false, isMessageSource);
 	}
 	
 	private QueryResult<Map<String, Object>> readPaginationDataList(String index, String[] types,
-			QueryBuilder query, String scrollId, int size, boolean isHighLight, 
-				boolean isReturnScore) throws BusinessException {
+		QueryBuilder query, String scrollId, int size, boolean isHighLight, boolean isReturnScore, 
+			boolean isMessageSource) throws BusinessException {
 		return readPaginationDataList(index, types, query, SearchType.DFS_QUERY_THEN_FETCH, 
-				scrollId, size, isHighLight, isReturnScore);
+				scrollId, size, isHighLight, isReturnScore, isMessageSource);
 	}
 	
 	private QueryResult<Map<String, Object>> readPaginationDataList(String index, String[] types,
 			QueryBuilder query, SearchType searchType, String scrollId, int size, boolean isHighLight, 
-				boolean isReturnScore) throws BusinessException {
+				boolean isReturnScore, boolean isMessageSource) throws BusinessException {
 		if (!indicesExists(index)) return new QueryResult<Map<String,Object>>();
 		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(index, types);
 		searchRequestBuilder.setQuery(query);
@@ -461,12 +494,12 @@ public class ESServiceImpl implements IESService {
 		QueryResult<Map<String, Object>> qr = new QueryResult<Map<String, Object>>();
 		qr.setTotalRowNum(response.getHits().getTotalHits());
 		qr.setScrollId(response.getScrollId());
-		qr.setResultList(buildResultList(hitArray, true, isHighLight, isReturnScore));
+		qr.setResultList(buildResultList(hitArray, true, isHighLight, isReturnScore, isMessageSource));
 		return qr;
 	}
 	
 	private List<Map<String, Object>> buildResultList(SearchHit[] hitArray, boolean isPagination, 
-			boolean isHighLight, boolean isReturnScore) {
+			boolean isHighLight, boolean isReturnScore, boolean isMessageSource) {
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		SearchHit hit = null;
 		String key = null;
@@ -485,16 +518,19 @@ public class ESServiceImpl implements IESService {
 				key = entry.getKey();
 				if (filter_attributes.contains(key) || key.endsWith("Alias")) continue;
 				value = wrapperValue(key, entry.getValue());
-				String chValue = MessageUtils.getInstance().getMessage(prefix + "." + key);
-				replaceSource.put(StringUtils.isBlank(chValue) ? key : chValue, value);
+				String fKey = isMessageSource ? MessageUtils.getInstance()
+						.getMessage(prefix + "." + key) : key;
+				replaceSource.put(StringUtils.isBlank(fKey) ? key : fKey, value);
 			}
 			if (isReturnScore) {
 				replaceSource.put("score", hit.getScore());
 			}
 			if (isPagination) {
 				Map<String, Object> result = new HashMap<String, Object>();
-				result.put("index", MessageUtils.getInstance().getMessage(hit.getIndex()));
-				result.put("type", MessageUtils.getInstance().getMessage(prefix));
+				result.put("index", isMessageSource ? MessageUtils.getInstance()
+						.getMessage(hit.getIndex()) : hit.getIndex());
+				result.put("type", isMessageSource ? MessageUtils.getInstance()
+						.getMessage(prefix) : hit.getType());
 				result.put("data", replaceSource);
 				resultList.add(result);
 			} else {

@@ -4,8 +4,8 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.cisiondata.modules.auth.dto.UserDTO;
 import org.cisiondata.modules.auth.entity.User;
+import org.cisiondata.modules.login.dto.LoginDTO;
 import org.cisiondata.modules.login.service.ILoginService;
 import org.cisiondata.utils.endecrypt.EndecryptUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
@@ -73,7 +73,7 @@ public class AuthServiceTest {
 	public void testLoginServiceReadUserLoginInfo() {
 		String account = "test";
 		String password = "@#test456";
-		UserDTO userDTO = loginService.readUserLoginInfoByAccountAndPassowrd(account, password);
+		LoginDTO userDTO = loginService.readUserLoginInfoByAccountAndPassowrd(account, password);
 		System.out.println("accessToken: " + userDTO.getAccessToken());
 	}
 	

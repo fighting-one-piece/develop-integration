@@ -66,6 +66,8 @@ public class User extends PKAutoEntity<Long> {
 	/** 是否删除标志 */
 	@Column(name = "DELETE_FLAG")
 	private Boolean deleteFlag = Boolean.FALSE;
+	/** 访问Token*/
+	private transient String accessToken = null;
 	
 	public String getAccount() {
 		return account;
@@ -201,6 +203,14 @@ public class User extends PKAutoEntity<Long> {
 
 	public void setDeleteFlag(Boolean deleteFlag) {
 		this.deleteFlag = deleteFlag;
+	}
+
+	public String getAccessToken() {
+		return accessToken;
+	}
+
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
 	}
 
 	public boolean hasDeleted() {

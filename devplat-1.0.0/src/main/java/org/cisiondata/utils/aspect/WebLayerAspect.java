@@ -1,6 +1,5 @@
 package org.cisiondata.utils.aspect;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -15,10 +14,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
-import org.cisiondata.modules.auth.service.IAccessUserService;
+import org.cisiondata.modules.auth.service.IChargingService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.slf4j.Logger;
@@ -32,13 +30,12 @@ public class WebLayerAspect {
 
 	private Logger LOG = LoggerFactory.getLogger("MODULE_LOG");
 
-	private static final String EXECUTION = "execution(* org.cisiondata.modules.datada.controller.*.*(..)) or "
-			+ "execution(* org.cisiondata.modules.datainterface.controller.*.*(..)) or "
+	private static final String EXECUTION = "execution(* org.cisiondata.modules.datainterface.controller.*.*(..)) or "
 			+ "execution(* org.cisiondata.modules.identity.controller.*.*(..)) or "
 			+ "execution(* org.cisiondata.modules.elasticsearch.controller.ESController.*(..))";
 	
-	@Resource(name = "accessUserService")
-	private IAccessUserService accessUserService = null;
+	@Resource(name = "moneyChargingService")
+	private IChargingService chargingService = null;
 
 	@Before(EXECUTION)
 	public void before(JoinPoint joinPoint){
@@ -67,39 +64,15 @@ public class WebLayerAspect {
 				return proceedingJoinPoint.proceed();
 			}
 		}
-		long startTime = System.currentTimeMillis();
 		try {
 			judgeSensitiveWord(proceedingJoinPoint.getArgs());
-			String className = proceedingJoinPoint.getTarget().getClass().getSimpleName();
-			LOG.info("------Class {} Method {} Log Start", className, signature.getName());
-			
-			Object result = proceedingJoinPoint.proceed();
-			
-			//TODO
-//			Subject subject = SecurityUtils.getSubject();
-//			if (null != subject) {
-//				String account = (String) subject.getPrincipal();
-//				AccessUserControl accessUserControl = accessUserService.readAccessUserControlByAccount(account);
-//				long remainingCount = accessUserControl.getRemainingCount();
-//				if (remainingCount <= 0) throw new BusinessException("账户剩余查询条数不足");
-//				Object result = proceedingJoinPoint.proceed();
-//				long incOrDec = parseReturnResultCount(result);
-//				LOG.info("incOrDec : {}", incOrDec);
-//				accessUserService.updateRemainingCount(account, remainingCount, -incOrDec);
-//				return result;
-//			}
-			
-			LOG.info("------Class {} Method {} Log End ! Spend Time: {} s", className, signature.getName(), 
-					(System.currentTimeMillis() - startTime) / 1000);
-			
-			return result;
+			return chargingService.charge(proceedingJoinPoint);
 		} catch (BusinessException be) {
 			WebResult webResult = new WebResult();
 			webResult.setCode(ResultCode.FAILURE.getCode());
 			webResult.setFailure(be.getMessage());
 			return webResult;
 		}
-//		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -128,42 +101,7 @@ public class WebLayerAspect {
 					throw new BusinessException("抱歉!该查询涉及敏感信息");
 				}
 			}
-					
 		}
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
-	private long parseReturnResultCount(Object result) {
-		if (result instanceof WebResult) {
-    		WebResult webResult = (WebResult) result;
-    		int resultCode = webResult.getCode();
-    		if (resultCode == ResultCode.SUCCESS.getCode()) {
-	    		Object data = webResult.getData();
-	    		if (data instanceof List) {
-	    			return ((List) data).size();
-	    		} else if (data instanceof QueryResult) {
-	    			QueryResult queryResult = (QueryResult) data;
-	    			return queryResult.getResultList().size();
-	    		} else if (data instanceof Map) {
-	    			Map<String, Object> map = (Map<String, Object>) data;
-	    			long count = 0;
-	    			boolean valueIsList = false;
-	    			for (Map.Entry<String, Object> entry : map.entrySet()) {
-	    				Object value = entry.getValue();
-	    				if (value instanceof List) {
-	    					count += ((List) value).size();
-	    					valueIsList = true;
-	    				}
-	    			}
-	    			return valueIsList ? count : 1;
-	    		} else if (data instanceof String) {
-	    			return 1;
-	    		}
-    		} else if (resultCode == ResultCode.NOT_BINDING_QQ.getCode()) {
-    			return 1;
-    		}
-    	}
-    	return 0;
-    }
-
 }

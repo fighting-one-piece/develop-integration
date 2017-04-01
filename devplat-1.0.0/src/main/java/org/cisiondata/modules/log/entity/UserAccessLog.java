@@ -20,21 +20,21 @@ public class UserAccessLog extends PKAutoEntity<Long> {
 	private String account = null;
 	/** 访问地址 */
 	private String url = null;
+	/** 数据总条数*/
+	private String total = null;
 	/** 访问时间 */
 	private Date accessTime = null;
 	/** 请求参数 */
 	private String params = null;
 	/*请求结果*/
 	private String result = null;
-	/**统计关键字*/
-	private transient int count = 0;
 	
-	public int getCount() {
-		return count;
+	public String getTotal() {
+		return total;
 	}
 
-	public void setCount(int count) {
-		this.count = count;
+	public void setTotal(String total) {
+		this.total = total;
 	}
 
 	public String getResult() {

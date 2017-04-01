@@ -14,6 +14,15 @@ public class MobileAttributionModel {
 	private String dnseg;
 	/*手机号码归属*/
 	private String regionDnseg;
+	/*运营商*/
+	private String operator;
+	
+	public String getOperator() {
+		return operator;
+	}
+	public void setOperator(String operator) {
+		this.operator = operator;
+	}
 	public String getProvince() {
 		return province;
 	}

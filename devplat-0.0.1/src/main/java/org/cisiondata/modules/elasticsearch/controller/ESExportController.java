@@ -34,7 +34,7 @@ public class ESExportController {
 	public void readIndexsTypesDatasEXpoi(HttpServletRequest req, HttpServletResponse resp,String query) {
 		System.out.println(query+"--query--");
 		try {
-			esEportService.readDataListForExport(req, resp, query);
+			esEportService.dataListForExport(req, resp, query);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -45,6 +45,7 @@ public class ESExportController {
 	@SuppressWarnings({ "resource", "unchecked", "deprecation"})
 	public void exportExcel(HttpServletRequest req, HttpServletResponse resp,String query, String scrollId, int rowNumPerPage)throws IOException {
 		List<Map<String, Object>> lists  = esEportService.readPaginationDataListByExs(query, scrollId, rowNumPerPage);
+		
 		try {
 		HSSFWorkbook wb = new HSSFWorkbook();
 		req.setCharacterEncoding("UTF-8");

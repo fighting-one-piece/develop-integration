@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.elasticsearch.service.IESBizService;
+import org.cisiondata.utils.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -125,6 +126,33 @@ public class ESController {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+			LOG.error(e.getMessage(), e);
+		}
+		return result;
+	}
+	
+	/**
+	 * 物流过滤查询(未分页)
+	 * @param query
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/logistics/receiver/search")
+	public WebResult readFinancialLogisticsFilterData(String query) {
+		LOG.info("query:{}", query);
+		WebResult result = new WebResult();
+		try {
+			Object data = esBizService.readLogisticsFilterDataLists(query);
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(data);
+		} 
+		catch (BusinessException bu) {
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getMessage());
+			LOG.error(bu.getMessage(), bu);
+		}catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
 			LOG.error(e.getMessage(), e);

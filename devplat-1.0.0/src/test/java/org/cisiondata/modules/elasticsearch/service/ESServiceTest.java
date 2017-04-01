@@ -7,10 +7,10 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.cisiondata.modules.abstr.entity.QueryResult;
-import org.cisiondata.modules.elasticsearch.plugins.stconverter.analysis.STConvertType;
-import org.cisiondata.modules.elasticsearch.plugins.stconverter.analysis.STConverter;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.cisiondata.modules.es.plugins.stconverter.analysis.STConvertType;
+import org.cisiondata.modules.es.plugins.stconverter.analysis.STConverter;
+import org.cisiondata.modules.es.service.IESService;
+import org.cisiondata.modules.search.service.IESBizService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,17 +27,6 @@ public class ESServiceTest {
 	
 	@Resource(name = "esBizService")
 	private IESBizService esBizService = null;
-	
-	@Test
-	public void testReadDataListByQQ() {
-		List<Map<String, Object>> listMap = esService.readDataListByCondition(
-				"qq", "qqqunrelation", QueryBuilders.termQuery("qqNum", "445385318"));
-		List<String> list = new ArrayList<String>();
-		for (int i = 0, len = listMap.size(); i < len; i++) {
-			System.out.println(listMap.get(i));
-			list.add(listMap.get(i).get("QQ群号").toString());
-		}
-	}
 	
 	@Test
 	public void testReadDataListByAttributeValues() {
@@ -69,40 +58,14 @@ public class ESServiceTest {
 	}
 	
 	@Test
-	public void testReadDataListByCondition() {
-		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-		boolQueryBuilder.should(QueryBuilders.termQuery("phone", "15811024484"));
-		boolQueryBuilder.should(QueryBuilders.termQuery("mobilePhone", "15811024484"));			
-		boolQueryBuilder.should(QueryBuilders.termQuery("telePhone", "15811024484"));		
-		List<Map<String, Object>> list = esService.readDataListByCondition("account", "account", boolQueryBuilder);
-		System.out.println("datalist size: " + list.size());
-		QueryResult<Map<String, Object>> qr = esService.readPaginationDataListByCondition(
-				"account", "account", boolQueryBuilder, null, 100);
-		System.out.println("pagination list size: " + qr.getTotalRowNum());
-		QueryResult<Map<String, Object>> qr1 = esBizService.readPaginationDataListByCondition(
-				"account", "account", "782369901", null, 100);
-		for (Map<String, Object> map : qr1.getResultList()) {
-			System.out.println(map);
-		}
-		System.out.println("pagination list 1 size: " + qr1.getTotalRowNum());
-	}
-	
-	@Test
 	public void testReadPaginationDataListByCondition() {
 		QueryResult<Map<String, Object>> qr = esBizService
 				.readPaginationDataListByCondition("15811024484", null, 100);
 //		QueryResult<Map<String, Object>> qr = esBizService.readPaginationDataListByCondition(
 //				"account", "account", "15811024484", null, 100);
 		System.out.println(qr.getTotalRowNum());
-	}
-	
-	@Test
-	public void testReadPaginationDataListByConditionNoMessageSource() {
-		QueryResult<Map<String, Object>> qr = esService.readPaginationDataListByCondition("financial", "logistics", 
-				QueryBuilders.termQuery("mobilePhone", "13512345678"), null, 10, true, true);
-		System.out.println(qr.getTotalRowNum());
-		for (Map<String, Object> result : qr.getResultList()) {
-			System.out.println(result);
+		for (Map<String, Object> r : qr.getResultList()) {
+			System.out.println(r);
 		}
 	}
 	

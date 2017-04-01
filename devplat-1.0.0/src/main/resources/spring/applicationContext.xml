@@ -90,10 +90,14 @@
         <property name="cacheSeconds" value="60"/>  
     </bean>
     
+    <bean id="esService" class="org.cisiondata.modules.es.service.impl.ESServiceImpl"/>
+    
     <!-- Import Resource -->
     <import resource="classpath:spring/applicationContext-task.xml"/>
     <import resource="classpath:spring/applicationContext-redis.xml"/>
     <import resource="classpath:spring/applicationContext-mybatis.xml"/>
+    <!--  
     <import resource="classpath:spring/applicationContext-rabbitmq.xml"/>
+    -->
     
 </beans>

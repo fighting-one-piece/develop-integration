@@ -1,7 +1,9 @@
 package org.cisiondata.modules.auth.entity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,11 +11,20 @@ import javax.persistence.Table;
 
 import org.cisiondata.modules.abstr.entity.PKAutoEntity;
 
+/** 用户表*/
 @Entity
 @Table(name="T_USER")
 public class User extends PKAutoEntity<Long> {
 
 	private static final long serialVersionUID = 1L;
+	
+	/** 密保问题*/
+	public static final String QUESTION = "question";
+	/** 密保答案*/
+	public static final String ANSWER = "answer";
+	/** 是否首次登录*/
+	public static final String FIRST_LOGIN_FLAG = "firstLoginFlag";
+	
 
 	/** 用户账号 */
 	@Column(name="ACCOUNT")
@@ -54,20 +65,23 @@ public class User extends PKAutoEntity<Long> {
 	/** 过期时间*/
 	@Column(name="EXPIRE_TIME")
 	private Date expireTime = null;
-	/** 用户密保问题*/
-	@Column(name="QUESTION")
-	private String question = null;
-	/** 用户密保答案*/
-	@Column(name="ANSWER")
-	private String answer = null;
-	/** 是否首次登录标志 */
-	@Column(name = "FIRST_LOGIN_FLAG")
-	private Boolean firstLoginFlag = Boolean.FALSE;
 	/** 是否删除标志 */
 	@Column(name = "DELETE_FLAG")
-	private Boolean deleteFlag = Boolean.FALSE;
+	private Boolean deleteFlag = false;
 	/** 访问Token*/
 	private transient String accessToken = null;
+	/** 密保问题*/
+	private transient String question = null;
+	/** 密保答案*/
+	private transient String answer = null;
+	/** 是否第一次登录*/
+	private transient Boolean firstLoginFlag = true;
+	/** 访问ID */
+	private transient String accessId = null;
+	/** 访问KEY */
+	private transient String accessKey = null;
+	/** 用户属性列表*/
+	private transient List<UserAttribute> attributes = null;
 	
 	public String getAccount() {
 		return account;
@@ -156,7 +170,7 @@ public class User extends PKAutoEntity<Long> {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-
+	
 	public Date getCreateTime() {
 		return createTime;
 	}
@@ -171,6 +185,26 @@ public class User extends PKAutoEntity<Long> {
 
 	public void setExpireTime(Date expireTime) {
 		this.expireTime = expireTime;
+	}
+
+	public Boolean getDeleteFlag() {
+		return deleteFlag;
+	}
+
+	public void setDeleteFlag(Boolean deleteFlag) {
+		this.deleteFlag = deleteFlag;
+	}
+	
+	public boolean hasDeleted() {
+		return deleteFlag;
+	}
+
+	public String getAccessToken() {
+		return accessToken;
+	}
+
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
 	}
 
 	public String getQuestion() {
@@ -197,26 +231,31 @@ public class User extends PKAutoEntity<Long> {
 		this.firstLoginFlag = firstLoginFlag;
 	}
 
-	public Boolean getDeleteFlag() {
-		return deleteFlag;
+	public String getAccessId() {
+		return accessId;
 	}
 
-	public void setDeleteFlag(Boolean deleteFlag) {
-		this.deleteFlag = deleteFlag;
+	public void setAccessId(String accessId) {
+		this.accessId = accessId;
 	}
 
-	public String getAccessToken() {
-		return accessToken;
+	public String getAccessKey() {
+		return accessKey;
 	}
 
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
+	public void setAccessKey(String accessKey) {
+		this.accessKey = accessKey;
 	}
 
-	public boolean hasDeleted() {
-		return deleteFlag;
+	public List<UserAttribute> getAttributes() {
+		if (null == attributes) attributes = new ArrayList<UserAttribute>();
+		return attributes;
 	}
-	
+
+	public void setAttributes(List<UserAttribute> attributes) {
+		this.attributes = attributes;
+	}
+
 	public boolean hasExpired() {
 		return expireTime.before(Calendar.getInstance().getTime());
 	}

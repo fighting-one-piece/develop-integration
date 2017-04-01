@@ -31,6 +31,7 @@ import com.google.gson.GsonBuilder;
 public class AccessLogFilter implements Filter {
 	
 	private Logger LOG = LoggerFactory.getLogger("ACCESS_LOG");
+	@SuppressWarnings("unused")
 	private UserAccessLogDAO userAccessLogDAO = null;
 	
 	@Override
@@ -80,7 +81,7 @@ public class AccessLogFilter implements Filter {
     				logModel.setParams(keyword);
     				logModel.setAccount(account);
     				if(m.matches()){
-    					userAccessLogDAO.addLog(logModel);
+//    					userAccessLogDAO.addLog(logModel);
     				}
     			}
         	}else{
@@ -105,7 +106,7 @@ public class AccessLogFilter implements Filter {
         				logModel.setAccessTime(new Date());
         				logModel.setParams(keyword.substring(1,keyword.length()-1));
         				logModel.setAccount(account);
-        				userAccessLogDAO.addLog(logModel);
+//        				userAccessLogDAO.addLog(logModel);
         			}
         		}
         	}

@@ -20,7 +20,7 @@ public interface IESExportService {
 	 * @throws BusinessException
 	 * @throws IOException 
 	 */
-	public void readDataListForExport(HttpServletRequest req, HttpServletResponse resp, String query) throws BusinessException, IOException;
+	public void dataListForExport(HttpServletRequest req, HttpServletResponse resp, String query) throws BusinessException, IOException;
 	
 	public List<Map<String,Object>> readPaginationDataListByExs(String query, String scrollId, int size) throws BusinessException;
 }

@@ -12,8 +12,8 @@ import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.abstr.web.ResultCode;
-import org.cisiondata.modules.elasticsearch.service.IESBizService;
 import org.cisiondata.modules.identity.service.IQQService;
+import org.cisiondata.modules.search.service.IESBizService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -41,7 +41,7 @@ public class QQServiceImpl implements IQQService {
 				for (int i = 0; i < listQ.size(); i++) {
 					boolQueryBuilder.should(QueryBuilders.termQuery("qunNum", listQ.get(i)));
 				}
-				listMap = esBizService.readDataListByCondition("qq", "qqqundata", boolQueryBuilder);
+				listMap = esBizService.readDataListByCondition("qq", "qqqundata", boolQueryBuilder, true);
 				for (int i = 0; i < listMap.size(); i++) {
 					listqun.add(listMap.get(i).get("QQ群号").toString());
 					list.add(listMap.get(i));
@@ -52,7 +52,8 @@ public class QQServiceImpl implements IQQService {
 						BoolQueryBuilder qb = QueryBuilders.boolQuery();
 						qb.must(QueryBuilders.termQuery("qunNum", listqun.get(i)))
 						.must(QueryBuilders.termQuery("qqNum", qq));
-						List<Map<String, Object>> listnick = esBizService.readDataListByCondition("qq", "qqqunrelation", qb);
+						List<Map<String, Object>> listnick = esBizService.readDataListByCondition(
+								"qq", "qqqunrelation", qb, true);
 						for (int j = 0; j < listnick.size(); j++) {
 							list.get(i).put("nick", listnick.get(j).get("QQ昵称"));
 						}
@@ -83,7 +84,7 @@ public class QQServiceImpl implements IQQService {
 		List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 		boolQueryBuilder.should(QueryBuilders.termQuery("qunNum", qunNum));
-		listMap = esBizService.readDataListByCondition("qq", "qqqundata", boolQueryBuilder);
+		listMap = esBizService.readDataListByCondition("qq", "qqqundata", boolQueryBuilder, true);
 		for (int i = 0; i < listMap.size(); i++) {
 			map.put("群名称", listMap.get(i).get("群名称").toString());
 			map.put("群通知", listMap.get(i).get("群通知").toString());
@@ -92,7 +93,8 @@ public class QQServiceImpl implements IQQService {
 	}
 	// 根据QQ号获取QQ群号
 	private List<String> AllList(String qq) {
-		List<Map<String, Object>> listMap = esBizService.readDataListByCondition("qq", "qqqunrelation", QueryBuilders.termQuery("qqNum", qq));
+		List<Map<String, Object>> listMap = esBizService.readDataListByCondition(
+				"qq", "qqqunrelation", QueryBuilders.termQuery("qqNum", qq), true);
 		List<String> list = new ArrayList<String>();
 		for (int i = 0, len = listMap.size(); i < len; i++) {
 			list.add(listMap.get(i).get("QQ群号").toString());
@@ -106,7 +108,8 @@ public class QQServiceImpl implements IQQService {
 		String  regex ="[1-9][0-9]{4,14}";
 		Pattern p = Pattern.compile(regex);  
 		Matcher m = p.matcher(qunNum);
-		List<Map<String, Object>> list = esBizService.readDataListByCondition("qq", "qqqunrelation", QueryBuilders.termQuery("qunNum", qunNum));
+		List<Map<String, Object>> list = esBizService.readDataListByCondition(
+				"qq", "qqqunrelation", QueryBuilders.termQuery("qunNum", qunNum), true);
 		if(m.matches()){
 			Map<String, Object> map = readQQqun(qunNum);
 			for (int i = 0; i < list.size(); i++) {
@@ -134,7 +137,8 @@ public class QQServiceImpl implements IQQService {
 		String  regex ="[1-9][0-9]{4,14}";
 		Pattern p = Pattern.compile(regex);  
 		Matcher m = p.matcher(qq); 
-		List<Map<String, Object>> list = esBizService.readDataListByCondition("qq", "qqdata", QueryBuilders.termQuery("qqNum", qq));
+		List<Map<String, Object>> list = esBizService.readDataListByCondition(
+				"qq", "qqdata", QueryBuilders.termQuery("qqNum", qq), true);
 		if(m.matches()){
 			for (int i = 0; i < list.size(); i++) {
 				list.get(i).remove("更新时间");
@@ -160,7 +164,7 @@ public class QQServiceImpl implements IQQService {
 			throw new BusinessException(ResultCode.PARAM_NULL);
 		}
 		QueryResult<Map<String, Object>> qr = esBizService.readPaginationDataListByCondition("qq", "qqqunrelation", 
-		QueryBuilders.matchPhraseQuery("nick", nick), scrollId, rowNumPerPage);
+				QueryBuilders.matchPhraseQuery("nick", nick), scrollId, rowNumPerPage, true);
 		List<Map<String, Object>> resultList = qr.getResultList();
 		for (int i = 0; i < resultList.size(); i++) {
 			Map<String, Object> data =(Map<String, Object>) resultList.get(i).get("data");
@@ -169,7 +173,7 @@ public class QQServiceImpl implements IQQService {
 			List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
 			BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 			boolQueryBuilder.should(QueryBuilders.termQuery("qunNum", qunNum));
-			listMap = esBizService.readDataListByCondition("qq", "qqqundata", boolQueryBuilder);
+			listMap = esBizService.readDataListByCondition("qq", "qqqundata", boolQueryBuilder, true);
 			for (int j = 0; j < listMap.size(); j++) {
 				data.put("群名称", listMap.get(j).get("群名称").toString());
 				data.put("群通知", listMap.get(j).get("群通知").toString());

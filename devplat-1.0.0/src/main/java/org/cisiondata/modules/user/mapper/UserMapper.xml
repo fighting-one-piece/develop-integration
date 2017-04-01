@@ -81,8 +81,13 @@
 		SELECT ANSWER FROM T_USER WHERE ACCOUNT=#{account}
 	</select>
 	
-	 <!--  获取用户信息  -->
+	 <!--  通过账号获取用户信息  -->
 	<select id="findUser" resultMap="UserModelsMap">
 		SELECT * FROM T_USER WHERE ACCOUNT=#{account}
+	</select>
+	
+	 <!--  通过电话获取用户信息  -->
+	<select id="findUserByPhone" resultMap="UserModelsMap">
+		SELECT * FROM T_USER WHERE MOBILE_PHONE=#{mobilePhone}
 	</select>
 </mapper>

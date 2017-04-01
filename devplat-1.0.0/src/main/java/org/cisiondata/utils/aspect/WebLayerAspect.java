@@ -2,8 +2,6 @@ package org.cisiondata.utils.aspect;
 
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -16,7 +14,6 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
-import org.cisiondata.modules.auth.service.IChargingService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.slf4j.Logger;
@@ -32,11 +29,8 @@ public class WebLayerAspect {
 
 	private static final String EXECUTION = "execution(* org.cisiondata.modules.datainterface.controller.*.*(..)) or "
 			+ "execution(* org.cisiondata.modules.identity.controller.*.*(..)) or "
-			+ "execution(* org.cisiondata.modules.elasticsearch.controller.ESController.*(..))";
+			+ "execution(* org.cisiondata.modules.search.controller.ESController.*(..))";
 	
-	@Resource(name = "moneyChargingService")
-	private IChargingService chargingService = null;
-
 	@Before(EXECUTION)
 	public void before(JoinPoint joinPoint){
 	}
@@ -66,7 +60,7 @@ public class WebLayerAspect {
 		}
 		try {
 			judgeSensitiveWord(proceedingJoinPoint.getArgs());
-			return chargingService.charge(proceedingJoinPoint);
+			return proceedingJoinPoint.proceed();
 		} catch (BusinessException be) {
 			WebResult webResult = new WebResult();
 			webResult.setCode(ResultCode.FAILURE.getCode());

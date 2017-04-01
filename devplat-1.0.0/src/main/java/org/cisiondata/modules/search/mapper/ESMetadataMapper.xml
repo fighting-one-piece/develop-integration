@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.search.dao.ESMetadataDAO">
+
+	<resultMap type="org.cisiondata.modules.search.entity.ESMetadata" id="ESMetadataMap">
+		<id property="id" column="id"/>  
+		<result column="indexs" property="indexs"/>
+		<result column="type" property="type"/>
+		<result column="attribute_en" property="attribute_en"/>
+		<result column="attribute_ch" property="attribute_ch"/>
+	</resultMap>
+	
+	<!-- 根据type查询 -->
+	<select id="findType" resultMap="ESMetadataMap">
+		select * from T_ES_METADATA where type = #{type}
+	</select>
+	<!-- 根据ID删除 -->
+	<delete id="deleteId" parameterType="int">
+		delete from T_ES_METADATA where id = #{id}
+	</delete>
+	
+	<!-- 添加   -->
+	<insert id="save" parameterType="org.cisiondata.modules.search.entity.ESMetadata">
+		insert into T_ES_METADATA(indexs,type,attribute_en,attribute_ch) values (#{indexs},#{type},#{attribute_en},#{attribute_ch})
+	</insert>
+	
+	<!-- 根据ID修改  -->
+	<update id="updateId" parameterType="org.cisiondata.modules.search.entity.ESMetadata">
+			update T_ES_METADATA set indexs=#{indexs}, type=#{type}, attribute_en=#{attribute_en}, attribute_ch=#{attribute_ch}  where id=#{id}
+	</update>
+</mapper>

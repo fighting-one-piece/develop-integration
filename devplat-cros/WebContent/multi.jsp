@@ -13,6 +13,7 @@
 <title>高级查询</title>
 </head>
 <body>
+<button id="verificationBtn">验证测试</button>
 <button id="loginBtn">登录测试</button>
 <button id="loginJsonBtn">登录测试</button>
 <button id="indicesBtn">ESMetadata测试</button>

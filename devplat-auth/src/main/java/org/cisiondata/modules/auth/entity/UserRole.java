@@ -9,6 +9,7 @@ import javax.persistence.Table;
 
 import org.cisiondata.modules.abstr.entity.PKAutoEntity;
 
+/** 用户角色表*/
 @Entity
 @Table(name="T_USER_ROLE")
 public class UserRole extends PKAutoEntity<Long> {
@@ -25,7 +26,10 @@ public class UserRole extends PKAutoEntity<Long> {
 	private Role role = null;
 	/**优先权*/
 	@Column(name="PRIORITY")
-	private String priority = null;
+	private Integer priority = null;
+	/** 是否删除标志 */
+	@Column(name = "DELETE_FLAG")
+	private Boolean deleteFlag = false;
 
 	public User getUser() {
 		return this.user;
@@ -43,12 +47,22 @@ public class UserRole extends PKAutoEntity<Long> {
 		this.role = role;
 	}
 
-	public String getPriority() {
+	public Integer getPriority() {
 		return this.priority;
 	}
 
-	public void setPriority(String priority) {
+	public void setPriority(Integer priority) {
 		this.priority = priority;
 	}
+
+	public Boolean getDeleteFlag() {
+		return deleteFlag;
+	}
+
+	public void setDeleteFlag(Boolean deleteFlag) {
+		this.deleteFlag = deleteFlag;
+	}
+	
+	
 
 }

@@ -12,7 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.datainterface.service.IDatadaService;
 import org.cisiondata.modules.datainterface.service.ILMInternetService;
-import org.cisiondata.modules.elasticsearch.service.IESService;
+import org.cisiondata.modules.es.service.IESService;
 import org.cisiondata.modules.identity.service.IIdCardService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -38,7 +38,8 @@ public class IdCardServiceImpl implements IIdCardService {
 		// 判断是否为身份证号
 		if (idNumMatcher.matches()) {
 			String[] type = { "student", "resume" };
-			list = esService.readDataListByCondition("work", type, QueryBuilders.prefixQuery("idCard", idcard));
+			list = esService.readDataListByCondition("work", type, 
+					QueryBuilders.prefixQuery("idCard", idcard), true);
 			List<Map<String, Object>> listmap = datadaService.readDatadaDatas(idcard);
 			if (listmap.size() > 0) {
 				for (int j = 0; j < listmap.size(); j++) {
@@ -68,7 +69,8 @@ public class IdCardServiceImpl implements IIdCardService {
 				// 判断是否为身份证号
 				if (idNumMatcher.matches()) {
 					String[] type = { "student", "resume" };
-					list = esService.readDataListByCondition("work", type, QueryBuilders.prefixQuery("idCard", idcard));
+					list = esService.readDataListByCondition("work", type, 
+							QueryBuilders.prefixQuery("idCard", idcard), false);
 					List<Map<String, Object>> listmap = datadaService.readDatadaDatas(idcard);
 					if (listmap.size() > 0) {
 						for (int j = 0; j < listmap.size(); j++) {

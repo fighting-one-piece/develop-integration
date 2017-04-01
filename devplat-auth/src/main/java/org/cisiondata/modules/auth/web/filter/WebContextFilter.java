@@ -42,7 +42,9 @@ public class WebContextFilter implements Filter {
 		httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE, PUT");
 		httpServletResponse.addHeader("Access-Control-Allow-Credentials", "true");
 		httpServletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type, "
-				+ "Access-Control-Allow-Headers, Authorization, X-Requested-With, accessToken");
+				+ "Access-Control-Allow-Headers, Authorization, X-Requested-With, Data, accessToken");
+		httpServletResponse.addHeader("Access-Control-Expose-Headers", "Content-Type, "
+				+ "Access-Control-Allow-Headers, Authorization, X-Requested-With, Data");
 		Session session = sessionManager.getSession(httpServletRequest, httpServletResponse);
 		WebContext instance = new WebContext(httpServletRequest, httpServletResponse, session, ctx);
 		try {

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.log.dao.UserCollectDAO">
+
+	<resultMap type="UserCollect" id="UserCollectMap">
+		<result column="ID" property="id" jdbcType="INTEGER"/>
+		<result column="ACCOUNT" property="account"/>
+		<result column="COLLECT_TYPE" property="type"/>
+		<result column="COLLECT_TIME" property="collectTime" javaType="java.util.Date"/>
+		<result column="COLLECT_CONTENT" property="collectContent"/>
+	</resultMap>
+	<!-- 用户收藏 -->
+	<insert id="addUserCollect" parameterType="UserCollect">
+		INSERT INTO T_USER_COLLECT(ACCOUNT,COLLECT_TYPE,COLLECT_TIME,COLLECT_CONTENT) VALUES (#{account},#{type},#{collectTime},#{collectContent})
+	</insert>
+	<!-- 展示 -->
+	<select id="selCollect" resultMap="UserCollectMap">
+		SELECT ACCOUNT,COLLECT_TYPE,COLLECT_TIME,COLLECT_CONTENT FROM T_USER_COLLECT WHERE ACCOUNT = #{account}
+	</select>
+</mapper>

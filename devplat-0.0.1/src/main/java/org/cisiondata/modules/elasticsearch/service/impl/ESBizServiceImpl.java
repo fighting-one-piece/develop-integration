@@ -15,10 +15,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
+import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.elasticsearch.service.IESBizService;
+import org.cisiondata.modules.identity.service.IMobileAttributionService;
+import org.cisiondata.modules.system.service.IIdCardAddressService;
 import org.cisiondata.utils.endecrypt.MD5Utils;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.message.MessageUtils;
@@ -35,11 +40,90 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
+	@Resource(name = "esBizService")
+	private IESBizService esBizService = null;
+	
+	@Resource(name = "mobileAttributionService")
+	private IMobileAttributionService mobileAttributionService = null;
+	
+	@Resource(name = "idCardAddressService")
+	private IIdCardAddressService idCardAddressService = null;
+	
+	private static Map<String, String> mobileAttributionCache = new HashMap<String, String>(10000);
+
+	private static Map<String, String> idCardAttributionCache = new HashMap<String, String>(10000);
+	
+	@Override
+	protected boolean isSkipKey(String key) {
+		if (!"sourceFile".equals(key)) return false;
+		String account = (String) SecurityUtils.getSubject().getPrincipal();
+		return "liqien".equals(account) || "shentou".equals(account) || "test".equals(account) ? false : true;
+	}
+	
 	@Override
 	protected Object wrapperValue(String key, Object value) {
-		String account = (String) SecurityUtils.getSubject().getPrincipal();
-		return key.toLowerCase().indexOf("password") != -1 && !"liqien".equals(account) 
-				&& !"shentou".equals(account) ? "********" : value;
+		key = key.toLowerCase();
+		if (key.indexOf("phone") != -1) {
+			String mobile = String.valueOf(value);
+			String suffix = mobileAttributionCache.get(mobile);
+			if (null == suffix) {
+				suffix = mobileAttributionService.readAttributionByMobile(mobile);
+				mobileAttributionCache.put(mobile, null != suffix ? suffix : "NA");
+			} else if ("NA".equals(suffix)) {
+				suffix = null;
+			}
+			if (null != suffix) {
+				return new StringBuilder().append(value).append("[").append(suffix).append("]").toString();
+			}
+		} else if (key.indexOf("idcard") != -1) {
+			String idCard = String.valueOf(value);
+			String suffix = idCardAttributionCache.get(idCard);
+			if (null == suffix) {
+				suffix = idCardAddressService.readAttributionByIdCard(idCard);
+				idCardAttributionCache.put(idCard, null != suffix ? suffix : "NA");
+			} else if ("NA".equals(suffix)) {
+				suffix = null;
+			}
+			if (null != suffix) {
+				return new StringBuilder().append(value).append("[").append(suffix).append("]").toString();
+			}
+		} else if (key.indexOf("password") != -1) {
+			String account = (String) SecurityUtils.getSubject().getPrincipal();
+			if (!"liqien".equals(account) && !"shentou".equals(account)) {
+				return "********";
+			}
+		}
+		return value;
+	}
+	
+	protected Object wrapperResultValue(String key, Object value) {
+		key = key.toLowerCase();
+		if (key.indexOf("手机号") != -1 || key.indexOf("座机") != -1) {
+			String mobile = String.valueOf(value);
+			String suffix = mobileAttributionCache.get(mobile);
+			if (null == suffix) {
+				suffix = mobileAttributionService.readAttributionByMobile(mobile);
+				mobileAttributionCache.put(mobile, null != suffix ? suffix : "NA");
+			} else if ("NA".equals(suffix)) {
+				suffix = null;
+			}
+			if (null != suffix) {
+				return new StringBuilder().append(value).append("[").append(suffix).append("]").toString();
+			}
+		} else if (key.indexOf("身份证号") != -1) {
+			String idCard = String.valueOf(value);
+			String suffix = idCardAttributionCache.get(idCard);
+			if (null == suffix) {
+				suffix = idCardAddressService.readAttributionByIdCard(idCard);
+				idCardAttributionCache.put(idCard, null != suffix ? suffix : "NA");
+			} else if ("NA".equals(suffix)) {
+				suffix = null;
+			}
+			if (null != suffix) {
+				return new StringBuilder().append(value).append("[").append(suffix).append("]").toString();
+			}
+		} 
+		return value;
 	}
 	
 	@Override
@@ -49,10 +133,28 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	}
 	
 	@Override
+	public List<Map<String, Object>> readDataListByCondition(String query, int size, boolean isHighLight) 
+			throws BusinessException {
+		return readDataListByCondition(buildBoolQuery(query), size, isHighLight);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByCondition(
 			String query, String scrollId, int size) throws BusinessException {
-//		return readPaginationDataListWithThread(query, scrollId, size);
-		return readPaginationDataListByCondition(buildBoolQuery(query), scrollId, size);
+		QueryResult<Map<String, Object>> qr = readPaginationDataListByCondition(buildBoolQuery(query), scrollId, size);
+		List<Map<String, Object>> resultList = qr.getResultList();
+		for (int i = 0, len = resultList.size(); i < len; i++) {
+			Map<String, Object> result = resultList.get(i);
+			Map<String, Object> data = (Map<String, Object>) result.get("data");
+			for (Map.Entry<String, Object> entry : data.entrySet()) {
+				String key = entry.getKey();
+				if (key.indexOf("手机号") != -1 || key.indexOf("座机") != -1 || key.indexOf("身份证号") != -1) {
+					data.put(key, wrapperResultValue(key, entry.getValue()));
+				}
+			}
+		}
+		return qr;
 	}
 
 	@Override
@@ -225,6 +327,48 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 			logisticsFilterData.put("下单日期", logisticsData.get("下单日期"));
 			logisticsFilterData.put("下单时间", logisticsData.get("下单时间"));
 			logisticsFilterDataList.add(logisticsFilterData);
+		}
+		return logisticsFilterDataList;
+	}
+	
+	@Override
+	public List<Map<String, Object>> readLogisticsFilterDataLists(String query) throws BusinessException {
+		if (! StringUtils.isNotBlank(query)) {
+			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
+		}
+		List<Map<String, Object>> logisticsFilterDataList = new ArrayList<Map<String, Object>>();
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+		List<Map<String, Object>> logisticsDataList = new ArrayList<Map<String,Object>>();;
+				boolQueryBuilder.should(QueryBuilders.termQuery("mobilePhone", query));
+				boolQueryBuilder.should(QueryBuilders.termQuery("telePhone", query));
+				logisticsDataList = esBizService.readDataListByCondition("financial", "logistics", boolQueryBuilder);
+		Map<String, Object> logisticsFilterData = null;
+		Map<String, Object> logisticsData = null;
+		Set<String> locations = new HashSet<String>();
+		for (int i = 0, len = logisticsDataList.size(); i < len; i++) {
+			logisticsData = logisticsDataList.get(i);
+			String orderDate = null != logisticsData.get("下单日期") ? (String)logisticsData.get("下单日期") : "";
+			String orderTime = null != logisticsData.get("下单时间") ? (String)logisticsData.get("下单时间") : "";
+//			String sourceFile = null != logisticsData.get("源文件") ? (String)logisticsData.get("源文件") : "";
+			String receiverAddress = null != logisticsData.get("收件人地址") ? (String)logisticsData.get("收件人地址") : "";
+			String receiverName = null != logisticsData.get("收件人姓名") ? (String)logisticsData.get("收件人姓名") : "";
+			String location = new StringBuilder().append(orderTime)
+					.append(receiverAddress).append(receiverName).toString();
+			if (locations.contains(location)) continue;
+			locations.add(location);
+			logisticsFilterData = new HashMap<String, Object>();
+			if (StringUtils.isNotBlank(orderTime)) {
+				logisticsFilterData.put("下单时间", orderTime);
+			}else {
+				logisticsFilterData.put("下单时间", orderDate);
+			}
+			logisticsFilterData.put("收件人姓名", receiverName);
+			logisticsFilterData.put("收件人地址", receiverAddress);
+//			logisticsFilterData.put("源文件", sourceFile);
+			logisticsFilterDataList.add(logisticsFilterData);
+		}
+		if (logisticsFilterDataList.size() == 0) {
+			throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 		}
 		return logisticsFilterDataList;
 	}

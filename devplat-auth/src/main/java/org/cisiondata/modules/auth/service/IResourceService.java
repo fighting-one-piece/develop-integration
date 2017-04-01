@@ -1,7 +1,5 @@
 package org.cisiondata.modules.auth.service;
 
-import java.util.List;
-
 import org.cisiondata.modules.abstr.service.IGenericService;
 import org.cisiondata.modules.auth.entity.Resource;
 import org.cisiondata.utils.exception.BusinessException;
@@ -24,10 +22,4 @@ public interface IResourceService extends IGenericService<Resource, Long> {
 	 */
 	public String readIdentityByUrl(String url) throws BusinessException;
 	
-	/**
-	 * 获取用户菜单
-	 * @return
-	 * @throws BusinessException
-	 */
-	public List<Resource> readResourceByType() throws BusinessException;
 }

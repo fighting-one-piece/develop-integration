@@ -1,125 +1,91 @@
 package org.cisiondata.modules.log.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.cisiondata.modules.abstr.entity.QueryResult;
+import org.cisiondata.modules.abstr.web.ResultCode;
+import org.cisiondata.modules.auth.web.WebUtils;
 import org.cisiondata.modules.log.dao.UserAccessLogDAO;
 import org.cisiondata.modules.log.entity.UserAccessLog;
 import org.cisiondata.modules.log.service.IUserAccessLogService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.cisiondata.utils.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
 @Service("userAccessLogService")
 public class UserAccessLogServiceImpl implements IUserAccessLogService{
 	
-	@Autowired
+	@Resource(name = "userAccessLogDAO")
 	private UserAccessLogDAO userAccessLogDAO;
-	//分页
-	int pageCount = 0; //总页数
-	int count = 10;  //每页显示的条数
-	int page = 0; //计算每页从哪里开始读取数据
 	
-	public void addLog(UserAccessLog log) {
-		 userAccessLogDAO.addLog(log);
-	}
-
-	public boolean delLog(String keyword) {
-		return userAccessLogDAO.delLog(keyword);
-	}
-
-	public List<UserAccessLog> findAll() {
+	public Map<String,Object> selAccessLog(String params, Date startTime, Date endTime, int index,int pageSize) throws BusinessException{
+		QueryResult<Map<String,Object>> result = new QueryResult<Map<String,Object>>();
+		Map<String, Object> map = new HashMap<String,Object>();
+		Map<String,Object> maps = new HashMap<String,Object>();
+		Map<String,Object> mapResult = new HashMap<String,Object>();
+		Map<String, String> mapHead = new HashMap<String,String>();
+		mapHead.put("total", "数据信息总计");
+		mapHead.put("accessTime", "查询时间");
+		mapHead.put("params", "关键字");
+		mapHead.put("ip", "IP地址");
+		String startDate = null;
+		String endDate = null;
+		if(startTime != null && endTime != null){
+			SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+			startDate = sdf.format(startTime);  
+			endDate = sdf.format(endTime);  
+		}
+		if(index > 0){
+			int pageCount = 0;
+			int page = (index - 1) * pageSize; 
+			if(StringUtils.isNotBlank(WebUtils.getCurrentAccout())){
+				String account = WebUtils.getCurrentAccout();
+				map.put("account", account);
+				map.put("params", params);
+				map.put("startTime", startDate);
+				map.put("endTime", endDate);
+				map.put("startPos", page);
+				map.put("pageSize", pageSize);
+				maps.put("account", account);
+				maps.put("params", params);
+				maps.put("startTime", startDate);
+				maps.put("endTime", endDate);
+				List<UserAccessLog> lists = userAccessLogDAO.selCount(maps);
+				List<UserAccessLog> list = userAccessLogDAO.selCount(map);
+				if(lists != null && lists.size() > 0){
+					pageCount = lists.size() % pageSize == 0 ? lists.size() / pageSize : lists.size() / pageSize + 1;
+				}
+				if(list.size() > 0){
+					List<Map<String,Object>>  listMap = new ArrayList<Map<String,Object>>();
+					for (int i = 0,len = list.size(); i < len; i++) {
+						Map<String,Object> mapList = new HashMap<String,Object>();
+						mapList.put("ip", list.get(i).getIp());
+						mapList.put("params", list.get(i).getParams());
+						mapList.put("accessTime",list.get(i).getAccessTime());
+						mapList.put("total", list.get(i).getTotal());
+						listMap.add(mapList);
+					}
+					result.setTotalRowNum(pageCount);
+					result.setResultList(listMap);
+					mapResult.put("data", result);
+					mapResult.put("head", mapHead);
+				}else{
+					throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
+				}
+			}else{
+				throw new BusinessException(ResultCode.ACCOUNT_NOT_EXIST);
+			}
+		}else{
+			throw new BusinessException(ResultCode.PARAM_ERROR);
+		}
 		
-		List<UserAccessLog> findAllList = userAccessLogDAO.findAll();
-		return findAllList;
+		return mapResult;
 	}
-
-	public List<UserAccessLog> selectByPage(int startPos, int pageSize) {
-		List<UserAccessLog> selectPage = userAccessLogDAO.selectByPage(startPos, pageSize);
-		return selectPage;
-	}
-
-	@Override
-	public List<UserAccessLog> count() {
-		List<UserAccessLog> count = userAccessLogDAO.count();
-		return count;
-	}
-
-	@Override
-	public Map<String, Object> countPage(int index) {
-		Map<String, Object> map = new HashMap<String,Object>();
-		List<UserAccessLog> list = count();
-		if(list != null && list.size() > 0){
-			pageCount =  list.size() % 10 == 0 ? list.size() / 10 : list.size() / 10 + 1;
-		}
-		//计算当前页数数据量
-		page= (index -1) * 10;
-		List<UserAccessLog> countPage = userAccessLogDAO.countPage(page, count);
-		map.put("data", countPage);
-		map.put("pageCount", pageCount);
-		return map;
-	}
-
-	@Override
-	public List<UserAccessLog> selectByKey(String keyword) {
-		List<UserAccessLog> selectKey = userAccessLogDAO.selectByKey(keyword);
-		return selectKey;
-	}
-
-	@Override
-	public Map<String, Object> keyByPage(int index,String keyword) {
-		Map<String, Object> map = new HashMap<String,Object>();
-		List<UserAccessLog> list = selectByKey(keyword);
-		if(list != null && list.size() > 0){
-			pageCount = list.size() % 10 == 0? list.size() / 10 : list.size() /10 + 1;
-		}
-		//计算当前页数数据量
-		page = (index -1) * 10;
-		List<UserAccessLog> keyPage = userAccessLogDAO.keyByPage(keyword, page, count);
-		map.put("data", keyPage);
-		map.put("pageCount", pageCount);
-		return map;
-	}
-
-	@Override
-	public List<UserAccessLog> selectByorderTime(int startPos, int pageSize) {
-		List<UserAccessLog> selectordertime = userAccessLogDAO.selectByorderTime(startPos, pageSize);
-		return selectordertime;
-	}
-
-	@Override
-	public int selLogCount(String keyword) {
-		return userAccessLogDAO.selLogCount(keyword);
-	}
-
-	@Override
-	public int addLogCount(UserAccessLog log) {
-		return userAccessLogDAO.addLogCount(log);
-	}
-
-	@Override
-	public int upLogCount(UserAccessLog log) {
-		return userAccessLogDAO.upLogCount(log);
-	}
-
-	//每天统计关键字
-	@Scheduled(cron="0 0 8 * * ?")
-	public void keywordCount() {
-		List<UserAccessLog> list = userAccessLogDAO.count();
-		for (int i = 0; i < list.size(); i++) {
-			UserAccessLog logModel = new UserAccessLog();
-			logModel.setParams(list.get(i).getParams());
-			logModel.setCount(list.get(i).getCount());
-			logModel.setAccessTime(new Date());
-			if(selLogCount(list.get(i).getParams()) == 0){
-				addLogCount(logModel);
-			}
-			if(selLogCount(list.get(i).getParams()) == 1){
-				upLogCount(logModel);
-			}
-		}
-	}
-
 }

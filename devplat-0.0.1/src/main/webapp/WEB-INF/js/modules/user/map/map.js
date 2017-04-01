@@ -249,8 +249,8 @@
 					'<td style="background: #EEE8AA;">收件人地址</td>' +
 					'<td style="background: #EEE8AA;">收件人地区</td>' +
 					'<td style="background: #EEE8AA;">货物内容</td>' +
-					'<td style="background: #EEE8AA;">下单日期</td>' +
-					'<td style="background: #EEE8AA;">下单时间</td><tr>' ;
+					'<td style="background: #EEE8AA;">下单时间</td>' +
+					'<td style="background: #EEE8AA;">寄件时间</td><tr>' ;
 					var valuetr = "";
 					$.each(result.data,function(n,list){
 						var addressPre = "";
@@ -326,17 +326,23 @@
 								goodName += list.货物内容;
 							}
 							valuetr += "<td>"+goodName+"</td>";
+							var orderTime = "";
 							if (list.下单日期  && list.下单日期  != 'NA'){
-								valuetr += "<td>"+list.下单日期+"</td>";
-							} else {
-								valuetr += "<td></td>";
+								orderTime += list.下单日期;
 							}
 							if (list.下单时间  && list.下单时间 != 'NA'){
-								valuetr += "<td>"+list.下单时间+"</td>";
-							} else {
-								valuetr += "<td></td>";
+								orderTime += " "+list.下单时间;
 							}
-							
+							valuetr += "<td>"+orderTime+"</td>";
+							if (list.寄件时间 && list.寄件时间 != "NA") {
+								valuetr += "<td>"+list.寄件时间+"</td>";
+							} else {
+								if (list.收件时间 && list.收件时间 != "NA") {
+									valuetr += "<td>"+list.收件时间+"</td>";
+								} else {
+									valuetr += "<td></td>";
+								}
+							}
 							
 							
 							if (list.收件人地址) {

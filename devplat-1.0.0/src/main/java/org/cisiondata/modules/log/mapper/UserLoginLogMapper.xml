@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.log.dao.UserLoginLogDAO">
+
+	<resultMap type="UserLoginLog" id="UserLoginLogMap">
+		<result column="ID" property="id" jdbcType="INTEGER"/>
+		<result column="ACCOUNT" property="account"/>
+		<result column="IP" property="ip"/>
+		<result column="CURRENT_TIME" property="currentTime" javaType="java.util.Date"/>
+		<result column="STATUS" property="status"/>
+	</resultMap>
+	<!-- 新增 -->
+	<insert id="addLoginLog" parameterType="UserLoginLog">
+		insert into T_USER_LOGIN_LOG(ACCOUNT,IP,`CURRENT_TIME`,`STATUS`) values(#{account},#{ip},#{currentTime},#{status})
+	</insert>
+	<!-- 查询用户上一次登录时间 -->
+	<select id="selLoginLog" resultMap="UserLoginLogMap">
+		SELECT ACCOUNT,IP,`CURRENT_TIME`,`STATUS` FROM T_USER_LOGIN_LOG WHERE ACCOUNT=#{account} AND STATUS=0 ORDER BY `CURRENT_TIME` DESC LIMIT 1;
+	</select>
+</mapper>

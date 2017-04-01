@@ -8,9 +8,16 @@
 		<result column="CITY" property="city"/>
 		<result column="DNSEG" property="dnseg"/>
 		<result column="REGION_DNSEG" property="regionDnseg"/>
+		<result column="OPERATOR" property="operator"/>
 	</resultMap>
 	<!-- 查询号码归属地 -->
 	<select id="selByDnseg" parameterType="String" resultMap="attributionMap">
-		SELECT PROVINCE,CITY,DNSEG,REGION_DNSEG FROM T_PHONE_CODE WHERE REGION_DNSEG = #{0}
+		SELECT PROVINCE,CITY,DNSEG,REGION_DNSEG,OPERATOR FROM T_PHONE_CODE WHERE REGION_DNSEG = #{0}
+	</select>
+	<select id="selByDnsegs" parameterType="String" resultMap="attributionMap">
+		SELECT PROVINCE,CITY,DNSEG,REGION_DNSEG,OPERATOR FROM T_PHONE_CODE WHERE REGION_DNSEG = #{0}
+	</select>
+	<select id="selAll" resultMap="attributionMap">
+		SELECT * FROM T_PHONE_CODE
 	</select>
 </mapper>

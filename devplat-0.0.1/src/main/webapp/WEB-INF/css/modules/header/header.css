@@ -39,3 +39,10 @@
 		position: relative;
 		left: 4%;
 	}
+	
+	.watermark {
+		pointer-events: none;
+		position: fixed;
+		top: 13.4%;
+		left: 2%;
+	}

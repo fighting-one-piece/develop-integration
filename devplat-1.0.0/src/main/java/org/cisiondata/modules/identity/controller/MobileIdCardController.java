@@ -2,8 +2,8 @@ package org.cisiondata.modules.identity.controller;
 
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
-import org.cisiondata.modules.elasticsearch.controller.ESController;
 import org.cisiondata.modules.identity.service.IMobileIdCardService;
+import org.cisiondata.modules.search.controller.ESController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

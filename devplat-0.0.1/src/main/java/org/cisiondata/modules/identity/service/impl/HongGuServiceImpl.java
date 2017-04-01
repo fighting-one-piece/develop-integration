@@ -110,6 +110,7 @@ public class HongGuServiceImpl implements IHongGuService {
 		String request = separator1 + QQ + separator2;
 		String wbBase = "http://t.qq.com/";
 		String result = HongGuUtils.requestPCHonggu(request, 4);
+		System.out.println(result);
 		Map<String,Object> map = new HashMap<String,Object>();
 		if(result == null || "".equals(result.trim()) || !result.contains("(@") || !result.contains(")") || result.length() <= 3){
 			throw new BusinessException(ResultCode.NOT_FOUNT_DATA.getCode(), ResultCode.NOT_FOUNT_DATA.getDesc());
@@ -190,7 +191,7 @@ public class HongGuServiceImpl implements IHongGuService {
 		String separator1 = "<qqpyw>";
 		String separator2 = "</qqpyw>";
 		String request = separator1 + num + separator2;
-		String phone =  HongGuUtils.requestPCHonggu(request, 7).trim();
+		String phone =  HongGuUtils.requestPhoneHongda(request).trim();
 		if (phone == null || "".equals(phone)) {
 			throw new BusinessException(ResultCode.NOT_FOUNT_DATA.getCode(), ResultCode.NOT_FOUNT_DATA.getDesc());
 		}

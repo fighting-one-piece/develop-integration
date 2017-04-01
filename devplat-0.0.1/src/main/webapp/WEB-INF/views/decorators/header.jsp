@@ -41,6 +41,8 @@
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/LMall.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/LMTwice.js"></script>
 <script type="text/javascript" src="<%=basePath %>/js/modules/lemon/LMThird.js"></script>
+<!-- 页面水印 -->
+<script type="text/javascript" src="<%=basePath %>/js/watermark.js"></script>
 
 <script type="text/javascript">
 	//处理键盘事件 禁止后退键（Backspace）密码或单行、多行文本框除外 

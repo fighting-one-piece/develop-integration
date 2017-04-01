@@ -25,6 +25,12 @@ public class Query implements Serializable {
 	public static final String OFFSET = "offset";
 	/** 限制数量*/
 	public static final String LIMIT = "limit";
+	/** 表名*/
+	public static final String TABLE = "table";
+	/** Entity表名*/
+	public static final String E_TABLE = "entityTable";
+	/** Data表名*/
+	public static final String D_TABLE = "dataTable";
 	/** 是否分页*/
 	private boolean isPagination = false;
 	/** 当前页数*/
@@ -37,6 +43,10 @@ public class Query implements Serializable {
 	private int orderType = ORDER_ASC;
 	/** 查询条件Map*/
 	private Map<String, Object> condition = new HashMap<String, Object>();
+	/** 基本属性查询条件Map*/
+	private Map<String, Object> basicAttributes = new HashMap<String, Object>();
+	/** 数据属性查询条件Map*/
+	private Map<String, Object> dataAttributes = new HashMap<String, Object>();
 	
 	public Query() {
 		condition.put(IS_PAGINATION, isPagination);
@@ -114,5 +124,20 @@ public class Query implements Serializable {
 		this.condition = condition;
 	}
 	
+	public Map<String, Object> getBasicAttributes() {
+		return basicAttributes;
+	}
+
+	public void setBasicAttributes(Map<String, Object> basicAttributes) {
+		this.basicAttributes = basicAttributes;
+	}
+
+	public Map<String, Object> getDataAttributes() {
+		return dataAttributes;
+	}
+
+	public void setDataAttributes(Map<String, Object> dataAttributes) {
+		this.dataAttributes = dataAttributes;
+	}
 
 }

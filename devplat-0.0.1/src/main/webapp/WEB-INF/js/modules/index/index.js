@@ -106,7 +106,6 @@ $(document).ready(function () {
 			if (result.code == 2) {
 				$("#resultsIndex").append(result.failure);
 			} else if (result.code == 1) {
-				console.log(result)
 				if (result.data) {
 //					es = result.data.es;
 					scrollId = result.data.scrollId;
@@ -128,7 +127,7 @@ $(document).ready(function () {
 						for(var i = 0;i < typeArr.length; i++){
 							keyArr.push(new Array());
 						}
-						
+						var logisticsFlag = false;
 						$.each(result.data.resultList,function(ide,item){
 							var type =item.type;
 							var n = -1;
@@ -136,21 +135,31 @@ $(document).ready(function () {
 								if(type == typeArr[i])n=i;
 							}
 							var newKeyArr = keyArr[n];
-							if(type == '物流' && newKeyArr.length == 0){
-								newKeyArr.push("寄件人姓名");
-								newKeyArr.push("寄件人手机号");
-								newKeyArr.push("寄件人座机");
-								newKeyArr.push("寄件人地址");
-								newKeyArr.push("寄件人地区");
-								newKeyArr.push("收件人姓名");
-								newKeyArr.push("收件人手机号");
-								newKeyArr.push("收件人座机");
-								newKeyArr.push("收件人地址");
-								newKeyArr.push("收件人地区");
-								newKeyArr.push("货物内容");
-								newKeyArr.push("下单日期");
-								newKeyArr.push("下单时间");
-								newKeyArr.push("源文件");
+							if(type == '物流'){
+								if(newKeyArr.length == 0){
+									newKeyArr.push("寄件人姓名");
+									newKeyArr.push("寄件人手机号");
+									newKeyArr.push("寄件人座机");
+									newKeyArr.push("寄件人地址");
+									newKeyArr.push("寄件人地区");
+									newKeyArr.push("收件人姓名");
+									newKeyArr.push("收件人手机号");
+									newKeyArr.push("收件人座机");
+									newKeyArr.push("收件人地址");
+									newKeyArr.push("收件人地区");
+									newKeyArr.push("货物内容");
+									newKeyArr.push("下单时间");
+									newKeyArr.push("寄件时间");
+									if (item.data.源文件 && !logisticsFlag){
+										newKeyArr.push("源文件");
+										logisticsFlag = true;
+									}
+								} else {
+									if (item.data.源文件 && !logisticsFlag){
+										newKeyArr.push("源文件");
+										logisticsFlag = true;
+									}
+								}
 								keyArr[n] = newKeyArr;
 							} else if (type != '物流'){
 								$.each(item.data,function(key,value){
@@ -211,6 +220,25 @@ $(document).ready(function () {
 									}
 									valueStr += "<td style='background: white;'>"+goodName+"</td>";
 									continue;
+								} else if(type == '物流' && keys[i] == '下单时间'){
+									var orderTime = "";
+									if (item.data.下单日期  && item.data.下单日期 != 'NA'){
+										orderTime += item.data.下单日期;
+									}
+									if (item.data.下单时间  && item.data.下单时间 != 'NA'){
+										orderTime += " "+item.data.下单时间;
+									}
+									valueStr += "<td style='background: white;'>"+orderTime+"</td>";
+									continue;
+								} else if(type == '物流' && keys[i] == '寄件时间'){
+									if (item.data.寄件时间  && item.data.寄件时间 != 'NA'){
+										valueStr += "<td style='background: white;'>"+item.data.寄件时间+"</td>";
+									} else if (item.data.收件时间  && item.data.收件时间 != 'NA'){
+										valueStr += "<td style='background: white;'>"+item.data.收件时间+"</td>";
+									} else {
+										valueStr += "<td style='background: white;'></td>";
+									}
+									continue;
 								}
 								
 								if (keys[i] == '源文件'){
@@ -220,7 +248,6 @@ $(document).ready(function () {
 									
 									if (item.data[keys[i]] && item.data[keys[i]] != 'NA'){
 										valueStr += "<td style='background: white;'>"+item.data[keys[i]]+"</td>";
-										console.log(keys[i]+":"+item.data[keys[i]])
 									} else {
 										valueStr += "<td style='background: white;'></td>";
 									}
@@ -254,8 +281,6 @@ $(document).ready(function () {
 							tables += "</tr>";
 							tables += valueStrArr[i];
 							tables += "</table>";
-							console.log(keyArr[i])
-							console.log(valueStrArr[i])
 						}
 						$("#resultsIndex").append(tables);
 						$("#resultsLable").append("搜索共" + totalRowNum + "结果</br><br/>")
@@ -295,7 +320,7 @@ $(document).ready(function () {
 						for(var i = 0;i < typeArr.length; i++){
 							keyArr.push(new Array());
 						}
-						
+						var logisticsFlag = false;
 						$.each(result.data.resultList,function(ide,item){
 							var type =item.type;
 							var n = -1;
@@ -303,21 +328,31 @@ $(document).ready(function () {
 								if(type == typeArr[i])n=i;
 							}
 							var newKeyArr = keyArr[n];
-							if(type == '物流' && newKeyArr.length == 0){
-								newKeyArr.push("寄件人姓名");
-								newKeyArr.push("寄件人手机号");
-								newKeyArr.push("寄件人座机");
-								newKeyArr.push("寄件人地址");
-								newKeyArr.push("寄件人地区");
-								newKeyArr.push("收件人姓名");
-								newKeyArr.push("收件人手机号");
-								newKeyArr.push("收件人座机");
-								newKeyArr.push("收件人地址");
-								newKeyArr.push("收件人地区");
-								newKeyArr.push("货物内容");
-								newKeyArr.push("下单日期");
-								newKeyArr.push("下单时间");
-								newKeyArr.push("源文件");
+							if(type == '物流'){
+								if(newKeyArr.length == 0){
+									newKeyArr.push("寄件人姓名");
+									newKeyArr.push("寄件人手机号");
+									newKeyArr.push("寄件人座机");
+									newKeyArr.push("寄件人地址");
+									newKeyArr.push("寄件人地区");
+									newKeyArr.push("收件人姓名");
+									newKeyArr.push("收件人手机号");
+									newKeyArr.push("收件人座机");
+									newKeyArr.push("收件人地址");
+									newKeyArr.push("收件人地区");
+									newKeyArr.push("货物内容");
+									newKeyArr.push("下单时间");
+									newKeyArr.push("寄件时间");
+									if (item.data.源文件 && !logisticsFlag){
+										newKeyArr.push("源文件");
+										logisticsFlag = true;
+									}
+								} else {
+									if (item.data.源文件 && !logisticsFlag){
+										newKeyArr.push("源文件");
+										logisticsFlag = true;
+									}
+								}
 								keyArr[n] = newKeyArr;
 							} else if (type != '物流'){
 								$.each(item.data,function(key,value){
@@ -377,6 +412,25 @@ $(document).ready(function () {
 										goodName += item.data.货物内容;
 									}
 									valueStr += "<td style='background: white;'>"+goodName+"</td>";
+									continue;
+								} else if(type == '物流' && keys[i] == '下单时间'){
+									var orderTime = "";
+									if (item.data.下单日期  && item.data.下单日期 != 'NA'){
+										orderTime += item.data.下单日期;
+									}
+									if (item.data.下单时间  && item.data.下单时间 != 'NA'){
+										orderTime += " "+item.data.下单时间;
+									}
+									valueStr += "<td style='background: white;'>"+orderTime+"</td>";
+									continue;
+								} else if(type == '物流' && keys[i] == '寄件时间'){
+									if (item.data.寄件时间  && item.data.寄件时间 != 'NA'){
+										valueStr += "<td style='background: white;'>"+item.data.寄件时间+"</td>";
+									} else if (item.data.收件时间  && item.data.收件时间 != 'NA'){
+										valueStr += "<td style='background: white;'>"+item.data.收件时间+"</td>";
+									} else {
+										valueStr += "<td style='background: white;'></td>";
+									}
 									continue;
 								}
 								

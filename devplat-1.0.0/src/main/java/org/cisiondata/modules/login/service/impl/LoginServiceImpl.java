@@ -2,9 +2,12 @@ package org.cisiondata.modules.login.service.impl;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.auth.service.IAuthService;
+import org.cisiondata.modules.auth.service.IUserService;
 import org.cisiondata.modules.auth.web.WebUtils;
+import org.cisiondata.modules.log.service.IUserLoginLogService;
 import org.cisiondata.modules.login.dto.LoginDTO;
 import org.cisiondata.modules.login.service.ILoginService;
 import org.cisiondata.utils.exception.BusinessException;
@@ -18,6 +21,12 @@ public class LoginServiceImpl implements ILoginService {
 	
 	private Logger LOG = LoggerFactory.getLogger(LoginServiceImpl.class);
 	
+	@Resource(name = "loginLogService")
+	private IUserLoginLogService userLoginLogService;
+	
+	@Resource(name = "userService")
+	private IUserService userService;
+	
 	@Resource(name = "authService")
 	private IAuthService authService = null;
 	
@@ -29,12 +38,14 @@ public class LoginServiceImpl implements ILoginService {
 		loginDTO.setNickname(user.getNickname());
 		loginDTO.setAccessToken(user.getAccessToken());
 		loginDTO.setFirstLoginFlag(user.getFirstLoginFlag());
-		loginDTO.setLastLoginTime("2017-03-13 17:58:25");
+		loginDTO.setLastLoginTime(userLoginLogService.readUserLoginLog(account));
 		return loginDTO;
 	}
 	
 	@Override
 	public void doUserLogout() throws BusinessException {
+		String account = WebUtils.getCurrentAccout();
+		if (StringUtils.isNotBlank(account)) userService.deleteUserCache(account);
 		String accessToken = WebUtils.getAccessTokenFromHead();
 		RedisClusterUtils.getInstance().delete(accessToken);
 	}

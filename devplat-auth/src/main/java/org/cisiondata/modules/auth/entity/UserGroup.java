@@ -25,7 +25,7 @@ public class UserGroup extends PKAutoEntity<Long> {
 	private Group group = null;
 	/** 优先权*/
 	@Column(name="PRIORITY")
-	private String priority = null;
+	private Integer priority = null;
 
 	public User getUser() {
 		return this.user;
@@ -43,11 +43,11 @@ public class UserGroup extends PKAutoEntity<Long> {
 		this.group = group;
 	}
 
-	public String getPriority() {
+	public Integer getPriority() {
 		return this.priority;
 	}
 
-	public void setPriority(String priority) {
+	public void setPriority(Integer priority) {
 		this.priority = priority;
 	}
 

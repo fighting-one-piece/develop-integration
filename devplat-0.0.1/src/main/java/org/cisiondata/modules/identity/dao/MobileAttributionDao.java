@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface MobileAttributionDAO {
 	
 	public List<MobileAttributionModel> selByDnseg(String phone);
+	public MobileAttributionModel selByDnsegs(String phone);
+	public List<MobileAttributionModel> selAll();
 }

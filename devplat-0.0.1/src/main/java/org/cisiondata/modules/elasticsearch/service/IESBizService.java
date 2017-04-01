@@ -20,6 +20,17 @@ public interface IESBizService extends IESService {
 			throws BusinessException;
 	
 	/**
+	 * 根据条件读取数据列表
+	 * @param query
+	 * @param size
+	 * @param isHighLight
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<Map<String, Object>> readDataListByCondition(String query, int size, boolean isHighLight) 
+			throws BusinessException;
+	
+	/**
 	 * 根据条件读取分页数据列表
 	 * @param query
 	 * @param scrollId
@@ -124,6 +135,14 @@ public interface IESBizService extends IESService {
 	 * @throws BusinessException
 	 */
 	public List<Map<String, Object>> readLogisticsFilterDataList(String query) throws BusinessException;
+	
+	/**
+	 * 根据条件读取物流过滤数据列表
+	 * @param query
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<Map<String, Object>> readLogisticsFilterDataLists(String query) throws BusinessException;
 	
 	/**
 	 * 根据条件读取物流关系数据列表

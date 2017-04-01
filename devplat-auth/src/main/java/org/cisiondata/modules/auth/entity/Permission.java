@@ -9,6 +9,7 @@ import javax.persistence.Table;
 
 import org.cisiondata.modules.abstr.entity.PKAutoEntity;
 
+/** 权限表*/
 @Entity
 @Table(name="T_PERMISSION")
 public class Permission extends PKAutoEntity<Long> {

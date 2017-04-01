@@ -70,10 +70,10 @@
 	</properties>
 
 	<dependencies>
-		<!--DevPlat Common依赖包 -->
+		<!--DevPlat Spring依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
-			<artifactId>devplat-common</artifactId>
+			<artifactId>devplat-spring</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		

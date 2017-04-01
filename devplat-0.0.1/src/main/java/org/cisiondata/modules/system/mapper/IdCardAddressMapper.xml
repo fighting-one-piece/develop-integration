@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.system.dao.IdCardAddressDAO">
+
+	<resultMap type="org.cisiondata.modules.system.entity.IdCardAddress" id="IdCardAddresslMap">
+		<result column="ID_CARD" property="idCard"/>
+		<result column="ADDRESS" property="address"/>
+	</resultMap>
+	
+	<select id="findByIdCard" resultType="string">
+		select ADDRESS from T_IDCARD_CODE where ID_CARD=#{0}
+	</select>
+	
+	<select id="findAll" resultMap="IdCardAddresslMap">
+		select ID_CARD,ADDRESS from T_IDCARD_CODE
+	</select>
+	
+</mapper>

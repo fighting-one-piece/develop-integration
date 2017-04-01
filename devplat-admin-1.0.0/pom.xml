@@ -105,19 +105,21 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
-		<!--DevPlat ElasticSearch依赖包 -->
+		<!--DevPlat ES依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
-			<artifactId>devplat-elasticsearch</artifactId>
+			<artifactId>devplat-es</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<!--DevPlat RabbitMQ依赖包 -->
+		<!--  
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-rabbitmq</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		-->
 		
 		<!--JUnit依赖包 -->
 		<dependency>

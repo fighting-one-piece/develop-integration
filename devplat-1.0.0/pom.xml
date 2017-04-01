@@ -70,10 +70,10 @@
 	</properties>
 
 	<dependencies>
-		<!--DevPlat Common依赖包 -->
+		<!--DevPlat Spring依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
-			<artifactId>devplat-common</artifactId>
+			<artifactId>devplat-spring</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
@@ -105,18 +105,27 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
-		<!--DevPlat ElasticSearch依赖包 -->
+		<!--DevPlat ES依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
-			<artifactId>devplat-elasticsearch</artifactId>
+			<artifactId>devplat-es</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<!--DevPlat RabbitMQ依赖包 -->
+		<!--  
 		<dependency>
 			<groupId>org.cisiondata</groupId>
 			<artifactId>devplat-rabbitmq</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		-->
+		
+		<!-- Alidayu依赖包 -->
+		<dependency>
+		  	<groupId>com.taobao</groupId>
+			<artifactId>alidayu</artifactId>
+		  	<version>0.0.1</version>
 		</dependency>
 		
 		<!--JUnit依赖包 -->
@@ -133,6 +142,13 @@
 			<artifactId>servlet-api</artifactId>
 			<version>2.4</version>
 			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.tomcat</groupId>
+		    <artifactId>tomcat-catalina</artifactId>
+		    <version>8.5.11</version>
+		    <scope>provided</scope>
 		</dependency>
 			
 	</dependencies>

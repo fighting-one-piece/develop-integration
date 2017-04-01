@@ -24,7 +24,7 @@ public class HongGuController {
 	
 	//朋友网url查找qq号，编号为1的操作
 	@ResponseBody
-	@RequestMapping(value="/qqs/penyou",method=RequestMethod.GET)
+	@RequestMapping(value="/qqs/pengyou",method=RequestMethod.GET)
 	public WebResult pywtoqq(String url){
 		WebResult result = new WebResult();
 		try {
@@ -43,7 +43,7 @@ public class HongGuController {
 		
 	//微博url查找qq号，编号为2的操作
 	@ResponseBody
-	@RequestMapping(value="/qqs/tweibo",method=RequestMethod.GET)
+	@RequestMapping(value="/qqs/weibo",method=RequestMethod.GET)
 	public WebResult wbtoqq(String url){
 		WebResult result = new WebResult();
 		try {
@@ -141,6 +141,8 @@ public class HongGuController {
 	@RequestMapping(value="/qqs/phone/{phone}",method=RequestMethod.GET)
 	public WebResult phonetoqq(String phone){
 		WebResult result = new WebResult();
+//		result.setCode(ResultCode.FAILURE.getCode());
+//		result.setFailure("系统维护升级中");
 		try {
 			result.setData(hongGuService.phoneNumToQQ(phone));
 			result.setCode(ResultCode.SUCCESS.getCode());

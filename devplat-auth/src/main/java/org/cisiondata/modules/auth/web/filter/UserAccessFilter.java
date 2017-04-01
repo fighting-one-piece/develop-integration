@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +28,6 @@ import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.auth.Constants.SessionName;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.auth.service.IAuthService;
-import org.cisiondata.modules.auth.web.WebContext;
 import org.cisiondata.modules.auth.web.WebUtils;
 import org.cisiondata.modules.auth.web.session.SessionManager;
 import org.cisiondata.utils.date.DateFormatter;
@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,8 +55,10 @@ public class UserAccessFilter implements Filter {
 	
 	private SessionManager sessionManager = null;
 	
-	private Set<String> filteredRequestUrls = null;
-
+	private Set<String> notAuthenticationUrls = null;
+	
+	private Set<String> mustAuthenticationUrls = null;
+	
 	public void init(FilterConfig config) throws ServletException {
 		WebApplicationContext wac = WebApplicationContextUtils.getWebApplicationContext(config.getServletContext());
 		authService = wac.getBean(IAuthService.class);
@@ -68,13 +71,11 @@ public class UserAccessFilter implements Filter {
 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 		HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 		String requestUrl = httpServletRequest.getServletPath();
-		if (requestUrl.startsWith("/api/v1")) requestUrl = requestUrl.replace("/api/v1", "");
 		LOG.info("client request url: {}", requestUrl);
 		LOG.info("current access account: {}", WebUtils.getCurrentAccout());
-		LOG.info("ipAddress: {} macAddress: {}", IPUtils.getIPAddress(WebContext.get().getRequest()), 
-				IPUtils.getMACAddress(WebContext.get().getRequest()));
-		if (!filteredRequestUrls.contains(requestUrl)) {
-			if (!authenticationRequest(httpServletRequest, httpServletResponse)) {
+		if (requestUrl.startsWith("/api/v1")) requestUrl = requestUrl.replace("/api/v1", "");
+		if (!notAuthenticationUrls.contains(requestUrl)) {
+			if (!authenticationRequest(requestUrl, httpServletRequest, httpServletResponse)) {
 				writeResponse(httpServletResponse, wrapperFailureWebResult("用户认证失败,请重新登录"));
 				return;
 			}
@@ -90,26 +91,33 @@ public class UserAccessFilter implements Filter {
 	}
 	
 	private void initializeFilteredRequestUrl() {
-		filteredRequestUrls = new HashSet<String>();
-		filteredRequestUrls.add("/login");
-		filteredRequestUrls.add("/jcaptcha.jpg");
-		filteredRequestUrls.add("/jcaptcha-validate");
-		filteredRequestUrls.add("/verificationCode.jpg");
+		notAuthenticationUrls = new HashSet<String>();
+		notAuthenticationUrls.add("/login");
+		notAuthenticationUrls.add("/jcaptcha.jpg");
+		notAuthenticationUrls.add("/jcaptcha-validate");
+		notAuthenticationUrls.add("/verificationCode.jpg");
+		notAuthenticationUrls.add("/users/sms/verify");
+		notAuthenticationUrls.add("/users/account/verify");
+		mustAuthenticationUrls = new HashSet<String>();
+		mustAuthenticationUrls.add("/users/sms");
+		mustAuthenticationUrls.add("/users/settings/profile");
+		mustAuthenticationUrls.add("/users/settings/security");
+		mustAuthenticationUrls.add("/users/security/questions");
+		mustAuthenticationUrls.add("/users/settings/security/verify");
+		mustAuthenticationUrls.add("/users/settings/security/question");
 	}
 	
-	private boolean authenticationRequest(HttpServletRequest request, HttpServletResponse response) {
-		String requestUrl = request.getServletPath();
-		if (requestUrl.startsWith("/api/v1")) requestUrl = requestUrl.replace("/api/v1", "");
+	private boolean authenticationRequest(String requestUrl, HttpServletRequest request, HttpServletResponse response) {
 		if (requestUrl.startsWith("/app")) {
 			return authenticationAppRequest(request, response);
 		} else if (requestUrl.startsWith("/ext")) {
 			return authenticationExternalRequest(request, response);
 		} else {
-			return authenticationWebRequest(request, response);
+			return authenticationWebRequest(requestUrl, request, response);
 		}
 	}
 	
-	private boolean authenticationWebRequest(HttpServletRequest request, HttpServletResponse response) {
+	private boolean authenticationWebRequest(String requestUrl, HttpServletRequest request, HttpServletResponse response) {
 		String accessToken = request.getHeader("accessToken");
 		LOG.info("client access token: {}", accessToken);
 		Object cacheObject = RedisClusterUtils.getInstance().get(accessToken);
@@ -121,7 +129,13 @@ public class UserAccessFilter implements Filter {
 			if (null == userObject) return false;
 			User user = (User) userObject;
 			String macAddress = IPUtils.getMACAddress(request);
-			if (!TokenUtils.authenticationMD5Token(accessToken, user.getAccount(), user.getPassword(), macAddress)) {
+			String currentDate = DateFormatter.DATE.get().format(new Date());
+			if (mustAuthenticationUrls.contains(requestUrl) && TokenUtils.isAuthenticationMD5Token(
+					accessToken, user.getAccount(), user.getPassword(), macAddress, currentDate)) {
+					return true;
+			} 
+			if (!TokenUtils.isAuthorizationMD5Token(accessToken, user.getAccount(), 
+					user.getPassword(), macAddress, currentDate)) {
 				return false;
 			}
 		} catch (Exception e) {
@@ -181,7 +195,7 @@ public class UserAccessFilter implements Filter {
 			throws JsonGenerationException, JsonMappingException, IOException {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
-		//objectMapper.setSerializationInclusion(Inclusion.NON_NULL);
+		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		response.getWriter().write(objectMapper.writeValueAsString(result));
 	}
 	

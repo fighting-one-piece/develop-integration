@@ -8,9 +8,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;  
 
 public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
@@ -25,20 +28,28 @@ public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 		Set<Entry<String, JsonElement>> entries = json.getAsJsonObject().entrySet();
 		for (Entry<String, JsonElement> entry : entries) {
 			JsonElement element = entry.getValue();
-			map.put(entry.getKey(), isInteger(element.getAsString()) ? element.getAsInt() : element);
+			if (null == element || element instanceof JsonNull) continue;
+			Class<?> elementClass = element.getClass();
+			if (JsonArray.class.isAssignableFrom(elementClass)) {
+				map.put(entry.getKey(), GsonUtils.builder().toJson(element));
+			} else if (JsonObject.class.isAssignableFrom(elementClass)) {
+				map.put(entry.getKey(), GsonUtils.builder().toJson(element));
+			} else {
+				map.put(entry.getKey(), isNumberic(element.getAsString()) ? element.getAsLong() : element);
+			}
 		}
 		return map;
 	}
 
 	/**
-	 * 判断是不是int类型的数字
+	 * 判断是不是数字
 	 * @param input
-	 * @return 是int类型返回true
+	 * @return 是数字类型返回true
 	 */
-	public boolean isInteger(String input) {
+	public boolean isNumberic(String input) {
 		Pattern pattern = Pattern.compile("[0-9]+");
-		Matcher isNum = pattern.matcher(input);
-		return !isNum.matches() ? false : true;
+		Matcher matcher = pattern.matcher(input);
+		return !matcher.matches() ? false : true;
 	}
 
 }

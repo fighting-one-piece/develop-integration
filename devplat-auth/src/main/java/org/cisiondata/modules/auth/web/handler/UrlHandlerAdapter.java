@@ -22,13 +22,11 @@ import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
-import org.cisiondata.modules.auth.entity.AccessUserControl;
-import org.cisiondata.modules.auth.entity.RequestMessage;
-import org.cisiondata.modules.auth.service.IAccessUserService;
 import org.cisiondata.modules.auth.web.WebUtils;
 import org.cisiondata.modules.auth.web.handler.UrlMappingStorage.Mapper;
-import org.cisiondata.modules.rabbitmq.entity.MQueue;
-import org.cisiondata.modules.rabbitmq.service.IMQService;
+import org.cisiondata.modules.queue.entity.MQueue;
+import org.cisiondata.modules.queue.entity.RequestMessage;
+import org.cisiondata.modules.queue.service.IRedisMQService;
 import org.cisiondata.utils.clazz.ClassScanner;
 import org.cisiondata.utils.clazz.ClassScanner.ClassResourceHandler;
 import org.cisiondata.utils.clazz.ObjectMethodParams;
@@ -55,6 +53,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.HandlerAdapter;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,9 +66,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	
 	private ApplicationContext ctx = null;
 	
-	private IAccessUserService accessUserService = null;
-	
-	private IMQService mqService = null;
+	private IRedisMQService redisMQService = null;
 	
 	public void setApplicationContext(ApplicationContext ctx) throws BeansException {
 		this.ctx = ctx;
@@ -85,6 +82,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	
 	@Override
 	public void afterPropertiesSet() {
+		redisMQService = ctx.getBean("redisMQService", IRedisMQService.class);
 		new ClassScanner(new String[]{"org.cisiondata.modules"}, new ClassResourceHandler() {
 			@SuppressWarnings("rawtypes")
 			public void handle(MetadataReader metadata) {
@@ -123,8 +121,6 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 				}
 			}
 		}).scan();
-		this.accessUserService = (IAccessUserService) ctx.getBean("accessUserService");
-		this.mqService = (IMQService) ctx.getBean("mqService");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -146,9 +142,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 				path = path.replace("/api/v1", "");
 				Object result = handleNormalRequest(path, request, response);
 				writeResponse(response, result);
-				/**
 				sendMessage(request, path, result);
-				**/
 			} else {
 				Object result = handleNormalRequest(path, request, response);
 				writeResponse(response, result);
@@ -193,16 +187,20 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	
 	private Object handleExternalRequestWithUserAccessControl(String interfaceUrl, 
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		/**
 		String account = request.getParameter("accessId");
 		AccessUserControl accessUserControl = accessUserService.readAccessUserControlByAccount(account);
 		long remainingCount = accessUserControl.getRemainingCount();
 		if (remainingCount <= 0) {
 			writeResponse(response, wrapperFailureWebResult(ResultCode.FAILURE, "账户剩余查询条数不足"));
 		}
+		**/
 		Object result = handleExternalRequest(interfaceUrl, request, response);
 		long incOrDec = parseReturnResultCount(result);
 		LOG.info("incOrDec : {}", incOrDec);
+		/**
 		accessUserService.updateRemainingCount(account, remainingCount, -incOrDec);
+		**/
 		return result;
 	}
 	
@@ -244,7 +242,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			throws JsonGenerationException, JsonMappingException, IOException {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
-		//objectMapper.setSerializationInclusion(Inclusion.NON_NULL);
+		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		response.getWriter().write(objectMapper.writeValueAsString(result));
 	}
 	
@@ -267,6 +265,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
     	for (Map.Entry<String, String[]> entry : requestParams.entrySet()) {
 			params.put(entry.getKey(), entry.getValue()[0]);
     	}
+    	/**
     	try {
 	    	String accessKey = accessUserService.readAccessKeyByAccessId(params.get("accessId"));
 	    	params.put("accessKey", accessKey);
@@ -275,6 +274,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
     		writeResponse(response, wrapperFailureWebResult(ResultCode.FAILURE, e.getMessage()));
     		return false;
     	}
+    	**/
     	params.put("date", DateFormatter.DATE.get().format(Calendar.getInstance().getTime()).replace("-", ""));
     	List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(params.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
@@ -371,22 +371,26 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
+	private void sendMessage(HttpServletRequest request, String requestUrl, Object result) {
+		redisMQService.sendMessage(MQueue.REQUEST_ACCESS_QUEUE.getRoutingKey(), 
+				wrapperRequestMessage(request, requestUrl, result));
+	}
+	
+	@SuppressWarnings({"unchecked"})
 	private RequestMessage wrapperRequestMessage(HttpServletRequest request, String requestUrl, Object result) {
 		RequestMessage requestMessage = new RequestMessage();
 		requestMessage.setUrl(requestUrl);
-		requestMessage.setParams(request.getParameterMap());
+		Map<String, String[]> requestParams = request.getParameterMap();
+		Map<String, String> params = new HashMap<String, String>();
+    	for (Map.Entry<String, String[]> entry : requestParams.entrySet()) {
+			params.put(entry.getKey(), entry.getValue()[0]);
+    	}
+		requestMessage.setParams(params);
 		requestMessage.setIpAddress(IPUtils.getIPAddress(request));
 		requestMessage.setAccount(WebUtils.getCurrentAccout());
 		requestMessage.setTime(new Date());
 		requestMessage.setReturnResult(result);
 		return requestMessage;
-	}
-	
-	@SuppressWarnings("unused")
-	private void sendMessage(HttpServletRequest request, String requestUrl, Object result) {
-		mqService.sendMessage(MQueue.REQUEST_ACCESS_QUEUE.getName(), 
-				wrapperRequestMessage(request, requestUrl, result));
 	}
 	
 }

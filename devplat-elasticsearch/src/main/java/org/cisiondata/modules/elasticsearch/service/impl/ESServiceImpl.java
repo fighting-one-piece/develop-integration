@@ -517,6 +517,7 @@ public class ESServiceImpl implements IESService {
 			for (Map.Entry<String, Object> entry : source.entrySet()) {
 				key = entry.getKey();
 				if (filter_attributes.contains(key) || key.endsWith("Alias")) continue;
+				if (isSkipKey(key)) continue;
 				value = wrapperValue(key, entry.getValue());
 				String fKey = isMessageSource ? MessageUtils.getInstance()
 						.getMessage(prefix + "." + key) : key;
@@ -556,6 +557,10 @@ public class ESServiceImpl implements IESService {
 			if (highLightText.length() > 0) entryValue = highLightText.toString();
 			entry.setValue(entryValue);
 		}
+	}
+	
+	protected boolean isSkipKey(String key) {
+		return false;
 	}
 	
 	protected Object wrapperValue(String key, Object value) {

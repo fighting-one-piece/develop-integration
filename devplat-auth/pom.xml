@@ -44,10 +44,10 @@
 	</properties>
 
 	<dependencies>
-		<!--DevPlat Common依赖包 -->
+		<!--DevPlat Spring依赖包 -->
 		<dependency>
 			<groupId>org.cisiondata</groupId>
-			<artifactId>devplat-common</artifactId>
+			<artifactId>devplat-spring</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
@@ -58,18 +58,17 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
-		<!--DevPlat RabbitMQ依赖包 -->
-		<dependency>
-			<groupId>org.cisiondata</groupId>
-			<artifactId>devplat-rabbitmq</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		
 		<!-- Jcaptcha依赖包 -->
 		<dependency>
 			<groupId>com.octo.captcha</groupId>
 			<artifactId>jcaptcha</artifactId>
 			<version>${jcaptcha.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>

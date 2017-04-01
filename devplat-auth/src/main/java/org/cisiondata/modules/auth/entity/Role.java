@@ -12,6 +12,7 @@ import javax.persistence.Table;
 
 import org.cisiondata.modules.abstr.entity.PKAutoEntity;
 
+/** 角色表*/
 @Entity
 @Table(name="T_ROLE")
 public class Role extends PKAutoEntity<Long> {

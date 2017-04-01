@@ -3,6 +3,7 @@ package org.cisiondata.modules.identity.service.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.identity.HongGuUtils;
 import org.cisiondata.modules.identity.service.IHongGuService;
@@ -23,6 +24,9 @@ public class HongGuServiceImpl implements IHongGuService {
 	 */
 	@Override
 	public Map<String,String> pywToQQ(String url) throws BusinessException {
+		if (! StringUtils.isNotBlank(url)) {
+			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
+		}
 		Map<String,String> map = new HashMap<String, String>();
 		String pywtoqq = HongGuUtils.requestPCHonggu(url, 1).split("朋友网")[0].trim().split("机器码")[0].trim();
 		if (pywtoqq == null || "".equals(pywtoqq)) {
@@ -46,6 +50,9 @@ public class HongGuServiceImpl implements IHongGuService {
 	 */
 	@Override
 	public Map<String,String> wbToQQ(String weibo) throws BusinessException {
+		if (! StringUtils.isNotBlank(weibo)) {
+			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
+		}
 		Map<String,String> map = new HashMap<String, String>();
 		String separator1 = "<wb>";
 		String separator2 = "</wb>";
@@ -75,6 +82,9 @@ public class HongGuServiceImpl implements IHongGuService {
 	 */
 	@Override
 	public Map<String,String> qqToPyw(String QQ) throws BusinessException {
+		if (! StringUtils.isNotBlank(QQ)) {
+			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
+		}
 		Map<String, String> map = new HashMap<String, String>();
 		String separator1 = "<qqpyw>";
 		String separator2 = "</qqpyw>";
@@ -105,6 +115,9 @@ public class HongGuServiceImpl implements IHongGuService {
 	 */
 	@Override
 	public Map<String,Object> qqTowb(String QQ) throws BusinessException {
+		if (! StringUtils.isNotBlank(QQ)) {
+			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
+		}
 		String separator1 = "<qqpyw>";
 		String separator2 = "</qqpyw>";
 		String request = separator1 + QQ + separator2;
@@ -133,6 +146,9 @@ public class HongGuServiceImpl implements IHongGuService {
 	 */
 	@Override
 	public String temporaryWindow(String QQ) throws BusinessException {
+		if (! StringUtils.isNotBlank(QQ)) {
+			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
+		}
 		String a = HongGuUtils.requestPCHonggu("", 5);
 		String r = a.split("uin=")[1].split("&Site")[0];
 		String qqsession = a.replace(r, QQ).trim();
@@ -154,6 +170,9 @@ public class HongGuServiceImpl implements IHongGuService {
 	 */
 	@Override
 	public Map<String, String> qqLastShuoShuo(String QQ) throws BusinessException {
+		if (! StringUtils.isNotBlank(QQ)) {
+			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
+		}
 		Map<String, String> map = new HashMap<String, String>();
 		String separator1 = "<wb>";
 		String separator2 = "</wb>";
@@ -187,10 +206,13 @@ public class HongGuServiceImpl implements IHongGuService {
 	 */
 	@Override
 	public String phoneNumToQQ(String num) throws BusinessException {
+		if (! StringUtils.isNotBlank(num)) {
+			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
+		}
 		String separator1 = "<qqpyw>";
 		String separator2 = "</qqpyw>";
 		String request = separator1 + num + separator2;
-		String phone =  HongGuUtils.requestPCHonggu(request, 7).trim();
+		String phone =  HongGuUtils.requestPhoneHongda(request).trim();
 		if (phone == null || "".equals(phone)) {
 			throw new BusinessException(ResultCode.NOT_FOUNT_DATA.getCode(), ResultCode.NOT_FOUNT_DATA.getDesc());
 		}

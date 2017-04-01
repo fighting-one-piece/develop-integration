@@ -30,14 +30,14 @@
     </sql>
     
      <insert id="insert" parameterType="Group">
-            INSERT INTO T_ROLE(NAME, IDENTITY, DESCRIPTION, DELETE_FLAG) 
+            INSERT INTO T_GROUP(NAME, IDENTITY, DESCRIPTION, DELETE_FLAG) 
             VALUES(#{name},#{identity},#{desc},#{deleteFlag})  
     </insert>
     
     <select id="readDataByPK" resultMap="groupResultMap">  
             SELECT 
             <include refid="columnClause"/>
-            FROM T_ROLE WHERE ID = #{id}
+            FROM T_GROUP WHERE ID = #{id}
     </select>
     
     <select id="readDataByCondition" resultMap="groupResultMap">  
@@ -50,18 +50,18 @@
     <select id="readDataListByCondition" resultMap="groupResultMap">  
             SELECT 
             <include refid="columnClause"/>
-            FROM T_ROLE
+            FROM T_GROUP
             <include refid="whereClause"/>
     </select>
     
     <select id="readDataPaginationByCondition" resultMap="groupResultMap">  
         <![CDATA[ 
-            SELECT * FROM T_ROLE
+            SELECT * FROM T_GROUP
         ]]>   
     </select>
     
     <select id="readDataListByUserId" parameterType="Long" resultMap="groupResultMap">  
-            SELECT r.* FROM T_ROLE r, T_USER_ROLE ur WHERE r.ID = ur.ROLE_ID AND ur.USER_ID = #{userId};
+            SELECT r.* FROM T_GROUP r, T_USER_GROUP ur WHERE r.ID = ur.GROUP_ID AND ur.USER_ID = #{userId};
     </select>
     
 </mapper>

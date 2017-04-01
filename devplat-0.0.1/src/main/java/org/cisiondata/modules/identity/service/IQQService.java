@@ -15,7 +15,7 @@ public interface IQQService {
 	public List<Map<String, Object>> readQQqunDatas(String qunNum);
 	//根据QQ号得到QQ基本信息
 	public List<Map<String, Object>> readQQData(String qq);
-	//根据QQ号得到QQ基本信息
+	//根据QQ昵称得到QQ信息
 	public QueryResult<Map<String, Object>> readQQNickData(String qqnick,String scrollId, int rowNumPerPage);
 	
 	public Map<String,Object> readQQAndQunDatas(String qqNum);

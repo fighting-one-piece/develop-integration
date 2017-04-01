@@ -161,7 +161,13 @@ $(document).ready(function(){
 									if (! result.data.resultList[i].data['性别']) {
 										html+="<td></td>";
 									}else {
-										html+="<td>"+result.data.resultList[i].data['性别']+"</td>";
+										if (result.data.resultList[i].data['性别'] == "0") {
+											html+="<td>男</td>";
+										}else if (result.data.resultList[i].data['性别'] == "1") {
+											html+="<td>女</td>";
+										}else{
+											html+="<td></td>";
+										}
 									}
 									if (! result.data.resultList[i].data['群通知']) {
 										html+="<td></td>";
@@ -319,9 +325,17 @@ $(document).ready(function(){
 									
 									html+="<tr>";
 									for(var key in result.data[i]){
-										
-										html+="<td>"+result.data[i][key]+"</td>"
-										
+										if (key == "性别") {
+											if (result.data[i]["性别"] == "0") {
+												html+="<td>男</td>"
+											}else if (result.data[i]["性别"] == "1") {
+												html+="<td>女</td>"
+											}else {
+												html+="<td></td>"
+											}
+										}else {
+											html+="<td>"+result.data[i][key]+"</td>"
+										}
 									}
 									html+="</tr>";
 								}
@@ -390,9 +404,17 @@ $(document).ready(function(){
 							
 							html+="<tr>";
 							for(var key in result.data[i]){
-								
-								html+="<td>"+result.data[i][key]+"</td>"
-								
+								if (key == "性别") {
+									if (result.data[i]["性别"] == "0") {
+										html+="<td>男</td>"
+									}else if (result.data[i]["性别"] == "1") {
+										html+="<td>女</td>"
+									}else {
+										html+="<td></td>"
+									}
+								}else {
+									html+="<td>"+result.data[i][key]+"</td>"
+								}
 							}
 							html+="</tr>";
 						}

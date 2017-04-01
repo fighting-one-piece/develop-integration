@@ -1,6 +1,15 @@
 var pathName=window.document.location.pathname;
 var projectName=pathName.substring(0,pathName.substr(1).indexOf('/')+1);
 $(function(){
+	$("#verificationBtn").click(function(){
+		$.ajax({
+			url:"http://192.168.0.198:8080/devplat/verificationCode.jpg",
+			type:"GET",
+			success:function(result){
+				console.log(result)
+			}
+		})
+	})
 	$("#loginBtn").click(function(){
 		$.ajax({
 			url:"http://192.168.0.198:8080/devplat/api/v1/login",

@@ -8,7 +8,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.cisiondata.modules.elasticsearch.service.IESService;
+import org.cisiondata.modules.es.service.IESService;
 import org.cisiondata.modules.identity.service.IMobileIdCardService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.cisiondata.utils.message.MessageUtils;
@@ -16,11 +16,6 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
 
-
-/**
- * 方法
- * @author Administrator
- */
 @Service("mobileIdCardService")
 public class MobileIdCardServiceImpl implements IMobileIdCardService {
 
@@ -48,7 +43,7 @@ public class MobileIdCardServiceImpl implements IMobileIdCardService {
 		for (String identityAttribute : identityAttributes) {
 			boolQueryBuilder.should(QueryBuilders.termQuery(identityAttribute, identity));			
 		}
-		List<Map<String, Object>> resultList = esService.readDataListByCondition(boolQueryBuilder, 1000);
+		List<Map<String, Object>> resultList = esService.readDataListByCondition(boolQueryBuilder, 1000, false);
 		for (int i = 0, len = resultList.size(); i < len; i++) {
 			Map<String, Object> result = resultList.get(i);	
 			//遍历数据
@@ -85,7 +80,7 @@ public class MobileIdCardServiceImpl implements IMobileIdCardService {
 			boolQueryBuilder.should(QueryBuilders.termQuery("mobilePhone", identity));			
 			boolQueryBuilder.should(QueryBuilders.termQuery("telePhone", identity));		
 		}
-		List<Map<String, Object>> list = esService.readDataListByCondition(index, type, boolQueryBuilder);
+		List<Map<String, Object>> list = esService.readDataListByCondition(index, type, boolQueryBuilder, true);
 		for (Map<String, Object> map : list) {
 			map.remove("index");
 			map.remove("type");

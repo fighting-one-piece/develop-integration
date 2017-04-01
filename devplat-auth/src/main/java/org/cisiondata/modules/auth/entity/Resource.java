@@ -1,6 +1,8 @@
 package org.cisiondata.modules.auth.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -14,6 +16,7 @@ import javax.persistence.Table;
 
 import org.cisiondata.modules.abstr.entity.PKAutoEntity;
 
+/** 资源表*/
 @Entity
 @Table(name="T_RESOURCE")
 public class Resource extends PKAutoEntity<Long> {
@@ -23,42 +26,55 @@ public class Resource extends PKAutoEntity<Long> {
 	/** 根ID*/
 	public static final Long ROOT = 1L;
 	
-	/** 菜单MENU*/
-	public static final Integer TYPE_MENU = 1;
-	/** 功能FUNCTION*/
-	public static final Integer TYPE_FUNCTION = 2;
-
-	/** 资源名称*/
-	@Column(name="NAME")
-	private String name = null;
+	/** 计费*/
+	public static final String CHARGINGS = "chargings";
+	/** 域*/
+	public static final String FIELDS = "fields";
+	
+	
 	/** 资源类型*/
 	@Column(name="TYPE")
 	private Integer type = null;
+	/** 资源名称*/
+	@Column(name="NAME")
+	private String name = null;
 	/** 资源标识*/
 	@Column(name="IDENTITY")
 	private String identity = null;
 	/** 资源URL*/
 	@Column(name="URL")
 	private String url = null;
-	/** 资源图标*/
-	@Column(name="ICON")
-	private String icon = null;
 	/**资源优先权*/
 	@Column(name="PRIORITY")
-	private String priority = null;
+	private Integer priority = null;
+	/** 父资源ID */
+	@Column(name = "PARENT_ID")
+	private Long parentId = null;
 	/** 是否删除标志 */
 	@Column(name = "DELETE_FLAG")
 	private Boolean deleteFlag = Boolean.FALSE;
+	/** 资源图标*/
+	private transient String icon = null;
 	/** 父资源*/
 	@ManyToOne(cascade = CascadeType.REFRESH, optional = true)
 	@JoinColumn(name = "PARENT_ID")
-	private Resource parent = null;
+	private transient Resource parent = null;
+	/** 是否有子节点*/
+	private transient boolean hasChildren = false;
 	/** 子资源*/
 	@OneToMany(mappedBy="parent", fetch=FetchType.LAZY)
-	private Set<Resource> children = null;
-	/** 是否有子节点*/
-	private boolean hasChildren;
+	private transient Set<Resource> children = null;
+	/** 用户属性列表*/
+	private transient List<UserAttribute> attributes = null;
 
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -83,28 +99,20 @@ public class Resource extends PKAutoEntity<Long> {
 		this.url = url;
 	}
 
-	public Integer getType() {
-		return type;
-	}
-
-	public void setType(Integer type) {
-		this.type = type;
-	}
-
-	public String getIcon() {
-		return icon;
-	}
-
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
-
-	public String getPriority() {
+	public Integer getPriority() {
 		return priority;
 	}
 
-	public void setPriority(String priority) {
+	public void setPriority(Integer priority) {
 		this.priority = priority;
+	}
+
+	public void setParentId(Long parentId) {
+		this.parentId = parentId;
+	}
+
+	public Long getParentId() {
+		return parentId;
 	}
 
 	public Boolean getDeleteFlag() {
@@ -113,6 +121,14 @@ public class Resource extends PKAutoEntity<Long> {
 
 	public void setDeleteFlag(Boolean deleteFlag) {
 		this.deleteFlag = deleteFlag;
+	}
+	
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
 	}
 
 	public Resource getParent() {
@@ -146,28 +162,18 @@ public class Resource extends PKAutoEntity<Long> {
 		this.hasChildren = hasChildren;
 	}
 	
-	public Long getParentId() {
-		return null == parent ? null : parent.getId();
-	}
-	
 	public boolean isTop() {
 		return null != this.getParent() && Resource.ROOT.equals(this.getParent().getId());
 	}
-
-}
-
-enum ResourceType {
 	
-	MENU(1), FUNCTION(2);
-	
-	private int value;
-	
-	private ResourceType(int value) {
-		this.value = value;
+	public List<UserAttribute> getAttributes() {
+		if (null == attributes) attributes = new ArrayList<UserAttribute>();
+		return attributes;
 	}
 
-	public int value() {
-		return value;
+	public void setAttributes(List<UserAttribute> attributes) {
+		this.attributes = attributes;
 	}
 
 }
+

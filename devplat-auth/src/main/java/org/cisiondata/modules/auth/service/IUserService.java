@@ -21,12 +21,30 @@ public interface IUserService extends IGenericService<User, Long> {
 	public void updateUser(User user) throws BusinessException;
 	
 	/**
+	 * 修改用户密码
+	 * @param account
+	 * @param originalPassword
+	 * @param newPassword
+	 * @throws BusinessException
+	 */
+	public void updateUserPassword(String account, String originalPassword, String newPassword) 
+			throws BusinessException;
+	
+	/**
 	 * 根据用户账号读取用户数据
 	 * @param account
 	 * @return
 	 * @throws BusinessException
 	 */
 	public User readUserByAccount(String account) throws BusinessException;
+	
+	/**
+	 * 根据accessId读取用户accessKey
+	 * @param accessId
+	 * @return
+	 * @throws BusinessException
+	 */
+	public String readUserAccessKeyByAccessId(String accessId) throws BusinessException;
 	
 	/**
 	 * 根据用户账号和密码读取用户数据
@@ -38,13 +56,10 @@ public interface IUserService extends IGenericService<User, Long> {
 	public User readUserByAccountAndPassword(String account, String password) throws BusinessException;
 	
 	/**
-	 * 修改用户密码
+	 * 删除用户缓存
 	 * @param account
-	 * @param originalPassword
-	 * @param newPassword
 	 * @throws BusinessException
 	 */
-	public void updateUserPassword(String account, String originalPassword, String newPassword) 
-			throws BusinessException;
+	public void deleteUserCache(String account) throws BusinessException;
 	
 }

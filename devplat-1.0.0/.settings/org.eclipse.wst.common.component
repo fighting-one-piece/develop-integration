@@ -7,10 +7,10 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/resources"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/filters"/>
-        <dependent-module archiveName="devplat-common-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-common/devplat-common">
+        <dependent-module archiveName="devplat-spring-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-spring/devplat-spring">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="devplat-spring-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-spring/devplat-spring">
+        <dependent-module archiveName="devplat-common-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-common/devplat-common">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="devplat-redis-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-redis/devplat-redis">
@@ -25,10 +25,7 @@
         <dependent-module archiveName="devplat-auth-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-auth/devplat-auth">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="devplat-elasticsearch-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-elasticsearch/devplat-elasticsearch">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="devplat-rabbitmq-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-rabbitmq/devplat-rabbitmq">
+        <dependent-module archiveName="devplat-es-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/devplat-es/devplat-es">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="java-output-path" value="/devplat/target/classes"/>

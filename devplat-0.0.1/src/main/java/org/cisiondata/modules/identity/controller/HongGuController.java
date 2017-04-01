@@ -131,6 +131,8 @@ public class HongGuController {
 	@ResponseBody
 	public WebResult phonetoqq(String phone){
 		WebResult result = new WebResult();
+//		result.setCode(ResultCode.FAILURE.getCode());
+//		result.setFailure("系统维护升级中");
 		try {
 			result.setData(hongGuService.phoneNumToQQ(phone));
 			result.setCode(ResultCode.SUCCESS.getCode());

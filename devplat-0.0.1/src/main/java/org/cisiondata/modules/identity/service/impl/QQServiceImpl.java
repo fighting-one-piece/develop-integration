@@ -1,6 +1,7 @@
 package org.cisiondata.modules.identity.service.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,14 @@ public class QQServiceImpl implements IQQService {
 				list.get(i).put(entry.getKey(), entry.getValue());
 			}
 		}
+		list.sort(new Comparator<Map<String, Object>>() {
+			@Override
+			public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+				Object scoreObj1 = o1.get("QQ号");
+				Object scoreObj2 = o2.get("QQ号");
+				return ((String) scoreObj1).compareTo((String)scoreObj2);
+			}
+		});
 		return list;
 	}
 
@@ -136,6 +145,14 @@ public class QQServiceImpl implements IQQService {
 			}
 			data.remove("源文件");
 		}
+		resultList.sort(new Comparator<Map<String, Object>>() {
+			@Override
+			public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+				Map<String, Object> map1 = (Map<String, Object>) o1.get("data");
+				Map<String, Object> map2 = (Map<String, Object>) o2.get("data");
+				return ((String) map1.get("QQ号")).compareTo((String) map2.get("QQ号"));
+			}
+		});
 		return qr;
 	}
 	

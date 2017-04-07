@@ -11,8 +11,8 @@ public enum ResultCode {
 	PARAM_FORMAT_ERROR(-103, "请求参数格式错误"),
 	
 	DATA_EXISTED(-110, "数据已存在"),
-	
-	URL_ERROR(-190, "页面不存在"),
+	URL_MAPPING_ERROR(-120, "URL Mapping错误"),
+	PAGE_NOT_FOUND(-190, "页面不存在"),
 	
 	DATABASE_CONNECTION_FAIL(-201, "数据库连接失败"),
 	DATABASE_READ_FAIL(-202, "数据库读取失败"),
@@ -24,6 +24,7 @@ public enum ResultCode {
 	VERIFICATION_NO_IP_PERIMISSION(410, "服务器没有开通接口的IP权限"),
 	VERIFICATION_NO_EXIST(420, "用户不存在"),
 	VERIFICATION_ID_INVALID(427, "id参数无效，需要重新初始化id"),
+	VERIFICATION_USER_FAIL(428, "用户认证失败,请重新登录"),
 	
 	SERVER_ERROR(500, "服务器端错误"),
 	SERVER_UNDER_MAINTENANCE(503, "服务器正在维护"),
@@ -34,9 +35,7 @@ public enum ResultCode {
 	
 	SECURITY_ANSWER_ERROR(560, "密保答案错误"),
 	
-	NOT_BINDING_QQ(601, "手机号未绑定QQ"),
-	VERIFICATION_CODE_FAILURE(602, "验证码校验失败"),
-	KEYWORD_NOT_NULL(603, "关键字不能为空");
+	VERIFICATION_CODE_FAILURE(602, "验证码校验失败");
 	
 	/** 代码值*/
 	private int code = 0;

@@ -16,4 +16,12 @@ public interface IResourceService {
 	 */
 	public List<ResourceInterfaceField> findAttributeByUrl(HttpServletRequest req) throws BusinessException;
 	
+	/**
+	 * 根据identity和账号获取字段处理方式
+	 * @param identity
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<ResourceInterfaceField> findAttributeByIdentity(String identity) throws BusinessException;
+	
 }

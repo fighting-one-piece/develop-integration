@@ -11,7 +11,7 @@ import org.cisiondata.utils.exception.BusinessException;
 public interface IUserService {
 	
 	//通过账号添加个人信息
-	public void updateUserSetting(String realName,String mobilePhone,
+	public String updateUserSetting(String realName,String mobilePhone,
 			String newPassword,String verificationCode,HttpServletRequest request)throws BusinessException;
 	//通过账号添加密保
 	public String updateUserSecurity(String question,String answer)throws BusinessException;

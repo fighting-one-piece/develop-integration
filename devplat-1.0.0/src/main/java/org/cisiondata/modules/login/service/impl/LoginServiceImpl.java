@@ -39,6 +39,7 @@ public class LoginServiceImpl implements ILoginService {
 		loginDTO.setAccessToken(user.getAccessToken());
 		loginDTO.setFirstLoginFlag(user.getFirstLoginFlag());
 		loginDTO.setLastLoginTime(userLoginLogService.readUserLoginLog(account));
+		loginDTO.setMacAddress(user.getMacAddress());
 		return loginDTO;
 	}
 	

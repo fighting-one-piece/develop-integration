@@ -18,13 +18,11 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.highlight.HighlightField;
 
 public class ESServiceImpl extends AbstrESServiceImpl implements IESService {
 	
@@ -151,11 +149,11 @@ public class ESServiceImpl extends AbstrESServiceImpl implements IESService {
 	
 	private void wrapperSearchRequestBuilder(SearchRequestBuilder searchRequestBuilder) {
 		searchRequestBuilder.setExplain(false);
-        searchRequestBuilder.setHighlighterPreTags("<span style=\"color:red\">");
-        searchRequestBuilder.setHighlighterPostTags("</span>");
-        for (String attri : all_attributes) {
-        	searchRequestBuilder.addHighlightedField(attri);
-        }
+//        searchRequestBuilder.setHighlighterPreTags("<span style=\"color:red\">");
+//        searchRequestBuilder.setHighlighterPostTags("</span>");
+//        for (String attri : all_attributes) {
+//        	searchRequestBuilder.addHighlightedField(attri);
+//        }
 	}
 	
 	private boolean indicesExists(String index) {
@@ -220,7 +218,7 @@ public class ESServiceImpl extends AbstrESServiceImpl implements IESService {
 			hit = hitArray[i];
 			source = hit.getSource();
 			if (isHighLight) {
-				wrapperHighLight(source, hit.getHighlightFields());
+//				wrapperHighLight(source, hit.getHighlightFields());
 			}
 			replaceSource = new HashMap<String, Object>();
 			for (Map.Entry<String, Object> entry : source.entrySet()) {
@@ -247,21 +245,21 @@ public class ESServiceImpl extends AbstrESServiceImpl implements IESService {
 		return resultList;
 	}
 	
-	private void wrapperHighLight(Map<String, Object> source, Map<String, HighlightField> highLightFields) {
-		String entryKey = null;
-		Object entryValue = null;
-		for (Map.Entry<String, Object> entry : source.entrySet()) {
-			entryKey = entry.getKey();
-			if (!highLightFields.containsKey(entryKey)) continue;
-			Text[] texts = highLightFields.get(entryKey).getFragments();
-			StringBuilder highLightText = new StringBuilder(100);
-			for (int i = 0, tlen = texts.length; i < tlen; i++) {
-				highLightText.append(texts[i]);
-			}
-			if (highLightText.length() > 0) entryValue = highLightText.toString();
-			entry.setValue(entryValue);
-		}
-	}
+//	private void wrapperHighLight(Map<String, Object> source, Map<String, HighlightField> highLightFields) {
+//		String entryKey = null;
+//		Object entryValue = null;
+//		for (Map.Entry<String, Object> entry : source.entrySet()) {
+//			entryKey = entry.getKey();
+//			if (!highLightFields.containsKey(entryKey)) continue;
+//			Text[] texts = highLightFields.get(entryKey).getFragments();
+//			StringBuilder highLightText = new StringBuilder(100);
+//			for (int i = 0, tlen = texts.length; i < tlen; i++) {
+//				highLightText.append(texts[i]);
+//			}
+//			if (highLightText.length() > 0) entryValue = highLightText.toString();
+//			entry.setValue(entryValue);
+//		}
+//	}
 	
 	protected Object wrapperValue(String key, Object value) {
 		return value;

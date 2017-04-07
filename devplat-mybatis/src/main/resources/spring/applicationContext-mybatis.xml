@@ -9,11 +9,8 @@
 						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
 	
 	<!-- MyBatis 配置 -->
-	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.CustomSqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
-		<property name="typeAliasesPackage" value="org.cisiondata.modules.abstr.entity,
-			org.cisiondata.modules.auth.entity,org.cisiondata.modules.log.entity,
-			org.cisiondata.modules.datainterface.entity" />
 		<property name="configLocation" value="classpath:mybatis/mybatis-config.xml" />
 		<property name="mapperLocations" value="classpath*:org/cisiondata/modules/**/mapper/**/*.xml" />
 	</bean>

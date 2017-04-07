@@ -177,6 +177,10 @@ public class ESServiceImpl implements IESService {
 			location_attributes.add(attribute);
 		} else if (attributeLowerCase.indexOf("county") != -1) {
 			location_attributes.add(attribute);
+		} else if (attributeLowerCase.indexOf("title") != -1 || 
+				attributeLowerCase.indexOf("quntext") != -1 ||
+					attributeLowerCase.indexOf("nick") != -1) {
+			name_attributes.add(attribute);
 		}
 		chinese_attributes.addAll(name_attributes);
 		chinese_attributes.addAll(location_attributes);

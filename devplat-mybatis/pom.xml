@@ -38,6 +38,14 @@
 	</properties>
 
 	<dependencies>
+		<!--DevPlat Spring依赖包 -->
+		<dependency>
+			<groupId>org.cisiondata</groupId>
+			<artifactId>devplat-spring</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+	
 		<!-- Mybatis依赖包 -->
 		<dependency>
 			<groupId>org.mybatis</groupId>

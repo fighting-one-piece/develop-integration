@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.user.dao.AUserDAO">
+
+	<resultMap type="org.cisiondata.modules.user.entity.AUser" id="AUserModelMap">
+		<id property="id" column="ID"/>
+		<result column="ACCOUNT" property="account"/>
+		<result column="PASSWORD" property="password"/>
+		<result column="SALT" property="salt"/>
+		<result column="IDENTITY" property="identity"/>
+		<result column="NICK_NAME" property="nickname"/>
+		<result column="REAL_NAME" property="realname"/>
+		<result column="ID_CARD" property="idCard"/>
+		<result column="MOBILE_PHONE" property="mobilePhone"/>
+		<result column="MAC_ADDRESS" property="macAddress"/>
+		<result column="EMAIL" property="email"/>
+		<result column="STATUS" property="status"/>
+		<result column="CREATE_TIME" property="createTime"/>
+		<result column="EXPIRE_TIME" property="expireTime"/>
+		<result column="DELETE_FLAG" property="deleteFlag"/>
+	</resultMap>
+	
+	
+</mapper>

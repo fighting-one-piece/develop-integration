@@ -11,11 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.web.ResultCode;
+import org.cisiondata.modules.auth.entity.UserAttribute;
 import org.cisiondata.modules.auth.service.IAuthService;
 import org.cisiondata.modules.auth.web.WebUtils;
 import org.cisiondata.modules.user.dao.UserDAO;
+import org.cisiondata.modules.user.entity.AUser;
 import org.cisiondata.modules.user.entity.Security;
-import org.cisiondata.modules.user.entity.User;
 import org.cisiondata.modules.user.service.IMessageService;
 import org.cisiondata.modules.user.service.IUserService;
 import org.cisiondata.utils.endecrypt.EndecryptUtils;
@@ -43,12 +44,11 @@ public class UserServiceImpl implements IUserService {
 	
 	// 通过账号添加个人信息
 	@Override
-	public void updateUserSetting(String realName,String mobilePhone,
+	public String updateUserSetting(String realName,String mobilePhone,
 			String newPassword,String verificationCode,HttpServletRequest request) throws BusinessException {
-		User user = new User();
+		AUser user = new AUser();
 		String account = WebUtils.getCurrentAccout();
 		String macAddress = IPUtils.getMACAddress(request);
-		System.out.println(macAddress);
 		if (StringUtils.isBlank(account)
 				|| StringUtils.isBlank(realName)
 				|| StringUtils.isBlank(mobilePhone)
@@ -57,7 +57,7 @@ public class UserServiceImpl implements IUserService {
 				|| StringUtils.isBlank(newPassword)) {
 			throw new BusinessException(ResultCode.PARAM_ERROR);
 		}
-		if (!macAddress.matches("([A-Fa-f0-9]{2}-){5}[A-Fa-f0-9]{2}") ||  StringUtils.isBlank(macAddress)) {
+		if (!macAddress.matches("([A-Fa-f0-9]{2}[:,-]{1}){5}[A-Fa-f0-9]{2}") ||  StringUtils.isBlank(macAddress)) {
 			throw new BusinessException(668,"macAddress错误");
 		}
 		user = auserDAO.findUserByPhone(mobilePhone);
@@ -75,27 +75,67 @@ public class UserServiceImpl implements IUserService {
 				user.getSalt()));
 		user.setMacAddress(macAddress);
 		auserDAO.updateUser(user);
-		userService.deleteUserCache(account);
+		
+		UserAttribute userAttribute = new UserAttribute();
+		userAttribute.setUserId(user.getId());
+		userAttribute.setKey("information");
+		userAttribute.setValue("false");
+		userAttribute.setType("boolean");
+		auserDAO.addUserAttribute(userAttribute);
+		
+		String encrypted = auserDAO.findUserAttribute(user.getId(), "encrypted");
+		if ("false".equals(encrypted)) {
+			userService.deleteUserCache(account);
+			return authService.readUserAuthorizationToken(account);
+		}else {
+			return "未填写密保问题";
+		}
 	}
 
 	// 通过账号添加密保
 	@Override
 	public String updateUserSecurity(String question, String answer)
 			throws BusinessException {
-		User user = new User();
+		AUser user = new AUser();
+		UserAttribute userAttribute = new UserAttribute();
 		String account = WebUtils.getCurrentAccout();
 		if (StringUtils.isBlank(account) || StringUtils.isBlank(answer)
 				|| StringUtils.isBlank(question)) {
 			throw new BusinessException(ResultCode.PARAM_ERROR);
 		}
-		user.setAccount(account);
-		user.setAnswer(SHAUtils.SHA1(answer));
-		user.setQuestion(question);
-		user.setDeleteFlag(null);
-		user.setFirstLoginFlag(false);
-		auserDAO.updateUser(user);
+		user = auserDAO.findUser(account);
+		if (null == user) {
+			throw new BusinessException(ResultCode.ACCOUNT_NOT_EXIST);
+		}
+		
+		userAttribute.setUserId(user.getId());
+		userAttribute.setKey("question");
+		userAttribute.setValue(question);
+		userAttribute.setType("string");
+		auserDAO.addUserAttribute(userAttribute);
+		
+		userAttribute.setKey("answer");
+		userAttribute.setValue(SHAUtils.SHA1(answer));
+		userAttribute.setType("string");
+		auserDAO.addUserAttribute(userAttribute);
+		
+		userAttribute.setKey("encrypted");
+		userAttribute.setValue("false");
+		userAttribute.setType("boolean");
+		auserDAO.addUserAttribute(userAttribute);
 		userService.deleteUserCache(account);
-		return authService.readUserAuthorizationToken(account);
+		
+		String information = auserDAO.findUserAttribute(user.getId(), "information");
+		if ("false".equals(information)) {
+			userAttribute.setKey("firstLoginFlag");
+			userAttribute.setValue("false");
+			userAttribute.setType("boolean");
+			auserDAO.editUserAttribute(userAttribute);
+			userService.deleteUserCache(account);
+			return authService.readUserAuthorizationToken(account);
+		}else {
+			return "未填写个人信息";
+		}
 	}
 
 	// 查询密保问题
@@ -149,7 +189,7 @@ public class UserServiceImpl implements IUserService {
 		String oldSecurityAnswer = null;
 		String newSecurityAnswer = null;
 		String account = WebUtils.getCurrentAccout();
-		User user = new User();
+		AUser user = new AUser();
 		if (StringUtils.isNotBlank(account)
 				&& StringUtils.isNotBlank(oldAnswer)
 				&& StringUtils.isNotBlank(newAnswer)
@@ -179,7 +219,7 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public void updatePassword(String oldPassword, String newPassword)
 			throws BusinessException {
-		User user = new User();
+		AUser user = new AUser();
 		String oldEndecryptPassword = null;
 		String newEndecryptPassword = null;
 		String account = WebUtils.getCurrentAccout();
@@ -209,7 +249,7 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public void updateNewPassword(String newPassword) throws BusinessException {
 		String account = WebUtils.getCurrentAccout();
-		User user = new User();
+		AUser user = new AUser();
 		if (StringUtils.isBlank(newPassword) || StringUtils.isBlank(account)) {
 			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
 		}
@@ -225,7 +265,7 @@ public class UserServiceImpl implements IUserService {
 	//验证电话号码并发送验证码
 	@Override
 	public void validation(String phone) throws BusinessException {
-		User user = new User();
+		AUser user = new AUser();
 		if (StringUtils.isBlank(phone)) {
 			throw new BusinessException(ResultCode.PARAM_NULL);
 		}
@@ -254,7 +294,7 @@ public class UserServiceImpl implements IUserService {
 		if (!RegexUtils.isMoblePhone(phone)) {
 			throw new BusinessException(ResultCode.PARAM_FORMAT_ERROR);
 		}
-		User user = new User();
+		AUser user = new AUser();
 		user = auserDAO.findUserByPhone(phone);
 		if (user != null) {
 			throw new BusinessException(669,"电话号码已存在,请更换电话号码");
@@ -275,7 +315,7 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public String judgeValidationCode(String phone,String verificationCode)
 			throws BusinessException {
-		User user = new User();
+		AUser user = new AUser();
 		judgeValidation(phone, verificationCode);
 		user = auserDAO.findUserByPhone(phone);
 		return authService.readUserAuthorizationToken(user.getAccount());
@@ -295,7 +335,7 @@ public class UserServiceImpl implements IUserService {
 		}
 		String account = WebUtils.getCurrentAccout();
 		if (StringUtils.isBlank(account)) {
-			User user = new User();
+			AUser user = new AUser();
 			user = auserDAO.findUserByPhone(phone);
 			account = user.getAccount();
 		}
@@ -323,7 +363,7 @@ public class UserServiceImpl implements IUserService {
 		@Override
 		public void updatePhone(String phone,String verificationCode) throws BusinessException {
 			judgeValidationCode(phone, verificationCode);
-			User user = new User();
+			AUser user = new AUser();
 			String account = WebUtils.getCurrentAccout();
 			user = auserDAO.findUser(account);
 			if (user == null) {
@@ -343,7 +383,7 @@ public class UserServiceImpl implements IUserService {
 		// 获取用户电话号码
 		@Override
 		public String findMobilePhone() throws BusinessException {
-			User user = new User();
+			AUser user = new AUser();
 			String account = WebUtils.getCurrentAccout();
 			user = auserDAO.findUser(account);
 			if (user == null) {
@@ -357,7 +397,7 @@ public class UserServiceImpl implements IUserService {
 		public Map<String, String> findUser() throws BusinessException {
 			Map<String, String> map = new HashMap<String, String>();
 			String account = WebUtils.getCurrentAccout();
-			User user = new User();
+			AUser user = new AUser();
 			user = auserDAO.findUser(account);
 			if (user ==null) {
 				throw new BusinessException(ResultCode.ACCOUNT_NOT_EXIST);

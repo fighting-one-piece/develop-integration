@@ -16,6 +16,8 @@ public class LoginDTO implements Serializable {
 	private Boolean firstLoginFlag = Boolean.FALSE;
 	/** 上次登录时间*/
 	private String lastLoginTime = null;
+	/** MAC地址*/
+	private String macAddress = null;
 	
 
 	public String getLastLoginTime() {
@@ -56,6 +58,14 @@ public class LoginDTO implements Serializable {
 
 	public void setFirstLoginFlag(Boolean firstLoginFlag) {
 		this.firstLoginFlag = firstLoginFlag;
+	}
+
+	public String getMacAddress() {
+		return macAddress;
+	}
+
+	public void setMacAddress(String macAddress) {
+		this.macAddress = macAddress;
 	}
 	
 }

@@ -54,7 +54,7 @@ public class MoneyChargingServiceImpl implements IChargingService {
 				double incOrDec = null == accessInterface ? 0 : parseReturnResultMoney(account, accessInterface.getId(), result);
 				LOG.info("incOrDec : {}", incOrDec);
 				if (incOrDec != 0) {
-					accessUserService.updateRemainingMoney(account, remainingMoney, -incOrDec);
+					accessUserService.updateRemainingMoney(account, -incOrDec);
 				}
 			}
 			LOG.info("------Class {} Method {} Log End ! Spend Time: {} s", className, methodName, 

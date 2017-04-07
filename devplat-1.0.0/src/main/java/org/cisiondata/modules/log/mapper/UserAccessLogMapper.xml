@@ -12,6 +12,7 @@
 		<result column="params" property="params"/>
 		<result column="total" property="total"/>
 		<result column="account" property="account"/>
+		<result column="result" property="result"/>
 	</resultMap>
 	<!-- 查询 -->
 	<select id="selCount" parameterType="map" resultMap="UserAccessLogMap">
@@ -32,4 +33,8 @@
 			LIMIT #{startPos},#{pageSize}
 		</if>
 	</select>
+	<!-- 新增 -->
+	<insert id="addAccessLog" parameterType="UserAccessLog">
+		INSERT INTO T_LOG(ip,url,access_time,params,total,account,result) VALUES (#{ip},#{url},#{accessTime},#{params},#{total},#{account},#{result})
+	</insert>
 </mapper>

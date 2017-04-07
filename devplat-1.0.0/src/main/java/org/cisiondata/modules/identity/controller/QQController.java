@@ -10,6 +10,7 @@ import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.es.service.IESService;
 import org.cisiondata.modules.identity.service.IQQService;
 import org.cisiondata.modules.search.service.IESBizService;
+import org.cisiondata.utils.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class QQController {
 	private IESBizService esBizService = null;
 	
 	@ResponseBody
-	@RequestMapping(value = "/qqs/{qq}/base")
+	@RequestMapping(value = "/qqs/{qq}/base",method=RequestMethod.GET)
 	//根据QQ号码查询基础信息和对应的群信息
 	public WebResult readQQ(@RequestParam String qq){
 		WebResult result = new WebResult();
@@ -44,7 +45,10 @@ public class QQController {
 			List<Map<String, Object>> listBase = qqService.readQQData(qq);
 			result.setData(listBase);
 			result.setCode(ResultCode.SUCCESS.getCode());
-		} catch (Exception e) {
+		}catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+		}  catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
 		}
@@ -54,13 +58,16 @@ public class QQController {
 	
 	//根据QQ号码查询对应的群信息
 	@ResponseBody
-	@RequestMapping(value="/qqs/{qq}/quns")
+	@RequestMapping(value="/qqs/{qq}/quns",method=RequestMethod.GET)
 	public WebResult readQQqunData(@RequestParam String qq){
 		WebResult result = new WebResult();
 		try {
 			result.setData(qqService.readQQDatas(qq));
 			result.setCode(ResultCode.SUCCESS.getCode());
-		} catch (Exception e) {
+		}catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+		}  catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
 		}
@@ -77,7 +84,10 @@ public class QQController {
 		try {
 			result.setData(qqService.readQQNickData(nickname,scrollId,rowNumPerPage));
 			result.setCode(ResultCode.SUCCESS.getCode());
-		} catch (Exception e) {
+		}catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
+		}  catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());
 		}
@@ -85,13 +95,16 @@ public class QQController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/quns/{qun}/members")
+	@RequestMapping(value="/quns/{qun}/members",method=RequestMethod.GET)
 	//根据QQ群号得到群信息
 	public WebResult readQQqunDatas(@RequestParam String qun){
 		WebResult result = new WebResult();
 		try {
 			result.setData(qqService.readQQqunDatas(qun));
 			result.setCode(ResultCode.SUCCESS.getCode());
+		}catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
 			result.setCode(ResultCode.FAILURE.getCode());
 			result.setFailure(e.getMessage());

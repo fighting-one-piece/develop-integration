@@ -12,16 +12,21 @@ import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.abstr.web.ResultCode;
+import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.auth.web.WebUtils;
 import org.cisiondata.modules.log.dao.UserAccessLogDAO;
 import org.cisiondata.modules.log.entity.UserAccessLog;
 import org.cisiondata.modules.log.service.IUserAccessLogService;
+import org.cisiondata.modules.queue.entity.MQueue;
+import org.cisiondata.modules.queue.entity.RequestMessage;
+import org.cisiondata.modules.queue.service.impl.ConsumerServiceImpl;
 import org.cisiondata.utils.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+
 @Service("userAccessLogService")
-public class UserAccessLogServiceImpl implements IUserAccessLogService{
-	
+public class UserAccessLogServiceImpl extends ConsumerServiceImpl implements IUserAccessLogService{
 	@Resource(name = "userAccessLogDAO")
 	private UserAccessLogDAO userAccessLogDAO;
 	
@@ -87,5 +92,77 @@ public class UserAccessLogServiceImpl implements IUserAccessLogService{
 		}
 		
 		return mapResult;
+	}
+
+	@Override
+	protected String getRoutingKey() {
+		return MQueue.REQUEST_ACCESS_QUEUE.getRoutingKey();
+	}
+
+	@Override
+	public void handleMessage(Object message) {
+		if (message instanceof RequestMessage) {
+			RequestMessage requestMessage = (RequestMessage) message;
+			if(judgeUrl(requestMessage.getUrl())){
+				Map<String,String> map = requestMessage.getParams();
+				String params = map.get("query");
+				if(StringUtils.isNotBlank(params)){
+					try {
+						UserAccessLog log = new UserAccessLog();
+						Gson gson = new Gson();
+						Object result = requestMessage.getReturnResult();
+						log.setIp(requestMessage.getIpAddress());
+						log.setParams(params);
+						log.setTotal(String.valueOf(this.parseReturnResultCount(result)));
+						log.setUrl(requestMessage.getUrl());
+						log.setAccount(requestMessage.getAccount());
+						log.setAccessTime(requestMessage.getTime());
+						log.setResult(gson.toJson(result));
+						userAccessLogDAO.addAccessLog(log);
+					} catch (Exception e) {
+						e.getMessage();
+					}
+				}
+			}
+		}
+	}
+	//过滤请求
+	private Boolean judgeUrl(String url){
+		if(url.equals("/login")) return false;
+		if(url.equals("/userAccessLogs")) return false;
+		if(url.indexOf("/users/") != -1) return false;
+		return true;
+	}
+	//获取条数
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private long parseReturnResultCount(Object result){
+		if(result instanceof WebResult){
+			WebResult webResult = (WebResult) result;
+			Object data = webResult.getData();
+			if(data instanceof List){
+				return ((List)data).size();
+			}else if(data instanceof QueryResult){
+				QueryResult queryResult = (QueryResult) data;
+				return queryResult.getResultList().size();
+			}else if(data instanceof Map){
+				Map<String,Object> map = (Map<String, Object>) data;
+				long count = 0;
+				for(Map.Entry<String, Object> entry : map.entrySet()){
+					Object value = entry.getValue();
+					if(value instanceof List){
+						count += ((List) value).size();
+					}
+					if(entry.getKey().equals("data")){
+						Object values = entry.getValue();
+						if(values instanceof QueryResult){
+							QueryResult queryResult = (QueryResult) values;
+							return queryResult.getResultList().size();
+						}
+					}
+				}
+				return count;
+			}
+		}
+		return 0;
 	}
 }

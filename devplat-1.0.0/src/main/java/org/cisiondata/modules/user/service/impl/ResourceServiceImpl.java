@@ -64,4 +64,36 @@ public class ResourceServiceImpl implements IResourceService {
 		
 	}
 
+	@Override
+	public List<ResourceInterfaceField> findAttributeByIdentity(String identity) throws BusinessException {
+		String account = WebUtils.getCurrentAccout();//账号
+		if(StringUtils.isBlank(account)) throw new BusinessException(ResultCode.FAILURE);
+		// TODO 此处应先查找user_resource_attribute表中是否有数据，没有才使用resource_attribute表中的默认配置
+		
+		
+		//查询默认配置
+		Map<String,Object> resourceMap = new HashMap<String,Object>();
+		resourceMap.put("identity", identity);
+		List<Resource> resourceList = resourceDAO.findByCondition(resourceMap);
+		if (resourceList.size() != 1) return new ArrayList<ResourceInterfaceField>();
+		
+		Resource resource = resourceList.get(0);
+		
+		Map<String,Object> resourceAttributeMap = new HashMap<String,Object>();
+		resourceAttributeMap.put("resourceId", resource.getId());
+		resourceAttributeMap.put("key", "fields");
+		List<ResourceAttribute> resourceAttributeList = resourceAttributeDAO.findByCondition(resourceAttributeMap);
+		if (resourceAttributeList.size() != 1) return new ArrayList<ResourceInterfaceField>();
+		
+		ResourceAttribute resourceAttribute = resourceAttributeList.get(0);
+		String fields = resourceAttribute.getValue();
+		if(StringUtils.isBlank(fields)) return new ArrayList<ResourceInterfaceField>();
+		try{
+			List<ResourceInterfaceField> list = GsonUtils.fromJsonToList(fields, ResourceInterfaceField.class);
+			return list;
+		} catch(Exception e){
+			return new ArrayList<ResourceInterfaceField>();
+		}
+	}
+
 }

@@ -1,7 +1,5 @@
 package org.cisiondata.modules.auth.service;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -9,9 +7,6 @@ import javax.annotation.Resource;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.login.dto.LoginDTO;
 import org.cisiondata.modules.login.service.ILoginService;
-import org.cisiondata.modules.queue.entity.MQueue;
-import org.cisiondata.modules.queue.entity.RequestMessage;
-import org.cisiondata.modules.queue.service.IRedisMQService;
 import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,9 +28,6 @@ public class AuthServiceTest {
 	
 	@Resource(name = "loginService")
 	private ILoginService loginService = null;
-	
-	@Resource(name = "redisMQService")
-	private IRedisMQService redisMQService = null;
 	
 	@Test
 	public void testUserServiceReadUserByAccount() {
@@ -100,28 +92,6 @@ public class AuthServiceTest {
 		Set<String> keys = RedisClusterUtils.getInstance().getJedisCluster().hkeys("cisiondata*");
 		for (String key : keys) {
 			System.out.println(key);
-		}
-	}
-	
-	@Test
-	public void testC() {
-		try {
-			Thread.sleep(20000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		RequestMessage requestMessage = new RequestMessage();
-		requestMessage.setUrl("/login");
-		requestMessage.setParams(new HashMap<String, String>());
-		requestMessage.setIpAddress("192.168.0.1");
-		requestMessage.setAccount("test");
-		requestMessage.setTime(new Date());
-		requestMessage.setReturnResult(null);
-		redisMQService.sendMessage(MQueue.REQUEST_ACCESS_QUEUE.getRoutingKey(), requestMessage);
-		try {
-			Thread.sleep(1000000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 	}
 	

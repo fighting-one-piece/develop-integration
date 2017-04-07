@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface UserAccessLogDAO {
 	//查询
 	public List<UserAccessLog> selCount(Map<String,Object> map);
+	//新增日志
+	public void addAccessLog(UserAccessLog log);
 }

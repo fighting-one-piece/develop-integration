@@ -48,11 +48,10 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
-import org.elasticsearch.search.aggregations.metrics.MetricsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.avg.Avg;
 import org.elasticsearch.search.aggregations.metrics.sum.Sum;
 import org.elasticsearch.search.sort.SortOrder;
@@ -73,7 +72,7 @@ public class ESClientHelper {
 	 * @param shardsNum 分片数
 	 * @param replicasNum 备份数
 	 */
-	public static void createIndex(String index, String shardsNum, String replicasNum) {
+	public static void createIndex(String index, int shardsNum, int replicasNum) {
 		Client client = ESClient.getInstance().getClient();
 		try {
 			XContentBuilder builder = XContentFactory
@@ -262,7 +261,7 @@ public class ESClientHelper {
 		Client client = ESClient.getInstance().getClient();
 		DeleteResponse response = client.prepareDelete().setIndex(index)
 				.setType(type).setId(id).execute().actionGet();
-		System.out.println(response.isFound());
+		System.out.println(response.getResult());
 	}
 	
 	/**
@@ -359,7 +358,7 @@ public class ESClientHelper {
 	public static void readIndexTypeDatasWithGroup(String index, String type, String groupFieldName) {
 		String groupFieldAgg = groupFieldName + "Agg";
 		Client client = ESClient.getInstance().getClient();
-		TermsBuilder termsBuilder = AggregationBuilders.terms(groupFieldAgg)
+		AggregationBuilder termsBuilder = AggregationBuilders.terms(groupFieldAgg)
 				.size(Integer.MAX_VALUE).field(groupFieldName);
 		SearchResponse response = client.prepareSearch(index).setTypes(type)
 				.setQuery(QueryBuilders.matchAllQuery())
@@ -386,9 +385,9 @@ public class ESClientHelper {
 		String groupFieldAgg = groupFieldName + "Agg";
 		String subGroupFieldAgg = subGroupFieldName + "Agg";
 		Client client = ESClient.getInstance().getClient();
-		TermsBuilder subTermsBuilder = AggregationBuilders.terms(subGroupFieldAgg)
+		AggregationBuilder subTermsBuilder = AggregationBuilders.terms(subGroupFieldAgg)
 				.size(Integer.MAX_VALUE).field(subGroupFieldName);
-		TermsBuilder termsBuilder = AggregationBuilders.terms(groupFieldAgg)
+		AggregationBuilder termsBuilder = AggregationBuilders.terms(groupFieldAgg)
 				.size(Integer.MAX_VALUE).field(groupFieldName).subAggregation(subTermsBuilder);
 		SearchResponse response = client.prepareSearch(index).setTypes(type)
 				.setQuery(QueryBuilders.matchAllQuery())
@@ -422,7 +421,7 @@ public class ESClientHelper {
 	public static double readIndexTypeFieldValueWithAvg(String index, String type, String avgField) {
 		Client client = ESClient.getInstance().getClient();
 		String avgName = avgField + "Avg";
-		MetricsAggregationBuilder aggregation = AggregationBuilders.avg(avgName).field(avgField);
+		AggregationBuilder aggregation = AggregationBuilders.avg(avgName).field(avgField);
 		SearchResponse response = client.prepareSearch(index).setTypes(type)
 				.setQuery(QueryBuilders.matchAllQuery())
 					.addAggregation(aggregation).execute().actionGet();
@@ -441,7 +440,7 @@ public class ESClientHelper {
 	public static double readIndexTypeFieldValueWithSum(String index, String type, String sumField) {
 		Client client = ESClient.getInstance().getClient();
 		String sumName = sumField + "Sum";
-		MetricsAggregationBuilder aggregation = AggregationBuilders.sum(sumName).field(sumField);
+		AggregationBuilder aggregation = AggregationBuilders.sum(sumName).field(sumField);
 		SearchResponse response = client.prepareSearch(index).setTypes(type)
 				.setQuery(QueryBuilders.matchAllQuery())
 					.addAggregation(aggregation).execute().actionGet();
@@ -606,7 +605,7 @@ public class ESClientHelper {
 	}
 	
 	public static void main(String[] args) {
-		test02();
+		createIndex("logistics", 10, 1);
 	}
 
 }

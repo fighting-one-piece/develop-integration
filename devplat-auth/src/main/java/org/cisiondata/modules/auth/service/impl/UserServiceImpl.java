@@ -68,11 +68,18 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements I
 		if (StringUtils.isBlank(account)) throw new BusinessException("账号不能为空");
 		String accountCacheKey = genAccountCacheKey(account);
 		Object value = RedisClusterUtils.getInstance().get(accountCacheKey);
-		if (null != value) return (User) value;
-		Query query = new Query();
-		query.addCondition("account", account);
-		User user = userIntegrationDAO.readDataByCondition(query);
-		if (null != user) RedisClusterUtils.getInstance().set(accountCacheKey, user, 1800);
+		User user = new User();
+		if (null != value) {
+			user = (User) value;
+			user.transientHandle();
+		} else {
+			Query query = new Query();
+			query.addCondition("account", account);
+			user = userIntegrationDAO.readDataByCondition(query);
+			if (null != user && null != user.getId()) {
+				RedisClusterUtils.getInstance().set(accountCacheKey, user, 1800);
+			}
+		}
 		return user;
 	}
 	

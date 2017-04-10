@@ -9,7 +9,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.web.ResultCode;
-import org.cisiondata.modules.auth.Constants.SessionName;
+import org.cisiondata.modules.auth.Constants;
 import org.cisiondata.modules.auth.entity.Group;
 import org.cisiondata.modules.auth.entity.Permission;
 import org.cisiondata.modules.auth.entity.Role;
@@ -71,8 +71,8 @@ public class AuthServiceImpl implements IAuthService {
 				user.getPassword(), macAddress, currentDate);
 		user.setAccessToken(accessToken);
 		WebContext.get().getSession().getManager().setCookieSecure(true);
-		WebContext.get().getSession().setAttribute(SessionName.CURRENT_USER, user);
-		WebContext.get().getSession().setAttribute(SessionName.CURRENT_USER_ACCOUNT, account);
+		WebContext.get().getSession().setAttribute(Constants.SESSION_CURRENT_USER, user);
+		WebContext.get().getSession().setAttribute(Constants.SESSION_CURRENT_USER_ACCOUNT, account);
 		RedisClusterUtils.getInstance().set(accessToken, WebContext.get().getSession().getId(), 1800);
 		return user;
 	}
@@ -88,8 +88,8 @@ public class AuthServiceImpl implements IAuthService {
 		RedisClusterUtils.getInstance().delete(user.getAccessToken());
 		user.setAccessToken(accessToken);
 		WebContext.get().getSession().getManager().setCookieSecure(true);
-		WebContext.get().getSession().setAttribute(SessionName.CURRENT_USER, user);
-		WebContext.get().getSession().setAttribute(SessionName.CURRENT_USER_ACCOUNT, account);
+		WebContext.get().getSession().setAttribute(Constants.SESSION_CURRENT_USER, user);
+		WebContext.get().getSession().setAttribute(Constants.SESSION_CURRENT_USER_ACCOUNT, account);
 		RedisClusterUtils.getInstance().set(accessToken, WebContext.get().getSession().getId(), 1800);
 		return user;
 	}

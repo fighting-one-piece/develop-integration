@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.cisiondata.modules.abstr.entity.PKAutoEntity;
+import org.cisiondata.modules.auth.dao.utils.EntityAttributeUtils;
 
 /** 用户表*/
 @Entity
@@ -24,6 +25,10 @@ public class User extends PKAutoEntity<Long> {
 	public static final String ANSWER = "answer";
 	/** 是否首次登录*/
 	public static final String FIRST_LOGIN_FLAG = "firstLoginFlag";
+	/** 是否填了密保*/
+	public static final String ENCRYPTED_FLAG = "encryptedFlag";
+	/** 是否填了个人信息*/
+	public static final String INFORMATION_FLAG = "informationFlag";
 	
 
 	/** 用户账号 */
@@ -76,12 +81,16 @@ public class User extends PKAutoEntity<Long> {
 	private transient String answer = null;
 	/** 是否第一次登录*/
 	private transient Boolean firstLoginFlag = true;
+	/** 是否填写密保问题*/
+	private transient Boolean encryptedFlag = false;
+	/** 是否填写个人信息*/
+	private transient Boolean informationFlag = false;
 	/** 访问ID */
 	private transient String accessId = null;
 	/** 访问KEY */
 	private transient String accessKey = null;
 	/** 用户属性列表*/
-	private transient List<UserAttribute> attributes = null;
+	private List<UserAttribute> attributes = null;
 	
 	public String getAccount() {
 		return account;
@@ -262,6 +271,28 @@ public class User extends PKAutoEntity<Long> {
 	
 	public boolean isValid() {
 		return hasDeleted() || hasExpired() ? false : true;
+	}
+
+	public Boolean getEncryptedFlag() {
+		return encryptedFlag;
+	}
+
+	public void setEncryptedFlag(Boolean encryptedFlag) {
+		this.encryptedFlag = encryptedFlag;
+	}
+
+	public Boolean getInformationFlag() {
+		return informationFlag;
+	}
+
+	public void setInformationFlag(Boolean informationFlag) {
+		this.informationFlag = informationFlag;
+	}
+	
+	public void transientHandle() {
+		if (attributes.size() > 0) {
+			EntityAttributeUtils.fillEntity(attributes, this);
+		}
 	}
 	
 }

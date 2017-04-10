@@ -54,22 +54,18 @@ public class Constants {
 
     public static final String CONTEXT_URL = "contextURL";
 
-    /**
-     * 编码
-     */
+    /** 编码*/
     public static final String ENCODING = "UTF-8";
     
-    public interface SessionName {
-   	 	public static final String CURRENT_USER = "_CURRENT_USER_";
-        public static final String CURRENT_USER_ACCOUNT = "_CURRENT_USER_ACCOUNT_";
-        public static final String CURRENT_USER_RIGHTS = "_CURRENT_USER_RIGHTS_";
-        public static final String VERIFICATION_CODE = "_VERIFICATION_CODE_";
-    }
+    /** Session常量*/
+    public static final String SESSION_CURRENT_USER = "_CURRENT_USER_";
+    public static final String SESSION_CURRENT_USER_ACCOUNT = "_CURRENT_USER_ACCOUNT_";
+    public static final String SESSION_CURRENT_USER_RIGHTS = "_CURRENT_USER_RIGHTS_";
+    public static final String SESSION_VERIFICATION_CODE = "_VERIFICATION_CODE_";
     
-    public interface CookieName {
-        public static final String USER_ACCOUNT = "_ua_";
-        public static final String USER_SESSION = "_session_";
-        public static final String USER_ACCESS_TOKEN = "accessToken";
-    }
+    /** Cookie常量*/
+    public static final String COOKIE_USER_ACCOUNT = "_ua_";
+    public static final String COOKIE_USER_SESSION = "_session_";
+    public static final String COOKIE_USER_ACCESS_TOKEN = "accessToken";
     
 }

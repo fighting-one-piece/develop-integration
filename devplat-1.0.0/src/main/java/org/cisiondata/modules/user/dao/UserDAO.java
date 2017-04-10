@@ -26,6 +26,6 @@ public interface UserDAO {
 	public void editUserAttribute(UserAttribute userAttribute)  throws DataAccessException;
 	//插入用户各种单一属性
 	public void addUserAttribute(UserAttribute userAttribute)  throws DataAccessException;
-	//findUserAttribute
-	public String findUserAttribute(Long userId,String key)  throws DataAccessException;
+	//查看用户各种单一属性
+	public String findUserAttribute(UserAttribute userAttribute)  throws DataAccessException;
 }

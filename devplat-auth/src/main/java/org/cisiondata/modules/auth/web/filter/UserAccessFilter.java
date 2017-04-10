@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
-import org.cisiondata.modules.auth.Constants.SessionName;
+import org.cisiondata.modules.auth.Constants;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.auth.service.IAuthService;
 import org.cisiondata.modules.auth.web.WebUtils;
@@ -76,7 +76,7 @@ public class UserAccessFilter implements Filter {
 		if (requestUrl.startsWith("/api/v1")) requestUrl = requestUrl.replace("/api/v1", "");
 		if (!notAuthenticationUrls.contains(requestUrl)) {
 			if (!authenticationRequest(requestUrl, httpServletRequest, httpServletResponse)) {
-				writeResponse(httpServletResponse, wrapperFailureWebResult("用户认证失败,请重新登录"));
+				writeResponse(httpServletResponse, wrapperFailureWebResult(ResultCode.VERIFICATION_USER_FAIL,"用户认证失败,请重新登录"));
 				return;
 			}
 			if (!authorizationRequest(requestUrl)) {
@@ -125,7 +125,7 @@ public class UserAccessFilter implements Filter {
 		String sessionId = (String) cacheObject;
 		try {
 			Object userObject = sessionManager.getStorageHandler().getAttribute(sessionId, 
-					request, response, SessionName.CURRENT_USER);
+					request, response, Constants.SESSION_CURRENT_USER);
 			if (null == userObject) return false;
 			User user = (User) userObject;
 			String macAddress = IPUtils.getMACAddress(request);
@@ -207,6 +207,7 @@ public class UserAccessFilter implements Filter {
 		return wrapperFailureWebResult(resultCode.getCode(), failure);
 	}
 	
+	@SuppressWarnings("unused")
 	private WebResult wrapperFailureWebResult(String failure) {
 		return wrapperFailureWebResult(ResultCode.FAILURE, failure);
 	}

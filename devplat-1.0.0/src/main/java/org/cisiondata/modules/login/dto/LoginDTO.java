@@ -18,7 +18,27 @@ public class LoginDTO implements Serializable {
 	private String lastLoginTime = null;
 	/** MAC地址*/
 	private String macAddress = null;
+	/** 是否填写密保问题*/
+	private Boolean encryptedFlag = null;
+	/** 是否填写个人信息*/
+	private Boolean informationFlag = null;
 	
+
+	public Boolean getEncryptedFlag() {
+		return encryptedFlag;
+	}
+
+	public void setEncryptedFlag(Boolean encryptedFlag) {
+		this.encryptedFlag = encryptedFlag;
+	}
+
+	public Boolean getInformationFlag() {
+		return informationFlag;
+	}
+
+	public void setInformationFlag(Boolean informationFlag) {
+		this.informationFlag = informationFlag;
+	}
 
 	public String getLastLoginTime() {
 		return lastLoginTime;

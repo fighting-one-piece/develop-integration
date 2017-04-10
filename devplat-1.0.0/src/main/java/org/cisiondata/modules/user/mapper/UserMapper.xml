@@ -72,6 +72,16 @@
 	 	WHERE ACCOUNT=#{account}
 	 </update>
 	 
+	  <!--  通过账号获取用户信息  -->
+	<select id="findUser" resultMap="UserModelsMap">
+		SELECT * FROM T_USER WHERE ACCOUNT=#{account}
+	</select>
+	
+	 <!--  通过电话获取用户信息  -->
+	<select id="findUserByPhone" resultMap="UserModelsMap">
+		SELECT * FROM T_USER WHERE MOBILE_PHONE=#{mobilePhone}
+	</select>
+	 
 	 <!--  获取用户密保问题  -->
 	<select id="findSecurityQuestion" resultType="string">
 		SELECT QUESTION FROM T_USER WHERE ACCOUNT=#{account}
@@ -81,29 +91,25 @@
 	<select id="findSecurityAnswer" resultType="string">
 		SELECT ANSWER FROM T_USER WHERE ACCOUNT=#{account}
 	</select>
+	
 	 <!--  修改用户各种单一属性  -->
 	<update id="editUserAttribute" parameterType="org.cisiondata.modules.auth.entity.UserAttribute">
-		UPDATE  T_USER_ATTRIBUTE SET VALUE=#{value} WHERE USER_ID=#{userId} AND KEY=#{key}
+		UPDATE  T_USER_ATTRIBUTE SET `VALUE`=#{value} WHERE USER_ID=#{userId} AND `KEY`=#{key}
 	</update>
 	
-	 <!--  插入用户各种单一属性  -->
-	<insert id="addUserAttribute" parameterType="org.cisiondata.modules.auth.entity.UserAttribute">
-		INSERT INTO T_USER_ATTRIBUTE (USER_ID,KEY,VALUE,TYPE) VALUE(#{userId},#{key},#{value},#{type})
+	<!-- 新增，新增成功后返回id值 -->
+	<insert id="addUserAttribute" parameterType="org.cisiondata.modules.auth.entity.UserAttribute" useGeneratedKeys="true" keyProperty="id">
+		insert into T_USER_ATTRIBUTE
+		(USER_ID,`KEY`,`VALUE`,TYPE)
+		values
+		(#{userId},#{key},#{value},#{type})
 	</insert>
 	
 	<!--  获取用户各种单一属性  -->
-	<select id="findUserAttribute" resultType="string">
-		SELECT VALUE FROM T_USER_ATTRIBUTE WHERE USER_ID=#{userId} AND KEY =#{key} 
+	<select id="findUserAttribute" resultType="string" parameterType="org.cisiondata.modules.auth.entity.UserAttribute">
+		SELECT `VALUE` FROM T_USER_ATTRIBUTE WHERE USER_ID=#{userId} AND `KEY` =#{key} 
 	</select>
 	
-	 <!--  通过账号获取用户信息  -->
-	<select id="findUser" resultMap="UserModelsMap">
-		SELECT * FROM T_USER WHERE ACCOUNT=#{account}
-	</select>
 	
-	 <!--  通过电话获取用户信息  -->
-	<select id="findUserByPhone" resultMap="UserModelsMap">
-		SELECT * FROM T_USER WHERE MOBILE_PHONE=#{mobilePhone}
-	</select>
 	
 </mapper>

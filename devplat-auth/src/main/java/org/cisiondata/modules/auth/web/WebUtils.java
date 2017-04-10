@@ -1,8 +1,7 @@
 package org.cisiondata.modules.auth.web;
 
 import org.apache.commons.lang.StringUtils;
-import org.cisiondata.modules.auth.Constants.CookieName;
-import org.cisiondata.modules.auth.Constants.SessionName;
+import org.cisiondata.modules.auth.Constants;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.auth.service.IUserService;
 import org.cisiondata.modules.auth.web.session.SessionManager;
@@ -24,7 +23,7 @@ public class WebUtils {
 		WebContext webContext = WebContext.get();
 		User user = null;
 		if (null != webContext && null != webContext.getSession()) {
-			user = webContext.getSession().getAttribute(SessionName.CURRENT_USER);
+			user = webContext.getSession().getAttribute(Constants.SESSION_CURRENT_USER);
 		} 
 		if (null == user) {
 //			String sessionId = getCookieValueFromHead(CookieName.USER_SESSION);
@@ -34,10 +33,10 @@ public class WebUtils {
 				if (StringUtils.isBlank(sessionId)) return null;
 				SessionManager sessionManager = SpringBeanFactory.getBean(SessionManager.class);
 				Object accountObject = sessionManager.getStorageHandler().getAttribute(sessionId, 
-						webContext.getRequest(), webContext.getResponse(), SessionName.CURRENT_USER_ACCOUNT);
+						webContext.getRequest(), webContext.getResponse(), Constants.SESSION_CURRENT_USER_ACCOUNT);
 				LOG.info("WebUtils account: {}", accountObject);
 				Object userObject = sessionManager.getStorageHandler().getAttribute(sessionId, 
-						webContext.getRequest(), webContext.getResponse(), SessionName.CURRENT_USER);
+						webContext.getRequest(), webContext.getResponse(), Constants.SESSION_CURRENT_USER);
 				LOG.info("WebUtils user: {}", userObject);
 				if (null != accountObject) {
 					IUserService userService = SpringBeanFactory.getBean(IUserService.class);
@@ -55,14 +54,14 @@ public class WebUtils {
 	public static void setCurrentUser(User user) {
 		WebContext webContext = WebContext.get();
 		if (null != webContext && null != webContext.getSession()) {
-			webContext.getSession().setAttribute(SessionName.CURRENT_USER, user);
+			webContext.getSession().setAttribute(Constants.SESSION_CURRENT_USER, user);
 		}
 	}
 	
 	public static void removeCurrentUser() {
 		WebContext webContext = WebContext.get();
 		if (null != webContext && null != webContext.getSession()) {
-			webContext.getSession().removeAttribute(SessionName.CURRENT_USER);
+			webContext.getSession().removeAttribute(Constants.SESSION_CURRENT_USER);
 		}
 	}
 	
@@ -71,7 +70,7 @@ public class WebUtils {
 	}
 	
 	public static String getAccountFromHead() {
-		return getCookieValueFromHead(CookieName.USER_ACCOUNT);
+		return getCookieValueFromHead(Constants.COOKIE_USER_ACCOUNT);
 	}
 	
 	public static String getCookieValueFromHead(String cookieKey) {

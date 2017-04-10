@@ -35,7 +35,7 @@ public class CustomSqlSessionFactoryBean extends SqlSessionFactoryBean {
 							SystemPropertyUtils.resolvePlaceholders(basePackage)) + "/**/*.class";
 			Resource[] resources = resourcePatternResolver.getResources(packagePath);
 			for (Resource resource : resources) {
-				String entityClassPath = resource.getFile().getPath().replaceAll("/", ".")
+				String entityClassPath = resource.getURL().getPath().replaceAll("/", ".")
 						.replaceAll("\\" + File.separator, ".").replace(".class", "");
 				String entityClass = entityClassPath.substring(entityClassPath.lastIndexOf(".") + 1);
 				String entityClassPackage = entityClassPath.substring(

@@ -1,6 +1,5 @@
 package org.cisiondata.modules.identity.controller;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -42,7 +41,7 @@ public class QQController {
 		WebResult result = new WebResult();
 		try {
 			//得到基本信息
-			List<Map<String, Object>> listBase = qqService.readQQData(qq);
+			Map<String, Object> listBase = qqService.readQQData(qq);
 			result.setData(listBase);
 			result.setCode(ResultCode.SUCCESS.getCode());
 		}catch(BusinessException bu){

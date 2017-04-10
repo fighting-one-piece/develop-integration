@@ -5,6 +5,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.cisiondata.modules.auth.entity.User;
+import org.cisiondata.modules.auth.entity.UserAttribute;
 import org.cisiondata.modules.login.dto.LoginDTO;
 import org.cisiondata.modules.login.service.ILoginService;
 import org.cisiondata.utils.redis.RedisClusterUtils;
@@ -31,9 +32,11 @@ public class AuthServiceTest {
 	
 	@Test
 	public void testUserServiceReadUserByAccount() {
-		User user = userService.readUserByAccount("dev11");
+		User user = userService.readUserByAccount("dev5");
 		System.out.println(user.getNickname());
-		System.out.println("2: " + user.getId() + ":" + user.getIdentity() + ":" + user.getPassword());
+		System.out.println(user.getFirstLoginFlag());
+		System.out.println(user.getEncryptedFlag());
+		System.out.println(user.getInformationFlag());
 	}
 	
 	@Test
@@ -81,18 +84,33 @@ public class AuthServiceTest {
 	
 	@Test
 	public void testA() {
-		Object value = RedisClusterUtils.getInstance().get("user:account:test");
+		Object value = RedisClusterUtils.getInstance().get("user:cache:account:test");
 		System.out.println("value: " + ((User) value).getPassword());
 		System.out.println("value: " + ((User) value).getSalt());
-		RedisClusterUtils.getInstance().delete("user:account:test");
+		RedisClusterUtils.getInstance().delete("user:cache:account:test");
 	}
 	
 	@Test
 	public void testB() {
-		Set<String> keys = RedisClusterUtils.getInstance().getJedisCluster().hkeys("cisiondata*");
-		for (String key : keys) {
-			System.out.println(key);
-		}
+		User user = new User();
+		user.setAccount("random");
+		user.setAccessId("id1");
+		user.setAccessKey("key1");
+		UserAttribute ua1 = new UserAttribute();
+		ua1.setKey("accessId");
+		ua1.setValue("accessId1");
+		user.getAttributes().add(ua1);
+		UserAttribute ua2 = new UserAttribute();
+		ua2.setKey("accessKey");
+		ua2.setValue("accessKey1");
+		user.getAttributes().add(ua2);
+		RedisClusterUtils.getInstance().set("user:cache:account:random", user);
+		User temp = (User) RedisClusterUtils.getInstance().get("user:cache:account:random");
+		System.out.println(temp.getAttributes().size());
+		temp.transientHandle();
+		System.out.println("account: " + temp.getAccount());
+		System.out.println("accessId: " + temp.getAccessId());
+		System.out.println("accessKey: " + temp.getAccessKey());
 	}
 	
 }

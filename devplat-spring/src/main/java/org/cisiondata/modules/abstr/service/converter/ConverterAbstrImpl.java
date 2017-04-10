@@ -2,6 +2,7 @@ package org.cisiondata.modules.abstr.service.converter;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -130,11 +131,12 @@ public abstract class ConverterAbstrImpl<Entity extends Serializable, EntityDTO 
 			}
 		}
 		for (Field fieldFrom : clazz.getDeclaredFields()) {
+			if (Modifier.isStatic(fieldFrom.getModifiers())) continue;
 			String name = fieldFrom.getName();
 			Class<?> type = fieldFrom.getType();
 			if ("serialVersionUID".equals(name)
 					|| PKEntity.class.isAssignableFrom(type)
-					|| Collection.class.isAssignableFrom(type)) {
+						|| Collection.class.isAssignableFrom(type)) {
 				continue;
 			}
 			try {

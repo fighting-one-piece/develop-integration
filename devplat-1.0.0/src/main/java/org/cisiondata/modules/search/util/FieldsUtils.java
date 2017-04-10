@@ -17,8 +17,9 @@ public class FieldsUtils {
 	private static final String BANK_CARD_REX = "\\d{10,19}";
 	private static final String IDCARD_REX = "\\d{17}(\\d|X|x)|\\d{15}";
 	private static final String QQ_REX = "\\d{5,14}";
-	private static Pattern highLightPattern = Pattern.compile("<span style=\"color:red\">[^</span>]*</span>");
-	private static Integer highLightLength = "<span style=\"color:red\"></span>".length();
+	private static final Pattern highLightPattern = Pattern.compile("<span style=\"color:red\">[^</span>]*</span>");
+	private static final String HIGH_LIGHT_PRE = "<span style=\"color:red\">";
+	private static final String HIGH_LIGHT_END = "</span>";
 	
 	/**
 	 * 获取返回的head
@@ -50,6 +51,7 @@ public class FieldsUtils {
 		newQr.setTotalRowNum(qr.getTotalRowNum());
 		for (Map<String,Object> map : resultList){
 			Map<String,Object> resultMap = (Map<String,Object>)map.get("data");
+			if(null == resultMap) resultMap = map;
 			Map<String,Object> newResultMap = new HashMap<String,Object>();
 			for(ResourceInterfaceField re : list){
 				if (resultMap.containsKey(re.getFieldEN())) {
@@ -68,8 +70,8 @@ public class FieldsUtils {
 			}
 			newList.add(newResultMap);
 		}
-		qr.setResultList(newList);
-		return qr;
+		newQr.setResultList(newList);
+		return newQr;
 	}
 	
 	
@@ -83,18 +85,11 @@ public class FieldsUtils {
 		if("NA".equals(value) || StringUtils.isBlank(value)) return value;
 		value = value.trim();
 		Matcher matcher = highLightPattern.matcher(value);
-		List<Integer> list = new ArrayList<Integer>();
-		boolean flag = matcher.find();
 		switch (FieldEncryptType.getFieldEncryptType(status)) {
 		case NO_ENCRYPT:
 			return value;
 		case ACCUMULATION_FUND_CARD_ENCRYPT:
-			if (flag) {
-				list.add(matcher.start());
-				list.add(matcher.end());
-			}
-			
-			if(list.size() == 0) {//没有高亮代码
+			if(matcher.find()) {//没有高亮代码
 				if (value.length() > 4){
 					StringBuilder accumulation = new StringBuilder(value);
 					accumulation.replace(accumulation.length() - 4, accumulation.length(), "****");
@@ -106,12 +101,7 @@ public class FieldsUtils {
 				return value;
 			}
 		case BANK_CARD_ENCRYPT:
-			if (flag) {
-				list.add(matcher.start());
-				list.add(matcher.end());
-			}
-			
-			if(list.size() == 0) {//没有高亮代码
+			if(matcher.find()) {//没有高亮代码
 				if(value.matches(BANK_CARD_REX)){
 					StringBuilder bankcard = new StringBuilder(value);
 					StringBuilder encryptionBankcard = new StringBuilder();
@@ -130,28 +120,39 @@ public class FieldsUtils {
 				return value;
 			}
 		case ADDRESS_ENCRYPT:
-			//TODO
-			if (flag) {
-				list.add(matcher.start());
-				list.add(matcher.end());
+			List<String> queryList = new ArrayList<String>();
+			while(matcher.find()) {
+				queryList.add(matcher.group().replaceAll(HIGH_LIGHT_PRE, "").replaceAll(HIGH_LIGHT_END, ""));
 			}
-			if (list.size() == 0){
+			if (queryList.size() == 0){
 				if(value.length() <= 6) return value;
 				StringBuilder address = new StringBuilder(value);
 				address.delete(6, address.length());
 				address.append("***");
 				return address.toString();
 			} else {//有高亮代码
-				return value;
+				value = value.replaceAll(HIGH_LIGHT_PRE, "").replaceAll(HIGH_LIGHT_END, "");
+				StringBuilder address = new StringBuilder(value);
+				if(value.length() <= 6){
+					for (String query : queryList){
+						value = value.replaceAll(query, HIGH_LIGHT_PRE + query + HIGH_LIGHT_END);
+					}
+					return value;
+				} else {
+					
+					address.delete(6, address.length());
+					address.append("***");
+					value = address.toString();
+					for (String query : queryList){
+						value = value.replaceAll(query, HIGH_LIGHT_PRE + query + HIGH_LIGHT_END);
+					}
+					return value;
+				}
 			}
 		case EMAIL_ENCRYPT:
 			return value;
 		case IDCARD_ENCRYPT:
-			if (flag) {
-				list.add(matcher.start());
-				list.add(matcher.end());
-			}
-			if (list.size() == 0) {//没有高亮代码
+			if (matcher.find()) {//没有高亮代码
 				if(value.matches(IDCARD_REX)){
 					StringBuilder idcard = new StringBuilder(value);
 					if (value.length() == 18){
@@ -168,13 +169,8 @@ public class FieldsUtils {
 				return value;
 			}
 		case MOBILE_ENCRYPT:
-			if (flag) {
-				list.add(matcher.start());
-				list.add(matcher.end());
-			}
-			
 			StringBuilder sb = new StringBuilder(value);
-			if(list.size() == 0) {//没有高亮代码
+			if(matcher.find()) {//没有高亮代码
 				if (value.length() == 11) {
 					if (value.startsWith("1")){
 						sb.replace(3, 7, "****");
@@ -230,12 +226,12 @@ public class FieldsUtils {
 				return value;
 			}
 		case NAME_ENCRYPT:
-			while (flag) {
-				list.add(matcher.start());
-				list.add(matcher.end());
+			List<String> namequeryList = new ArrayList<String>();
+			while(matcher.find()) {
+				namequeryList.add(matcher.group().replaceAll(HIGH_LIGHT_PRE, "").replaceAll(HIGH_LIGHT_END, ""));
 			}
 			StringBuilder name = new StringBuilder(value);
-			if (list.size() == 0) {//没有高亮代码
+			if (namequeryList.size() == 0) {//没有高亮代码
 				if (value.length() <2) {
 					return value;
 				} else {
@@ -245,28 +241,30 @@ public class FieldsUtils {
 					return name.toString();
 				}
 			} else {//有高亮代码
-				int nameLen = 0;
-				for (int i = 0 ; i < list.size() ; i+=2 ) {
-					nameLen = name.length() - highLightLength;
-				}
-				if (nameLen < 2) {
+				value = value.replaceAll(HIGH_LIGHT_PRE, "").replaceAll(HIGH_LIGHT_END, "");
+				name = new StringBuilder(value);
+				if (name.length() < 2) {
+					for (String query : namequeryList){
+						value = value.replaceAll(query, HIGH_LIGHT_PRE + query + HIGH_LIGHT_END);
+					}
 					return value;
 				} else {
-//					int realLeng = 0;
-					//TODO-
+					for(int i = 1 ; i<name.length(); i++) {
+						name.replace(i, i+1, "*");
+					}
+					value = name.toString();
+					for (String query : namequeryList){
+						value = value.replaceAll(query, HIGH_LIGHT_PRE + query + HIGH_LIGHT_END);
+					}
+					return value;
 				}
 			}
-			return value;
 		case PASSWORD_ENCRYPT:
 			return "*****";
 		case PHOTO_ENCRYPT:
 			return value;
 		case QQ_ENCRYPT:
-			if (flag) {
-				list.add(matcher.start());
-				list.add(matcher.end());
-			}
-			if (list.size() == 0) {//没有高亮代码
+			if (matcher.find()) {//没有高亮代码
 				
 				if (value.matches(QQ_REX)) {
 					StringBuilder qq = new StringBuilder(value);
@@ -281,7 +279,7 @@ public class FieldsUtils {
 		case TIME_ENCRYPT:
 			return value;
 		default:
-				return value;
+			return value;
 		}
 		
 	}

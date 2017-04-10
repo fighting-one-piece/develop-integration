@@ -78,13 +78,19 @@ public class UserServiceImpl implements IUserService {
 		
 		UserAttribute userAttribute = new UserAttribute();
 		userAttribute.setUserId(user.getId());
-		userAttribute.setKey("information");
+		userAttribute.setKey("informationFlag");
 		userAttribute.setValue("false");
 		userAttribute.setType("boolean");
-		auserDAO.addUserAttribute(userAttribute);
+		auserDAO.editUserAttribute(userAttribute);
 		
-		String encrypted = auserDAO.findUserAttribute(user.getId(), "encrypted");
+		userAttribute.setKey("encryptedFlag");
+		String encrypted = auserDAO.findUserAttribute(userAttribute);
+		
 		if ("false".equals(encrypted)) {
+			userAttribute.setKey("firstLoginFlag");
+			userAttribute.setValue("false");
+			userAttribute.setType("boolean");
+			auserDAO.editUserAttribute(userAttribute);
 			userService.deleteUserCache(account);
 			return authService.readUserAuthorizationToken(account);
 		}else {
@@ -119,13 +125,14 @@ public class UserServiceImpl implements IUserService {
 		userAttribute.setType("string");
 		auserDAO.addUserAttribute(userAttribute);
 		
-		userAttribute.setKey("encrypted");
+		userAttribute.setKey("encryptedFlag");
 		userAttribute.setValue("false");
 		userAttribute.setType("boolean");
-		auserDAO.addUserAttribute(userAttribute);
+		auserDAO.editUserAttribute(userAttribute);
 		userService.deleteUserCache(account);
 		
-		String information = auserDAO.findUserAttribute(user.getId(), "information");
+		userAttribute.setKey("informationFlag");
+		String information = auserDAO.findUserAttribute(userAttribute);
 		if ("false".equals(information)) {
 			userAttribute.setKey("firstLoginFlag");
 			userAttribute.setValue("false");
@@ -157,7 +164,12 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public String findSecurityQuestion() throws BusinessException {
 		String account = WebUtils.getCurrentAccout();
-		String question = auserDAO.findSecurityQuestion(account);
+		AUser user = new AUser();
+		user = auserDAO.findUser(account);
+		UserAttribute userAttribute = new UserAttribute();
+		userAttribute.setUserId(user.getId());
+		userAttribute.setKey("question");
+		String question = auserDAO.findUserAttribute(userAttribute);
 		if (StringUtils.isBlank(question)) {
 			throw new BusinessException(ResultCode.ACCOUNT_NOT_EXIST);
 		}
@@ -171,7 +183,12 @@ public class UserServiceImpl implements IUserService {
 			throw new BusinessException(ResultCode.PARAM_NULL);
 		}
 		String account = WebUtils.getCurrentAccout();
-		String securityAnswer = auserDAO.findSecurityAnswer(account);
+		AUser user = new AUser();
+		user = auserDAO.findUser(account);
+		UserAttribute userAttribute = new UserAttribute();
+		userAttribute.setUserId(user.getId());
+		userAttribute.setKey("answer");
+		String securityAnswer = auserDAO.findUserAttribute(userAttribute);
 		if (StringUtils.isBlank(securityAnswer)) {
 			throw new BusinessException(ResultCode.ACCOUNT_NOT_EXIST);
 		}
@@ -185,7 +202,6 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public void updateSecurityAnswer(String oldAnswer, String newQuestion,
 			String newAnswer) throws BusinessException {
-		String answer = null;
 		String oldSecurityAnswer = null;
 		String newSecurityAnswer = null;
 		String account = WebUtils.getCurrentAccout();
@@ -199,19 +215,28 @@ public class UserServiceImpl implements IUserService {
 		} else {
 			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
 		}
-		answer = auserDAO.findSecurityAnswer(account);
+		user = auserDAO.findUser(account);
+		
+		UserAttribute userAttribute = new UserAttribute();
+		userAttribute.setUserId(user.getId());
+		userAttribute.setKey("answer");
+		String answer = auserDAO.findUserAttribute(userAttribute);
 		if (StringUtils.isBlank(answer)) {
 			throw new BusinessException(ResultCode.ACCOUNT_NOT_EXIST);
 		}
 		if (!oldSecurityAnswer.equals(answer)) {
 			throw new BusinessException(605, "密保问题答案错误");
 		}
-		user.setAccount(account);
-		user.setQuestion(newQuestion);
-		user.setAnswer(newSecurityAnswer);
-		user.setDeleteFlag(null);
-		user.setFirstLoginFlag(null);
-		auserDAO.updateUser(user);
+		userAttribute.setKey("question");
+		userAttribute.setValue(newQuestion);
+		userAttribute.setType("string");
+		auserDAO.editUserAttribute(userAttribute);
+		
+		userAttribute.setKey("answer");
+		userAttribute.setValue(SHAUtils.SHA1(newSecurityAnswer));
+		userAttribute.setType("string");
+		auserDAO.editUserAttribute(userAttribute);
+		
 		userService.deleteUserCache(account);
 	}
 

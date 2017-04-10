@@ -22,4 +22,9 @@ public class UserConverter extends ConverterAbstrImpl<User, UserDTO> {
 		convert(user, userDTO);
 	}
 	
+	@Override
+	public void convertDTO2Entity(UserDTO userDTO, User user) {
+		convert(userDTO, user);
+	}
+	
 }

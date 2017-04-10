@@ -30,8 +30,7 @@ public class UserController {
 		WebResult result  = new WebResult();
 		try {
 			result.setResultCode(ResultCode.SUCCESS);
-			auserService.updateUserSetting(realName,mobilePhone, newPassword,verificationCode,request);
-			result.setData("信息更新完成");
+			result.setData(auserService.updateUserSetting(realName,mobilePhone, newPassword,verificationCode,request));
 		}catch (BusinessException bu) {
 			result.setCode((bu.getCode()));
 			result.setFailure(bu.getMessage());
@@ -124,7 +123,7 @@ public class UserController {
 			return result;
 		}
 		
-		//获取用户密保问题答案
+		//设置新密保问题
 		@ResponseBody
 		@RequestMapping(value="/users/settings/newsecurity",method=RequestMethod.POST)
 		public WebResult updateSecurityAnswer(String oldAnswer,String newQuestion,String newAnswer){

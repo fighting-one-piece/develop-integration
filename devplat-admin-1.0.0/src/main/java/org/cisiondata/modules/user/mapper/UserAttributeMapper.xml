@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.user.dao.UserAttributeDAO">
+	<resultMap type="org.cisiondata.modules.auth.entity.UserAttribute" id="UserAttributeModelMap">
+		<id property="id" column="ID"/>
+		<result column="USER_ID" property="userId" javaType="long"/>
+		<result column="KEY" property="key"/>
+		<result column="VALUE" property="value"/>
+		<result column="TYPE" property="type"/>
+	</resultMap>
+	
+	<!-- 新增用户属性 -->
+	<insert id="addUserAttribte" parameterType="org.cisiondata.modules.auth.entity.UserAttribute">
+		insert into T_USER_ATTRIBUTE(USER_ID,`KEY`,`VALUE`,TYPE)
+		value (#{userId},#{key},#{value},#{type})
+	</insert>
+	<!-- 根据USER_ID查询是否存在KEY=ACCESS_ID -->
+	<select id="findAUserAttribte" parameterType="org.cisiondata.modules.auth.entity.UserAttribute" resultMap="UserAttributeModelMap">
+		select * from T_USER_ATTRIBUTE where USER_ID=#{userId} and `KEY`=#{key}
+	</select>
+	<!-- 根据USER_ID和KEY修改VALUE -->
+	<update id="updateUserAttribte" parameterType="org.cisiondata.modules.auth.entity.UserAttribute">
+		update T_USER_ATTRIBUTE set `VALUE`=#{value} where USER_ID=#{userId} and `KEY`=#{key}
+	</update>
+</mapper>

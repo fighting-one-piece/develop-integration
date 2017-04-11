@@ -20,6 +20,73 @@
 		<result column="EXPIRE_TIME" property="expireTime"/>
 		<result column="DELETE_FLAG" property="deleteFlag"/>
 	</resultMap>
+	<!-- 增加 -->
+	<insert id="addAUser" parameterType="org.cisiondata.modules.user.entity.AUser" useGeneratedKeys="true" keyProperty="id">
+		insert into T_USER(ACCOUNT,PASSWORD,IDENTITY,NICK_NAME,CREATE_TIME,EXPIRE_TIME,DELETE_FLAG,STATUS,SALT)
+		value (#{account},#{password},#{identity},#{nickname},#{createTime},#{expireTime},#{deleteFlag},#{status},#{salt})
+	</insert>
+	
+	<!-- 根据账号是否存在 -->
+	<select id="findaccountAuser" resultMap="AUserModelMap">
+		select ID,ACCOUNT,PASSWORD,IDENTITY,NICK_NAME,CREATE_TIME,EXPIRE_TIME,DELETE_FLAG,STATUS,SALT from T_USER where ACCOUNT=#{account}
+	</select>
+	
+	<!-- 查询 -->
+	<select id="findAuser" parameterType="map" resultMap="AUserModelMap">
+		select ID,ACCOUNT,PASSWORD,IDENTITY,NICK_NAME,CREATE_TIME,EXPIRE_TIME,DELETE_FLAG,STATUS,SALT from T_USER
+		<where>
+			<if test="id !=null">ID=#{id}</if>
+			<if test="account !=null and account != ''">and ACCOUNT=#{account}</if>
+			<if test="identity !=null and identity != ''">and IDENTITY=#{identity}</if>
+			<if test="nickname !=null and nickname != ''">and NICK_NAME=#{nickname}</if>
+			<if test="createTime !=null and createTime != ''">and CREATE_TIME=#{createTime}</if>
+			<if test="expireTime !=null and expireTime != ''">and EXPIRE_TIME=#{expireTime}</if>
+			<if test="deleteFlag !=null">and DELETE_FLAG=#{deleteFlag}</if>
+			<if test="status !=null">and STATUS=#{status}</if>
+			<if test="salt !=null and salt != ''">and SALT=#{salt}</if>
+		</where>
+		<if test="orderBy != null and orderBy != ''">
+    		order by ${orderBy}
+    	</if>
+    	<if test="begin != null and pageSize != null">
+    		limit #{begin},#{pageSize}
+    	</if>
+	</select>
+	<!-- 查询总条数 -->
+	<select id="findCountAuser" parameterType="map" resultType="long">
+		select COUNT(ID) from T_USER
+		<where>
+			<if test="id !=null">ID=#{id}</if>
+			<if test="account !=null and account != ''">and ACCOUNT=#{account}</if>
+			<if test="identity !=null and identity != ''">and IDENTITY=#{identity}</if>
+			<if test="nickname !=null and nickname != ''">and NICK_NAME=#{nickname}</if>
+			<if test="createTime !=null and createTime != ''">and CREATE_TIME=#{createTime}</if>
+			<if test="expireTime !=null and expireTime != ''">and EXPIRE_TIME=#{expireTime}</if>
+			<if test="deleteFlag !=null">and DELETE_FLAG=#{deleteFlag}</if>
+			<if test="status !=null">and STATUS=#{status}</if>
+			<if test="salt !=null and salt != ''">and SALT=#{salt}</if>
+		</where>
+	</select>
+	
+	<!-- 根据ID查询 -->
+	<select id="findIdAuser" resultMap="AUserModelMap">
+		select ID,ACCOUNT,PASSWORD,IDENTITY,NICK_NAME,CREATE_TIME,EXPIRE_TIME,DELETE_FLAG,STATUS,SALT from T_USER WHERE ID=#{id} 
+	</select>
+	<!-- 根据ID修改 -->
+	<update id="updateAUser" parameterType="org.cisiondata.modules.user.entity.AUser"> 
+		update T_USER 
+		<set>
+			<if test="account !=null and account != ''">ACCOUNT=#{account},</if>
+			<if test="password !=null and password != ''">PASSWORD=#{password},</if>
+			<if test="identity !=null and identity != ''">IDENTITY=#{identity},</if>
+			<if test="nickname !=null and nickname != ''">NICK_NAME=#{nickname},</if>
+			<if test="expireTime !=null and expireTime != ''">EXPIRE_TIME=#{expireTime},</if>
+			<if test="email !=null and email != ''">EMAIL=#{email},</if>
+			<if test="deleteFlag !=null">DELETE_FLAG=#{deleteFlag},</if>
+			<if test="status !=null">STATUS=#{status},</if>
+		</set>
+		 WHERE ID=#{id}
+	</update>
 	
 	
 </mapper>

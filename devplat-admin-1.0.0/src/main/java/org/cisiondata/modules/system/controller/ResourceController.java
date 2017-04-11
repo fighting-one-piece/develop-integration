@@ -27,7 +27,7 @@ public class ResourceController {
 			resourceService.addResource(name, type, identity, url, icon, priority, parentId, deleteFlag);
 			result.setResultCode(ResultCode.SUCCESS);
 		} catch (BusinessException bu) {
-			result.setResultCode(ResultCode.FAILURE);
+			result.setCode(bu.getCode());
 			result.setFailure(bu.getMessage());
 		}catch (Exception e) {
 			result.setResultCode(ResultCode.FAILURE);
@@ -45,7 +45,7 @@ public class ResourceController {
 			resourceService.editResource(id, name, type, identity, url, icon, priority, parentId, deleteFlag);
 			result.setResultCode(ResultCode.SUCCESS);
 		} catch (BusinessException bu) {
-			result.setResultCode(ResultCode.FAILURE);
+			result.setCode(bu.getCode());
 			result.setFailure(bu.getMessage());
 		}catch (Exception e) {
 			result.setResultCode(ResultCode.FAILURE);
@@ -63,7 +63,7 @@ public class ResourceController {
 			result.setData(resourceService.qureyAllResource(page, pageSize));
 			result.setResultCode(ResultCode.SUCCESS);
 		} catch (BusinessException bu) {
-			result.setResultCode(ResultCode.FAILURE);
+			result.setCode(bu.getCode());
 			result.setFailure(bu.getMessage());
 		}catch (Exception e) {
 			result.setResultCode(ResultCode.FAILURE);
@@ -81,7 +81,7 @@ public class ResourceController {
 			resourceService.deleteResource(id, deleteFlag);
 			result.setResultCode(ResultCode.SUCCESS);
 		} catch (BusinessException bu) {
-			result.setResultCode(ResultCode.FAILURE);
+			result.setCode(bu.getCode());
 			result.setFailure(bu.getMessage());
 		}catch (Exception e) {
 			result.setResultCode(ResultCode.FAILURE);

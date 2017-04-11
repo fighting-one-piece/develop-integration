@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.user.dao.AResourcesDAO">
+
+	<resultMap type="org.cisiondata.modules.user.entity.AResources"
+		id="ResourcestMap">
+		<id property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="type" column="TYPE" />
+		<result property="identity" column="IDENTITY" />
+		<result property="url" column="URL" />
+		<result property="icon" column="ICON" />
+		<result property="priority" column="PRIORITY" />
+		<result property="parentId" column="PARENT_ID" />
+		<result property="deleteFlag" column="DELETE_FLAG" />
+	</resultMap>
+	<!-- 中间表 -->
+	<resultMap type="org.cisiondata.modules.user.entity.APermission"
+		id="PermissionMap">
+		<id property="id" column="ID" />
+		<result property="authStatus" column="AUTH_STATUS" />
+		<result property="extendStatus" column="EXTEND_STATUS" />
+		<result property="principalId" column="PRINCIPAL_ID" />
+		<result property="principalType" column="PRINCIPAL_TYPE" />
+		<result property="resourceId" column="RESOURCE_ID" />
+	</resultMap>
+	<!-- 查询资源 -->
+	<select id="selResource" resultMap="ResourcestMap">
+		SELECT * FROM T_RESOURCE WHERE PRIORITY = 1
+	</select>
+	<!-- 查询已授权的资源 -->
+	<select id="selResourceById" resultMap="ResourcestMap">
+		SELECT * FROM T_RESOURCE WHERE ID IN (SELECT RESOURCE_ID FROM T_PERMISSION WHERE PRINCIPAL_ID =#{0}) AND PRIORITY = 1
+	</select>
+	<!-- 保存授权的资源 -->
+	<insert id="addPermission" parameterType="org.cisiondata.modules.user.entity.APermission">
+		INSERT INTO T_PERMISSION (AUTH_STATUS,EXTEND_STATUS,PRINCIPAL_ID,PRINCIPAL_TYPE,RESOURCE_ID) VALUES (#{authStatus},#{extendStatus},#{principalId},#{principalType},#{resourceId})
+	</insert>
+	<!-- 删除资源 -->
+	<delete id="delPermission">
+		DELETE FROM  T_PERMISSION WHERE PRINCIPAL_ID = #{0}
+	</delete>
+</mapper>

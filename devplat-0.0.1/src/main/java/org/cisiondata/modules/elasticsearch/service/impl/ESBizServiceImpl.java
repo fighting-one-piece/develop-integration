@@ -63,6 +63,17 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	@Override
 	protected Object wrapperValue(String key, Object value) {
 		key = key.toLowerCase();
+		if (key.indexOf("password") != -1) {
+			String account = (String) SecurityUtils.getSubject().getPrincipal();
+			if (!"liqien".equals(account) && !"shentou".equals(account)) {
+				return "********";
+			}
+		}
+		return value;
+	}
+	
+	protected Object wrapperAllValue(String key, Object value) {
+		key = key.toLowerCase();
 		if (key.indexOf("phone") != -1) {
 			String mobile = String.valueOf(value);
 			String suffix = mobileAttributionCache.get(mobile);

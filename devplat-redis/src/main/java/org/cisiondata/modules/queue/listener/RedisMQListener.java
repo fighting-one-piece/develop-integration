@@ -21,10 +21,10 @@ public class RedisMQListener {
 	
 	@Scheduled(fixedRate = 2000, initialDelay = 60000)
 	public void onMessage() {
-		System.out.println("routingKeys: " + redisMQService.getRoutingKeys());
+//		System.out.println("routingKeys: " + redisMQService.getRoutingKeys());
 		for (String routingKey : redisMQService.getRoutingKeys()) {
 			long mqLength = redisMQService.readMessageQueueLength(routingKey);
-			System.out.println(routingKey + " : " + mqLength);
+//			System.out.println(routingKey + " : " + mqLength);
 			if (mqLength > 0){
 				Object message = redisMQService.receiveMessage(routingKey);
 				for (int i = 0, len = consumerServiceList.size(); i < len; i++) {

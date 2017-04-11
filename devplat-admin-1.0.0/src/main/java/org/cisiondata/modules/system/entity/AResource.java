@@ -1,6 +1,6 @@
 package org.cisiondata.modules.system.entity;
 
-public class Resource extends org.cisiondata.modules.auth.entity.Resource {
+public class AResource extends org.cisiondata.modules.auth.entity.Resource {
 
 	private static final long serialVersionUID = 1L;
 	

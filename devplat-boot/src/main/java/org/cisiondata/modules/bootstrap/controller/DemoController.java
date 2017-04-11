@@ -1,8 +1,8 @@
-package org.cisiondata.modules.boot.controller;
+package org.cisiondata.modules.bootstrap.controller;
 
 import javax.annotation.Resource;
 
-import org.cisiondata.modules.boot.config.JDBCConfiguration;
+import org.cisiondata.modules.bootstrap.config.JDBCConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;

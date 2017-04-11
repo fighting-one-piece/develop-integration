@@ -173,11 +173,11 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		String interfaceUrl = path.replaceAll("/+", "/").replaceAll("^/app", "").replaceAll("^/ext", "");
 		ObjectMethodParams omp = UrlMappingStorage.getObjectMethod(interfaceUrl, requestMethod);
 		if (omp == null) {
-			return wrapperFailureWebResult(ResultCode.URL_ERROR, "No mapping found for HTTP request with URI " + path);
+			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR, "No mapping found for HTTP request with URI " + path);
 		}
 		Method method = omp.getMethod();
 		if (method == null) {
-			return wrapperFailureWebResult(ResultCode.URL_ERROR, "No mapping found for HTTP request with URI " + path);
+			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR, "No mapping found for HTTP request with URI " + path);
 		}
 		try {
 			ParameterBinder parameterBinder = new ParameterBinder(ctx);
@@ -214,12 +214,12 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			HttpServletResponse response) throws UnsupportedEncodingException {
 		ObjectMethodParams omp = UrlMappingStorage.getObjectMethod(interfaceUrl);
 		if (omp == null) {
-			return wrapperFailureWebResult(ResultCode.URL_ERROR, 
+			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR, 
 					"No mapping found for HTTP request with URI " + interfaceUrl);
 		}
 		Method method = omp.getMethod();
 		if (method == null) {
-			return wrapperFailureWebResult(ResultCode.URL_ERROR, 
+			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR, 
 					"No mapping found for HTTP request with URI " + interfaceUrl);
 		}
 		try {

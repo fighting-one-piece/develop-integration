@@ -13,5 +13,25 @@ public interface IAdminUserService {
 	 * @return
 	 */
 	public QueryResult<AdminUser> findAdminUsersByPage(Integer page,Integer pageSize) throws BusinessException;
-	
+	/**
+	 * 新增用户
+	 * @param adminUser
+	 * @return
+	 * @throws BusinessException
+	 */
+	public boolean addAdminUser(AdminUser adminUser)throws BusinessException;
+	/**
+	 * 根据id修改用户
+	 * @param adminUser
+	 * @return
+	 * @throws BusinessException
+	 */
+	public boolean updateAdminUser(AdminUser user)throws BusinessException;
+	/**
+	 * 根据id删除用户
+	 * @throws BusinessException
+	 */
+	public boolean deleteAdminUser(long id)throws BusinessException;
+
+
 }

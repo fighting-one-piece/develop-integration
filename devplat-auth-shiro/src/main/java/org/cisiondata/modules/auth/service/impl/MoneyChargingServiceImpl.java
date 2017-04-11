@@ -123,7 +123,7 @@ public class MoneyChargingServiceImpl implements IChargingService {
     		} else if (data instanceof String) {
     			dataCount =  1;
     		}
-		} else if (resultCode == ResultCode.NOT_BINDING_QQ.getCode()) {
+		} else if (resultCode == 601) {
 			dataCount =  1;
 		}
 		return null == codeMoneyMap.get(resultCode) ? 0 : codeMoneyMap.get(resultCode) * dataCount;

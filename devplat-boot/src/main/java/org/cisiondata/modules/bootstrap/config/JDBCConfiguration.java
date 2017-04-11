@@ -1,4 +1,4 @@
-package org.cisiondata.modules.boot.config;
+package org.cisiondata.modules.bootstrap.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;

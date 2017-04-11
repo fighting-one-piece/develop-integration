@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.user.dao.RoleUserDAO">
+
+	<resultMap type="org.cisiondata.modules.user.entity.RoleUser"
+		id="roleResultMap">
+		<id property="Roleid" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="identity" column="IDENTITY" />
+		<result property="desc" column="DESCRIPTION" />
+		<result property="deleteFlag" column="DELETE_FLAG" />
+	</resultMap>
+	<!-- 中间表 -->
+	<resultMap type="org.cisiondata.modules.user.entity.AUserRole"
+		id="roleUserMap">
+		<result property="auser" column="USER_ID" />
+		<result property="arole" column="ROLE_ID" />
+		<result property="priority" column="PRIORITY" />
+	</resultMap>
+	<!-- 新增角色 -->
+	<insert id="addRole" parameterType="org.cisiondata.modules.user.entity.RoleUser">
+		INSERT INTO T_ROLE(NAME,IDENTITY,DESCRIPTION,DELETE_FLAG) VALUES (#{name},#{identity},#{desc},#{deleteFlag})
+	</insert>
+	<!-- 查询角色是否存在 -->
+	<select id="selRoleByName" parameterType="String" resultType="int">
+		SELECT count(*) FROM T_ROLE WHERE NAME = #{name}
+	</select>
+	<!-- 查询所有角色 -->
+	<select id="selRole" resultMap="roleResultMap">
+		SELECT * FROM T_ROLE WHERE DELETE_FLAG = 0
+	</select>
+	<!-- 分页查询所有角色 -->
+	<select id="selRoleByPage" resultMap="roleResultMap">
+		SELECT * FROM T_ROLE WHERE DELETE_FLAG = 0 LIMIT #{0},#{1}
+	</select>
+	<!-- 删除角色 -->
+	<update id="updateRoleByFlag" parameterType="String">
+		UPDATE T_ROLE SET DELETE_FLAG = 1 WHERE NAME = #{name}
+	</update>
+	<!-- 修改角色 -->
+	<update id="updateRole" parameterType="map">
+		UPDATE T_ROLE SET 
+		<if test="name != null and name != ''">NAME=#{name}</if>
+		<if test="identity != null and identity != ''">IDENTITY=#{identity}</if>
+		<if test="desc != null and desc != ''">DESCRIPTION=#{desc}</if>
+		WHERE ID = #{id}
+	</update>
+</mapper>

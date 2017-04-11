@@ -88,7 +88,7 @@ public class CountChargingServiceImpl implements IChargingService {
     		} else if (data instanceof String) {
     			return 1;
     		}
-		} else if (resultCode == ResultCode.NOT_BINDING_QQ.getCode()) {
+		} else if (resultCode == 601) {
 			return 1;
 		}
     	return 0;

@@ -10,9 +10,7 @@ import org.cisiondata.modules.abstr.entity.Query;
 import org.cisiondata.modules.auth.dao.UserDAO;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.user.dao.AdminUserDAO;
-import org.cisiondata.modules.user.dao.TestInfoDAO;
 import org.cisiondata.modules.user.entity.AdminUser;
-import org.cisiondata.modules.user.entity.TestInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -47,8 +45,7 @@ public class AuthenticationDAOTest {
 		params.put("begin", 1);
 		params.put("pageSize", 3);
 		List<AdminUser> list = adminUserDAO.findByCondition(params);
-		System.out.println(111);
-
+		System.out.println(list);
 	}
 
 	

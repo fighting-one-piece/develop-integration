@@ -16,7 +16,7 @@
 	
 	<!-- 查询 -->
 	<select id="findByCondition" parameterType="map" resultMap="AdminUserModelMap">
-		select ACCOUNT,PASSWORD,IDENTITY,NICK_NAME,SALT,MOBILE_PHONE,DELETE_FLAG from T_ADMIN_USER 
+		select ID,ACCOUNT,PASSWORD,IDENTITY,NICK_NAME,SALT,MOBILE_PHONE,DELETE_FLAG from T_ADMIN_USER 
 		<where>
     		<if test="id != null">ID=#{id}</if>
     		<if test="account != null and account != ''">and ACCOUNT=#{account}</if>
@@ -75,5 +75,8 @@
 		values
 		(#{account},#{password},#{identity},#{nickName},#{salt},#{mobilePhone},#{deleteFlag})
 	</insert>
-	
+	<!--根据id删除  -->
+	<update id="deleteAdminUserById" parameterType="org.cisiondata.modules.user.entity.AdminUser">
+		 	update T_ADMIN_USER set DELETE_FLAG=1 where id=#{id}
+	</update>	
 </mapper>

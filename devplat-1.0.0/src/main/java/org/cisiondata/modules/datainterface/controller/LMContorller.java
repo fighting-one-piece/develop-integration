@@ -9,9 +9,7 @@ import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.datainterface.service.ILMInternetService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class LMContorller {
@@ -29,8 +27,8 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(mapdata);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -45,16 +43,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/ExecutedPeopleB", method = RequestMethod.GET)
-	public ModelAndView ExecutedPeople() {
-		return new ModelAndView("lemoncome/executedPeoleB");
-	}
 	//39、学历查询（F机构）
 	@ResponseBody
 	@RequestMapping(value = "/education/organizeF")
@@ -66,17 +60,11 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
-	
-	@RequestMapping(value = "/educationf", method = RequestMethod.GET)
-	public ModelAndView lemonEducationf() {
-		return new ModelAndView("lemoncome/lemoneducationf");
-	}
-	
 	
 	// 38、信贷综合信息查询
 	@ResponseBody
@@ -88,16 +76,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(map);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
-	@RequestMapping(value = "/loanInfo",method = RequestMethod.GET)
-	public ModelAndView lemonLoanInfo(){
-		return new ModelAndView("lemoncome/loanInfo");
-	}
-	
+
 	//46、反欺诈黑名单验证
 	@ResponseBody
 	@RequestMapping(value = "/audit/phone")
@@ -108,17 +92,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 	
-	@RequestMapping(value = "/audit", method = RequestMethod.GET)
-	public ModelAndView lemonaudit() {
-		return new ModelAndView("lemoncome/auditphone");
-	}
-
 	// 37、学历查询（D机构）
 	@ResponseBody
 	@RequestMapping(value = "/education/organizeD")
@@ -129,16 +108,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 	
-	@RequestMapping(value = "/education", method = RequestMethod.GET)
-	public ModelAndView lemonEducation() {
-		return new ModelAndView("lemoncome/lemoneducation");
-	}
 
 	//36、搜索黑名单
 	@ResponseBody
@@ -151,16 +126,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 	
-	@RequestMapping(value = "/blacklistsearch", method = RequestMethod.GET)
-	public ModelAndView blacklistsearch() {
-		return new ModelAndView("lemoncome/blacklistsearch");
-	}
 	
 	// 35数信网黑名单
 	@ResponseBody
@@ -172,16 +143,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/blacklistLoanPlatform", method = RequestMethod.GET)
-	public ModelAndView lemonBlackList() {
-		return new ModelAndView("lemoncome/blacklist");
-	}
 
 	// 34多次申请记录查询C
 	@ResponseBody
@@ -193,16 +160,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/plat", method = RequestMethod.GET)
-	public ModelAndView multPlatfrom() {
-		return new ModelAndView("lemoncome/multiplatfrom");
-	}
 
 	// 33网络公开逾期信息
 	@ResponseBody
@@ -214,16 +177,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "overdue", method = RequestMethod.GET)
-	public ModelAndView loanOverdue() {
-		return new ModelAndView("lemoncome/loanoverdue");
-	}
 
 	// 32 合作机构共享黑名单
 	@ResponseBody
@@ -235,16 +194,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "blacklist", method = RequestMethod.GET)
-	public ModelAndView blackListCheat() {
-		return new ModelAndView("lemoncome/blacklistcheat");
-	}
 
 	// 31网络负面信息
 	@ResponseBody
@@ -256,16 +211,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/internetNegative", method = RequestMethod.GET)
-	public ModelAndView lemonNegative() {
-		return new ModelAndView("lemoncome/internetNegative");
-	}
 
 	// 30赌博吸毒名单
 	@ResponseBody
@@ -277,16 +228,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/lemonGamblingDrug")
-	public ModelAndView nameidcheck() {
-		return new ModelAndView("lemoncome/lemonGamblingDrug");
-	}
 
 	// 29 多次申请记录查询 B
 	@ResponseBody
@@ -298,16 +245,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/repeatedlyInquire", method = RequestMethod.GET)
-	public ModelAndView lemonInquire() {
-		return new ModelAndView("lemoncome/repeatedlyInquire");
-	}
 
 	// 28 多次申请记录查询 A
 	@ResponseBody
@@ -319,15 +262,10 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
-	}
-
-	@RequestMapping(value = "/repeatedlyInquireA", method = RequestMethod.GET)
-	public ModelAndView lemonInquireA() {
-		return new ModelAndView("lemoncome/repeatedlyInquireA");
 	}
 
 	// 27 银行、 P2P 逾期记录
@@ -340,16 +278,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/P2POverdue", method = RequestMethod.GET)
-	public ModelAndView P2P() {
-		return new ModelAndView("lemoncome/P2POverdue");
-	}
 
 	// 26法院被执行人记录
 	@ResponseBody
@@ -361,16 +295,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/CourtEnforce", method = RequestMethod.GET)
-	public ModelAndView CourtEnforce() {
-		return new ModelAndView("lemoncome/CourtEnforce");
-	}
 
 	// 25 手机号标签查询
 	@ResponseBody
@@ -382,16 +312,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/phoneTagQuery", method = RequestMethod.GET)
-	public ModelAndView phoneTagQuery() {
-		return new ModelAndView("lemoncome/phoneTagQuery");
-	}
 
 	// 24地址验证
 	@ResponseBody
@@ -405,16 +331,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/addressProve", method = RequestMethod.GET)
-	public ModelAndView address() {
-		return new ModelAndView("lemoncome/addressProve");
-	}
 
 	// 23 百度消费金融评分查询
 	@ResponseBody
@@ -428,16 +350,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/baiduQuery", method = RequestMethod.GET)
-	public ModelAndView baiduIntegralQuery() {
-		return new ModelAndView("lemoncome/baiduFinancialQuery");
-	}
 
 	// 22申请数据查询
 	@ResponseBody
@@ -449,16 +367,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/dataApply")
-	public ModelAndView applyDatascats() {
-		return new ModelAndView("lemoncome/ApplyDatas");
-	}
 
 	// 21柠檬黑名单查询
 	@ResponseBody
@@ -470,16 +384,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/Blacklistcat")
-	public ModelAndView blacklistcat() {
-		return new ModelAndView("lemoncome/blacklistion");
-	}
 
 	// 20可疑人员信息查询
 	@ResponseBody
@@ -491,16 +401,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "suspiciouscat")
-	public ModelAndView SuspiciousPersons() {
-		return new ModelAndView("lemoncome/suspiciousPersons");
-	}
 
 	// 19欺诈案件信息查询
 	@ResponseBody
@@ -512,16 +418,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "Fraudulentcat")
-	public ModelAndView fraudulentInFormation() {
-		return new ModelAndView("lemoncome/FraudulentInformation");
-	}
 
 
 	// 18、 银行卡消费信息查询1
@@ -534,8 +436,8 @@ public class LMContorller {
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
 			} catch (Exception e) {
-				result.setCode(ResultCode.FAILURE.getCode());
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			}
 			return result;
 		}
@@ -550,8 +452,8 @@ public class LMContorller {
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
 			} catch (Exception e) {
-				result.setCode(ResultCode.FAILURE.getCode());
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			}
 			return result;
 		}
@@ -566,8 +468,8 @@ public class LMContorller {
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
 			} catch (Exception e) {
-				result.setCode(ResultCode.FAILURE.getCode());
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			}
 			return result;
 		}
@@ -582,8 +484,8 @@ public class LMContorller {
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
 			} catch (Exception e) {
-				result.setCode(ResultCode.FAILURE.getCode());
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			}
 			return result;
 		}
@@ -598,8 +500,8 @@ public class LMContorller {
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData(data);
 			} catch (Exception e) {
-				result.setCode(ResultCode.FAILURE.getCode());
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			}
 			return result;
 		}
@@ -619,16 +521,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "verify")
-	public ModelAndView phoneIsInBlacklist() {
-		return new ModelAndView("lemoncome/PhoneIsInBlacklist");
-	}
 
 	// 16、通信小号
 
@@ -642,16 +540,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/NameQueryinfo", method = RequestMethod.GET)
-	public ModelAndView lemonPhone() {
-		return new ModelAndView("lemoncome/mobileOperatorNameQuery");
-	}
 
 	// 14、手机号绑定银行卡信息查询
 	@ResponseBody
@@ -663,16 +557,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/phoneBankCardinfo", method = RequestMethod.GET)
-	public ModelAndView queryPhoneBankCardBindInfo() {
-		return new ModelAndView("lemoncome/phoneBankCardBindInfo");
-	}
 
 	// 13、手机号绑定银行卡账动信息查询(只支持移动)
 	@ResponseBody
@@ -684,16 +574,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/lemonphoneactive", method = RequestMethod.GET)
-	public ModelAndView lemonPhoneActive() {
-		return new ModelAndView("lemoncome/lemonPhoneActive");
-	}
 
 	// 12、手机号绑定银行卡还款情况查询(只支持移动)
 	@ResponseBody
@@ -705,16 +591,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/lemonphoneinfo", method = RequestMethod.GET)
-	public ModelAndView readQueryLoadInfo() {
-		return new ModelAndView("lemoncome/lemonPhoneLoadInfo");
-	}
 
 	// 11、手机号绑定银行卡出入账查询(只支持移动)
 	@ResponseBody
@@ -726,16 +608,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/lemonphonelines", method = RequestMethod.GET)
-	public ModelAndView photoQuery1() {
-		return new ModelAndView("lemoncome/lemonPhoneLines");
-	}
 
 	// 10、手机号当前状态查询(只支持移动)
 	@ResponseBody
@@ -747,16 +625,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/lemonphonetime", method = RequestMethod.GET)
-	public ModelAndView lemonPhone1() {
-		return new ModelAndView("lemoncome/lemonPhoneTime");
-	}
 
 	// 9、手机号在网时长查
 	@ResponseBody
@@ -768,16 +642,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/lemonphone", method = RequestMethod.GET)
-	public ModelAndView lemonPhone2() {
-		return new ModelAndView("lemoncome/lemonPhone");
-	}
 
 	// 8、身份证照片查询
 	@ResponseBody
@@ -789,16 +659,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/idphoto", method = RequestMethod.GET)
-	public ModelAndView lemonIdPhoto() {
-		return new ModelAndView("lemoncome/lemonIdPhoto");
-	}
 
 	// 7、学历查询
 //	@ResponseBody
@@ -811,8 +677,8 @@ public class LMContorller {
 //			result.setCode(ResultCode.SUCCESS.getCode());
 //			result.setData(data);
 //		} catch (Exception e) {
-//			result.setCode(ResultCode.FAILURE.getCode());
-//			result.setFailure(e.getMessage());
+//			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+//			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 //		}
 //		return result;
 //	}
@@ -832,16 +698,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "nameidcat")
-	public ModelAndView bankcard2item() {
-		return new ModelAndView("lemoncome/namePhoneId");
-	}
 
 	// 5、姓名-身份证号-照片三维校验
 	@ResponseBody
@@ -853,16 +715,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "nameIDPhoto3Dcat")
-	public ModelAndView idNameImageCheck() {
-		return new ModelAndView("lemoncome/nameIDphoto3D");
-	}
 
 	// 4、姓名-身份证号-手机号-银行卡号一致性校验
 	@ResponseBody
@@ -874,16 +732,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "nameidphonebankcat")
-	public ModelAndView nameIdphone() {
-		return new ModelAndView("lemoncome/nameIdphoneBanks");
-	}
 
 	// 3、姓名-身份证号-手机号一致性校验
 	@ResponseBody
@@ -895,16 +749,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "namephonection")
-	public ModelAndView idNamePhoneCheck() {
-		return new ModelAndView("lemoncome/nameIDs");
-	}
 
 	// 2、姓名-身份证号-银行卡号一致性校验
 
@@ -917,16 +767,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "nameIdCardAccountVerify")
-	public ModelAndView nameIdCardAccountVerify() {
-		return new ModelAndView("lemoncome/nameIdCardAccountVerify");
-	}
 
 	// 2、M姓名-身份证号-银行卡号一致性校验
 	@ResponseBody
@@ -938,16 +784,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "accountVerifyM")
-	public ModelAndView AccountVerifyM() {
-		return new ModelAndView("lemoncome/nameIdCardAccountVerifyM");
-	}
 
 	// 2、F姓名-身份证号-银行卡号一致性校验
 	@ResponseBody
@@ -959,16 +801,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "accountVerifyF")
-	public ModelAndView AccountVerifyF() {
-		return new ModelAndView("lemoncome/nameIdCardAccountVerifyF");
-	}
 	// 1、姓名-身份证号一致性校验
 	@ResponseBody
 	@RequestMapping(value = "/idName/Check")
@@ -979,21 +817,12 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 
-	@RequestMapping(value = "/checknameid")
-	public ModelAndView idNameCheck() {
-		return new ModelAndView("lemoncome/NameIdCheck");
-	}
-	
-	@RequestMapping(value="lemoncome",method=RequestMethod.GET)
-	public ModelAndView lemon() {
-		return new ModelAndView("lemoncome/lemon");
-	}
 	
 	
 	// 众多接口
@@ -1006,20 +835,10 @@ public class LMContorller {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
-	}
-	//众多接口
-	@RequestMapping(value="RelationalQuery",method=RequestMethod.GET)
-	public ModelAndView RelationalQuery() {
-		return new ModelAndView("lemoncome/RelationalQuery");
-	}
-	//银行数据分析页面
-	@RequestMapping(value="lemonBank",method=RequestMethod.GET)
-	public ModelAndView LemonBankCard(){
-		return new ModelAndView("lemoncome/lemonBankCard");
 	}
 	
 }

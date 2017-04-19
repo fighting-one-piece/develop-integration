@@ -3,12 +3,11 @@ package org.cisiondata.modules.user.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.cisiondata.modules.user.entity.AdminUser;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
-
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 @Repository("aadminUserDAO")
 public interface AdminUserDAO {
@@ -46,7 +45,10 @@ public interface AdminUserDAO {
 	 * @param adminUser
 	 * @throws DataAccessException
 	 */
-	public int deleteAdminUserById(long id)throws DataAccessException;
-	
+	public int deleteAdminUserById(@Param("id") Long id,@Param("deleteFlag") Long deleteFlag )throws DataAccessException;
+	/**
+	 * 根据id查询
+	 */
+	public int querydeleteFlagById(Long id);
 	
 }

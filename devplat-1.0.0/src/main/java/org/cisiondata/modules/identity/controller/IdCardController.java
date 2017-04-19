@@ -27,8 +27,8 @@ public class IdCardController {
 			result.setCode(bu.getCode());
 			result.setFailure(bu.getDefaultMessage());
 		}  catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}

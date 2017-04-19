@@ -142,7 +142,7 @@ public interface IESBizService extends IESService {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public List<Map<String, Object>> readLogisticsFilterDataLists(String query) throws BusinessException;
+	public List<Map<String, Object>> seleLogisticsFilterDataLists(String query) throws BusinessException;
 	
 	/**
 	 * 根据条件读取物流关系数据列表

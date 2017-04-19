@@ -60,12 +60,24 @@
 		<filter-class>org.cisiondata.modules.auth.web.filter.JCaptchaFilter</filter-class>
 		<async-supported>true</async-supported>
 	</filter>
-
+	
 	<filter-mapping>
-		<filter-name>jCaptchaFilter</filter-name>
-		<url-pattern>/jcaptcha.jpg</url-pattern>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
+	<!-- 
+	<filter>
+		<filter-name>AdminUserAccessFilter</filter-name>
+		<filter-class>org.cisiondata.modules.auth.web.filter.AdminUserAccessFilter</filter-class>
+		<async-supported>true</async-supported>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>AdminUserAccessFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	 -->
 	<filter>
         <filter-name>hiddenHttpMethodFilter</filter-name>
         <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>

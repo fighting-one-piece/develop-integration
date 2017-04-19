@@ -12,6 +12,9 @@ public class TokenUtils {
 	/** 授权KEY*/
 	public static final String AUTHORIZATION = "authorization";
 	
+	/** admin认证KEY*/
+	public static final String ADMIN_AUTHENTICATION = "adminauthentication";
+	
 	/**
 	 * MD5摘要
 	 * @param params
@@ -113,6 +116,34 @@ public class TokenUtils {
 	public static boolean isAuthorizationMD5Token(String token, String... params) {
 		return token.equals(genAuthorizationMD5Token(params)) ? true : false;
 	}
+	
+	/**
+	 * admin认证MD5摘要
+	 * @param params
+	 * @return
+	 */
+	public static String genAdminAuthenticationMD5Token(String... params) {
+		if (null == params || params.length == 0) return "";
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0, len = params.length; i < len; i++) {
+			sb.append(params[i]);
+		}
+		sb.append(ADMIN_AUTHENTICATION);
+		return MD5Utils.hash(SHAUtils.SHA512(sb.toString()));
+    }
+	
+	/**
+	 * 验证是否是admin认证Token
+	 * @param token
+	 * @param params
+	 * @return
+	 */
+	public static boolean isAdminAuthenticationMD5Token(String token, String... params) {
+		return token.equals(genAdminAuthenticationMD5Token(params)) ? true : false;
+	}
+	
+	
+	
 	
 	public static void main(String[] args) {
 		String account = "test";

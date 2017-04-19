@@ -36,11 +36,28 @@
         <result property="createTime" column="CREATE_TIME"/> 
         <result property="expireTime" column="EXPIRE_TIME"/> 
         <result property="deleteFlag" column="DELETE_FLAG"/> 
+        <collection property="attributes" column="ID" ofType="UserAttribute" 
+        	javaType="ArrayList" select="readAttributesByUserId">
+        </collection>
+    </resultMap>
+    
+    <resultMap type="UserAttribute" id="userAttributeResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="userId" column="USER_ID"/>
+        <result property="key" column="KEY"/>
+        <result property="value" column="VALUE"/>  
+        <result property="type" column="TYPE"/>  
     </resultMap>
     
     <sql id="columnClause">
     	ID, ACCOUNT, PASSWORD, SALT, IDENTITY, NICK_NAME, REAL_NAME, ID_CARD, 
     	MOBILE_PHONE, MAC_ADDRESS, EMAIL, STATUS, CREATE_TIME, EXPIRE_TIME, DELETE_FLAG
+    </sql>
+    
+    <sql id="columnClauseWithAttributes">
+    	U.ID, U.ACCOUNT, U.PASSWORD, U.SALT, U.IDENTITY, U.NICK_NAME, U.REAL_NAME, U.ID_CARD, 
+    	U.MOBILE_PHONE, U.MAC_ADDRESS, U.EMAIL, U.STATUS, U.CREATE_TIME, U.EXPIRE_TIME, U.DELETE_FLAG,
+    	UA.USER_ID, UA.KEY, UA.VALUE, UA.TYPE
     </sql>
     
     <sql id="whereClause">

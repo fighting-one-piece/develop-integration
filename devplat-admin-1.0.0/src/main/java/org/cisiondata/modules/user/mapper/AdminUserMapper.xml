@@ -76,7 +76,12 @@
 		(#{account},#{password},#{identity},#{nickName},#{salt},#{mobilePhone},#{deleteFlag})
 	</insert>
 	<!--根据id删除  -->
-	<update id="deleteAdminUserById" parameterType="org.cisiondata.modules.user.entity.AdminUser">
-		 	update T_ADMIN_USER set DELETE_FLAG=1 where id=#{id}
+	<update id="deleteAdminUserById" >
+		update T_ADMIN_USER set DELETE_FLAG=#{deleteFlag} where ID=#{id}
 	</update>	
+	
+	<!--根据id查询  -->
+	<select id="querydeleteFlagById" resultType="int">
+		SELECT DELETE_FLAG FROM T_ADMIN_USER WHERE ID=#{id}
+	</select>
 </mapper>

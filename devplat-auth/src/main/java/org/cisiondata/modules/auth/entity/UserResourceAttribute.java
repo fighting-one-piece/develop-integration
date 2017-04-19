@@ -48,6 +48,30 @@ public class UserResourceAttribute extends PKAutoEntity<Long> {
 	public void setValue(String value) {
 		this.value = value;
 	}
+
+	public Long getUserResourceId() {
+		return userResourceId;
+	}
+
+	public void setUserResourceId(Long userResourceId) {
+		this.userResourceId = userResourceId;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public UserResource getUserResource() {
+		return userResource;
+	}
+
+	public void setUserResource(UserResource userResource) {
+		this.userResource = userResource;
+	}
 	
 	
 

@@ -144,7 +144,7 @@ public class ESController {
 		LOG.info("query:{}", query);
 		WebResult result = new WebResult();
 		try {
-			Object data = esBizService.readLogisticsFilterDataLists(query);
+			Object data = esBizService.seleLogisticsFilterDataLists(query);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} 

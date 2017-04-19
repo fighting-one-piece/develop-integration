@@ -42,5 +42,7 @@
 		<property name="maxRedirections" value="${redis.cluster.maxRedirections}" />
 		<property name="genericObjectPoolConfig" ref="genericObjectPoolConfig" />
 	</bean>
+	
+	<bean id="redisMQListener" class="org.cisiondata.modules.queue.listener.RedisMQListener" />
 
 </beans>

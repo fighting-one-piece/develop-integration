@@ -11,10 +11,10 @@ import org.cisiondata.utils.exception.BusinessException;
 public interface IUserService {
 	
 	//通过账号添加个人信息
-	public String updateUserSetting(String realName,String mobilePhone,
+	public Map<String, String> updateUserSetting(String realName,String mobilePhone,
 			String newPassword,String verificationCode,HttpServletRequest request)throws BusinessException;
 	//通过账号添加密保
-	public String updateUserSecurity(String question,String answer)throws BusinessException;
+	public Map<String, String> updateUserSecurity(String question,String answer)throws BusinessException;
 	//查询密保问题
 	public List<String> findSecurity() throws BusinessException;
 	//获取用户密保问题

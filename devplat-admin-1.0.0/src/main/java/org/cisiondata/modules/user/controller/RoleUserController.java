@@ -56,11 +56,11 @@ public class RoleUserController {
 
 	@ResponseBody
 	@RequestMapping(value = "/delRole", method = RequestMethod.POST)
-	public WebResult updateRoleByFlag(String name) {
+	public WebResult updateRoleByFlag(int id,Boolean deleteFlag) {
 		WebResult result = new WebResult();
 		try {
 			result.setCode(ResultCode.SUCCESS.getCode());
-			result.setData(roleService.updateRoleByFlag(name));
+			result.setData(roleService.updateRoleByFlag(id,deleteFlag));
 		} catch (BusinessException bu) {
 			result.setCode(bu.getCode());
 			result.setData(bu.getDefaultMessage());
@@ -89,23 +89,6 @@ public class RoleUserController {
 	}
 	@ResponseBody
 	@RequestMapping(value="/tree",method = RequestMethod.GET)
-	public WebResult selResource(){
-		WebResult result = new WebResult();
-		try {
-			result.setCode(ResultCode.SUCCESS.getCode());
-			result.setData(resourceService.selResource());
-		}catch(BusinessException bu){
-			result.setCode(bu.getCode());
-			result.setData(bu.getDefaultMessage());
-		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
-		}
-		return result;
-	}
-	
-	@ResponseBody
-	@RequestMapping(value="/permissionstatus",method = RequestMethod.GET)
 	public WebResult selResourceById(Long roleId){
 		WebResult result = new WebResult();
 		try {
@@ -136,4 +119,22 @@ public class RoleUserController {
 		}
 		return result;
 	}
+	@ResponseBody
+	@RequestMapping(value="/addUserRoles",method = RequestMethod.POST)
+	public WebResult addUserRoles(Long role_id,String user_id ,String  priority){
+		WebResult result = new WebResult();
+		try {
+			result.setCode(ResultCode.SUCCESS.getCode());
+			result.setData(roleService.addUserRoles(role_id, user_id ,priority));
+		}catch(BusinessException bu){
+			result.setCode(bu.getCode());
+			result.setData(bu.getDefaultMessage());
+		} catch (Exception e) {
+			result.setCode(ResultCode.FAILURE.getCode());
+			result.setFailure(e.getMessage());
+		}
+		return result;
+		
+	}
+	
 }

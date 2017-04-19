@@ -9,6 +9,13 @@
 
 	<name>DevPlat Boot Project</name>
 	<url>http://maven.apache.org</url>
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-parent</artifactId>
+	    <version>1.5.2.RELEASE</version>
+	    <relativePath/>
+	</parent>
 
 	<repositories>
 		<repository>
@@ -22,13 +29,25 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-			
+		
 		<repository> 
             <id>maven-restlet</id> 
             <name>Public Online Restlet Repository</name> 
             <url>http://maven.restlet.org</url> 
         </repository> 
+        
+         <repository>
+            <id>spring-milestone</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
 	</repositories>
+	
+	<pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestone</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -47,54 +66,39 @@
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter</artifactId>
-		    <version>${spring.boot.starter}</version>
 		</dependency>
-		
-		<!--  
-		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-parent</artifactId>
-		    <version>${spring.boot.starter.parent}</version>
-		</dependency>
-		-->
 		
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-web</artifactId>
-		    <version>${spring.boot.starter.web}</version>
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-test</artifactId>
-		    <version>${spring.boot.starter.test}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
-		    <version>${spring.boot.starter.jdbc}</version>
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-actuator</artifactId>
-		    <version>${spring.boot.starter.actuator}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-			<version>${spring.boot.starter.thymeleaf}</version>
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-configuration-processor</artifactId>
-		    <version>${spring.boot.configuration.processor}</version>
 		</dependency>
 		
-		<!--Mybatis -->
+		<!-- Mybatis依赖包-->
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis-spring</artifactId>
@@ -107,27 +111,83 @@
 			<version>3.4.0</version>
 		</dependency>
 		
-		<!--Mysql -->
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-jdbc</artifactId>
-			<version>8.5.11</version>
-		</dependency>
-		
+		<!-- Mysql依赖包-->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.38</version>
 		</dependency>
-		
-		<!--Json Support -->
+		<!--  
 		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>1.1.43</version>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+		</dependency>
+		-->
+		
+		<!--Commons Lang依赖包 -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+
+		<!-- Slf4j依赖包 -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 		
-		<!--Swagger support -->
+		<!--  
+		<dependency> 
+			<groupId>org.slf4j</groupId> 
+			<artifactId>slf4j-log4j12</artifactId> 
+			<version>1.7.21</version> 
+		</dependency>
+		-->
+
+		<dependency> 
+			<groupId>org.slf4j</groupId> 
+			<artifactId>jcl-over-slf4j</artifactId> 
+		</dependency>
+
+		<!-- Jackon依赖包 -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		
+		<!-- Gson依赖包 -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		
+		<!-- FastJSON依赖包 -->
+		<dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>fastjson</artifactId>
+		    <version>1.2.22</version>
+		</dependency>
+	
+		<!--DBCP依赖包 -->
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+		</dependency>
+
+		<!-- Javax Persistence依赖包 -->
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		<!-- Swagger依赖包-->
 		<dependency>
 			<groupId>com.mangofactory</groupId>
 			<artifactId>swagger-springmvc</artifactId>

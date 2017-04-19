@@ -31,8 +31,8 @@ public class BankContorller {
 			result.setCode(bu.getCode());
 			result.setFailure(bu.getDefaultMessage());
 		}  catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -51,8 +51,8 @@ public class BankContorller {
 					result.setCode(ResultCode.NOT_FOUNT_DATA.getCode());
 					result.setFailure(bu.getMessage());
 				}catch (Exception e) {
-					result.setCode(ResultCode.FAILURE.getCode());
-					result.setFailure(e.getMessage());
+					result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+					result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 				}
 				return result;
 			}

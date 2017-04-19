@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping(value = "/mobile")
@@ -36,8 +35,8 @@ public class MobileController  {
 			result.setData(mobileNameService.readNameFromMobile(mobile));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -50,8 +49,8 @@ public class MobileController  {
 			result.setData(mobileAddressService.readAddressFromMoblie(mobile));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -64,8 +63,8 @@ public class MobileController  {
 			result.setData(mobileService.readMobileInfo(mobile));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -85,14 +84,10 @@ public class MobileController  {
 			result.setCode(bu.getCode());
 			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
-	}
-	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView toMoblie(){
-		return new ModelAndView("/mobile/mobile");
 	}
 
 }

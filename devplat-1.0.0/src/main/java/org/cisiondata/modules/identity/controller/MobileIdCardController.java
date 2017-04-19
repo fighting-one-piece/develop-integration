@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * 分类查询接受请求
@@ -43,8 +42,8 @@ public class MobileIdCardController {
 			result.setData(mobileIdCardService.readClassifiedQuery(index,type,identity));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			LOG.error(e.getMessage(), e);
 		}
 		return result;
@@ -59,17 +58,11 @@ public class MobileIdCardController {
 			result.setData(mobileIdCardService.readStatisticsAndLabels(identity));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			LOG.error(e.getMessage(), e);
 		}
 		return result;
-	}
-	
-	//未使用
-	@RequestMapping(value ="/identity/labels/s", method = RequestMethod.GET)
-	public ModelAndView toMoblie(){
-		return new ModelAndView("/user/user_phoneCard");
 	}
 	
 }

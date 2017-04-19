@@ -298,6 +298,12 @@ public class ESServiceImpl implements IESService {
 	
 	@Override
 	public List<Map<String, Object>> readDataListByCondition(String index, String type, 
+			QueryBuilder query, int size) throws BusinessException {
+		return readDataList(index, new String[]{type}, query, size, false, true);
+	}
+	
+	@Override
+	public List<Map<String, Object>> readDataListByCondition(String index, String type, 
 			QueryBuilder query, boolean isHighLight) throws BusinessException {
 		return readDataListByCondition(index, new String[]{type}, query, isHighLight);
 	}

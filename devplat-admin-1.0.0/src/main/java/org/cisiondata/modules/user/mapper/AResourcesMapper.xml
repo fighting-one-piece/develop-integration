@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.cisiondata.modules.user.dao.AResourcesDAO">
 
-	<resultMap type="org.cisiondata.modules.user.entity.AResources"
+	<resultMap type="org.cisiondata.modules.user.entity.AResource"
 		id="ResourcestMap">
 		<id property="id" column="ID" />
 		<result property="name" column="NAME" />
@@ -24,20 +24,227 @@
 		<result property="principalType" column="PRINCIPAL_TYPE" />
 		<result property="resourceId" column="RESOURCE_ID" />
 	</resultMap>
+	<resultMap type="org.cisiondata.modules.auth.entity.UserResource"
+		id="AUserResourceModelMap">
+		<id property="id" column="ID" />
+		<result column="USER_ID" property="userId" />
+		<result column="RESOURCE_ID" property="resourceId" />
+		<result column="PRIORITY" property="priority" />
+		<result column="DELETE_FLAG" property="deleteFlag" />
+	</resultMap>
+	<resultMap type="org.cisiondata.modules.user.entity.AUserResource"
+		id="AUserResourceMap">
+		<result column="USER_ID" property="userId" />
+		<result column="ACCOUNT" property="account" />
+		<result column="RESOURCE_ID" property="resourceId" />
+		<result column="RESOURCE_NAME" property="resourceName" />
+		<result column="DELETE_FLAG" property="deleteFlag" />
+	</resultMap>
 	<!-- 查询资源 -->
 	<select id="selResource" resultMap="ResourcestMap">
-		SELECT * FROM T_RESOURCE WHERE PRIORITY = 1
+		SELECT * FROM T_RESOURCE
+		WHERE DELETE_FLAG = 0 AND TYPE = 3
 	</select>
 	<!-- 查询已授权的资源 -->
 	<select id="selResourceById" resultMap="ResourcestMap">
-		SELECT * FROM T_RESOURCE WHERE ID IN (SELECT RESOURCE_ID FROM T_PERMISSION WHERE PRINCIPAL_ID =#{0}) AND PRIORITY = 1
+		SELECT * FROM T_RESOURCE
+		WHERE ID IN (SELECT RESOURCE_ID FROM T_PERMISSION WHERE PRINCIPAL_ID
+		=#{0} AND PRINCIPAL_TYPE = 3) AND DELETE_FLAG = 0 AND TYPE = 3
 	</select>
 	<!-- 保存授权的资源 -->
-	<insert id="addPermission" parameterType="org.cisiondata.modules.user.entity.APermission">
-		INSERT INTO T_PERMISSION (AUTH_STATUS,EXTEND_STATUS,PRINCIPAL_ID,PRINCIPAL_TYPE,RESOURCE_ID) VALUES (#{authStatus},#{extendStatus},#{principalId},#{principalType},#{resourceId})
+	<insert id="addPermission" parameterType="java.util.List">
+		<selectKey resultType="java.lang.Integer" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO T_PERMISSION
+		(AUTH_STATUS,EXTEND_STATUS,PRINCIPAL_ID,PRINCIPAL_TYPE,RESOURCE_ID)
+		VALUES
+		<foreach collection="list" item="APermission" index="index"
+			separator=",">
+			(#{APermission.authStatus},#{APermission.extendStatus},#{APermission.principalId},#{APermission.principalType},#{APermission.resourceId})
+		</foreach>
 	</insert>
 	<!-- 删除资源 -->
 	<delete id="delPermission">
-		DELETE FROM  T_PERMISSION WHERE PRINCIPAL_ID = #{0}
+		DELETE FROM T_PERMISSION WHERE PRINCIPAL_ID = #{0} AND PRINCIPAL_TYPE = 3
 	</delete>
+	
+	
+	<!-- 查询角色已授权资源 -->
+	<select id="selResourceByUr" resultMap="ResourcestMap">
+		SELECT * FROM T_RESOURCE
+		WHERE ID IN (SELECT RESOURCE_ID FROM T_USER_RESOURCE WHERE USER_ID =
+		#{0} AND DELETE_FLAG = 0 AND PRIORITY = 3)
+	</select>
+	
+	<!-- 更新全部删除状态 -->
+	<update id="updateByUser">
+		UPDATE T_USER_RESOURCE SET DELETE_FLAG = 1 WHERE
+		USER_ID = #{0} AND PRIORITY = 3
+	</update>
+	<!-- 新增 -->
+	<insert id="addUserResource" parameterType="java.util.List">
+		<selectKey resultType="java.lang.Integer" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into T_USER_RESOURCE
+		(USER_ID,RESOURCE_ID,PRIORITY)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.userId},#{item.resourceId},#{item.priority})
+		</foreach>
+		on duplicate key update DELETE_FLAG = 0, PRIORITY = 3
+	</insert>
+	<!-- 查询用户资源关系 -->
+	<select id="selByUR" resultMap="AUserResourceMap">
+		SELECT U.ID AS USER_ID,U.ACCOUNT,R.ID AS RESOURCE_ID,R.`NAME` AS RESOURCE_NAME,UR.DELETE_FLAG FROM T_USER U 
+		LEFT JOIN T_USER_RESOURCE UR ON U.ID = UR.USER_ID 
+		LEFT JOIN T_RESOURCE R ON UR.RESOURCE_ID = R.ID 
+		WHERE 
+		U.ID IN (SELECT USER_ID FROM T_USER_RESOURCE) 
+		AND UR.PRIORITY = 3  
+		LIMIT #{0},#{1}
+	</select>
+	<!-- 分页查询总数 -->
+	<select id="selByUrPage" resultMap="AUserResourceMap">
+		SELECT U.ID AS USER_ID,U.ACCOUNT,R.ID AS RESOURCE_ID,R.`NAME` AS RESOURCE_NAME,UR.DELETE_FLAG FROM T_USER U 
+		LEFT JOIN T_USER_RESOURCE UR ON U.ID = UR.USER_ID 
+		LEFT JOIN T_RESOURCE R ON UR.RESOURCE_ID = R.ID 
+		WHERE 
+		U.ID IN (SELECT USER_ID FROM T_USER_RESOURCE) 
+		AND UR.PRIORITY = 3 
+	</select>
+	<!-- 更新是否删除标识 -->
+	<update id="updateURByFlag">
+		UPDATE T_USER_RESOURCE SET
+		DELETE_FLAG = 1 WHERE USER_ID = #{0} AND RESOURCE_ID = #{1} AND PRIORITY = 3
+	</update>
+	<update id="updateURFlag">
+		UPDATE T_USER_RESOURCE SET
+		DELETE_FLAG = 0 WHERE USER_ID = #{0} AND RESOURCE_ID = #{1} AND PRIORITY = 3
+	</update>
+	<!-- 根据账号查询用户定制资源的关系 -->
+	<select id="selUrByName" resultMap="AUserResourceMap">
+		SELECT U.ID AS USER_ID,U.ACCOUNT,R.ID AS RESOURCE_ID,R.`NAME` AS RESOURCE_NAME FROM T_USER U 
+		LEFT JOIN T_USER_RESOURCE UR ON U.ID = UR.USER_ID 
+		LEFT JOIN T_RESOURCE R ON UR.RESOURCE_ID = R.ID 
+		WHERE U.ID = (SELECT ID FROM T_USER WHERE ACCOUNT = #{0}) 
+		AND UR.PRIORITY = 3 
+		LIMIT #{1},#{2}
+	</select>
+	<!-- 分页查询总数 -->
+	<select id="selUrByPage" resultMap="AUserResourceMap">
+		SELECT U.ID AS USER_ID,U.ACCOUNT,R.ID AS RESOURCE_ID,R.`NAME` AS RESOURCE_NAME FROM T_USER U 
+		LEFT JOIN T_USER_RESOURCE UR ON U.ID = UR.USER_ID 
+		LEFT JOIN T_RESOURCE R ON UR.RESOURCE_ID = R.ID 
+		WHERE U.ID = (SELECT ID FROM T_USER WHERE ACCOUNT = #{0}) 
+		AND UR.PRIORITY = 3 
+	</select>
+	
+	<!-- API -->
+	<!-- 查询资源API -->
+	<select id="selApiResource" resultMap="ResourcestMap">
+		SELECT * FROM T_RESOURCE
+		WHERE  TYPE = 5
+	</select>
+	<!-- 查询已授权的资源API -->
+	<select id="selApiResourceById" resultMap="ResourcestMap">
+		SELECT * FROM T_RESOURCE
+		WHERE ID IN (SELECT RESOURCE_ID FROM T_PERMISSION WHERE PRINCIPAL_ID
+		=#{0} AND PRINCIPAL_TYPE = 5) AND TYPE = 5
+	</select>
+	<!-- 删除资源API -->
+	<delete id="delApiPermission">
+		DELETE FROM T_PERMISSION WHERE PRINCIPAL_ID = #{0} AND PRINCIPAL_TYPE = 5
+	</delete>
+	
+	<!-- 查询API用户资源关系 -->
+	<select id="selByApiUR" resultMap="AUserResourceMap">
+		SELECT U.ID AS USER_ID,U.ACCOUNT,R.ID AS RESOURCE_ID,R.`NAME` AS RESOURCE_NAME,UR.DELETE_FLAG FROM T_USER U 
+		LEFT JOIN T_USER_RESOURCE UR ON U.ID = UR.USER_ID 
+		LEFT JOIN T_RESOURCE R ON UR.RESOURCE_ID = R.ID 
+		WHERE 
+		U.ID IN (SELECT USER_ID FROM T_USER_RESOURCE) 
+		AND UR.PRIORITY = 5 
+		LIMIT #{0},#{1}
+	</select>
+	<!-- 分页API查询总数 -->
+	<select id="selByApiUrPage" resultMap="AUserResourceMap">
+		SELECT U.ID AS USER_ID,U.ACCOUNT,R.ID AS RESOURCE_ID,R.`NAME` AS RESOURCE_NAME,UR.DELETE_FLAG FROM T_USER U 
+		LEFT JOIN T_USER_RESOURCE UR ON U.ID = UR.USER_ID 
+		LEFT JOIN T_RESOURCE R ON UR.RESOURCE_ID = R.ID 
+		WHERE 
+		U.ID IN (SELECT USER_ID FROM T_USER_RESOURCE) 
+		AND UR.PRIORITY = 5 
+	</select>
+	
+	<!-- 更新是否删除标识 -->
+	<update id="updateApiURByFlag">
+		UPDATE T_USER_RESOURCE SET
+		DELETE_FLAG = 1 WHERE USER_ID = #{0} AND RESOURCE_ID = #{1} AND PRIORITY = 5
+	</update>
+	<update id="updateApiURFlag">
+		UPDATE T_USER_RESOURCE SET
+		DELETE_FLAG = 0 WHERE USER_ID = #{0} AND RESOURCE_ID = #{1} AND PRIORITY = 5
+	</update>
+	
+	<!-- 查询角色已授权资源 API-->
+	<select id="selApiResourceByUr" resultMap="ResourcestMap">
+		SELECT * FROM T_RESOURCE
+		WHERE ID IN (SELECT RESOURCE_ID FROM T_USER_RESOURCE WHERE USER_ID =
+		#{0} AND DELETE_FLAG = 0 AND PRIORITY = 5)
+	</select>
+	<!-- 新增API -->
+	<insert id="addApiUserResource" parameterType="java.util.List">
+		<selectKey resultType="java.lang.Integer" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into T_USER_RESOURCE
+		(USER_ID,RESOURCE_ID,PRIORITY)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.userId},#{item.resourceId},#{item.priority})
+		</foreach>
+		on duplicate key update DELETE_FLAG = 0, PRIORITY = 5
+	</insert>
+	<!-- 更新全部删除状态 -->
+	<update id="updateApiByUser">
+		UPDATE T_USER_RESOURCE SET DELETE_FLAG = 1 WHERE
+		USER_ID = #{0} AND PRIORITY = 5
+	</update>
+	<!-- 警友通 -->
+	<!-- 查询资源警友通 -->
+	<select id="selJYTResource" resultMap="ResourcestMap">
+		SELECT * FROM T_RESOURCE
+		WHERE DELETE_FLAG = 0 AND TYPE = 6
+	</select>
+	<!-- 查询已授权的资源 -->
+	<select id="selJYTResourceById" resultMap="ResourcestMap">
+		SELECT * FROM T_RESOURCE
+		WHERE ID IN (SELECT RESOURCE_ID FROM T_PERMISSION WHERE PRINCIPAL_ID
+		=#{0} AND PRINCIPAL_TYPE = 6) AND DELETE_FLAG = 0 AND TYPE = 6
+	</select>
+	<!-- 删除资源 -->
+	<delete id="delJYTPermission">
+		DELETE FROM T_PERMISSION WHERE PRINCIPAL_ID = #{0} AND PRINCIPAL_TYPE = 6
+	</delete>
+	<!-- 保存授权的资源 -->
+	<insert id="addJYTPermission" parameterType="java.util.List">
+		<selectKey resultType="java.lang.Integer" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO T_PERMISSION
+		(AUTH_STATUS,EXTEND_STATUS,PRINCIPAL_ID,PRINCIPAL_TYPE,RESOURCE_ID)
+		VALUES
+		<foreach collection="list" item="APermission" index="index"
+			separator=",">
+			(#{APermission.authStatus},#{APermission.extendStatus},#{APermission.principalId},#{APermission.principalType},#{APermission.resourceId})
+		</foreach>
+	</insert>
 </mapper>

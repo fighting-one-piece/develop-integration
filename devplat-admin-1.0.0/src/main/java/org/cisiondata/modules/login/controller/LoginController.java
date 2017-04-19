@@ -2,10 +2,9 @@ package org.cisiondata.modules.login.controller;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
-import org.cisiondata.modules.auth.entity.User;
+import org.cisiondata.modules.auth.entity.AAdminUser;
 import org.cisiondata.modules.login.service.ILoginService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.slf4j.Logger;
@@ -24,15 +23,11 @@ public class LoginController {
 	private ILoginService loginService;
 	
 	@ResponseBody
-    @RequestMapping(value = {"/login"}, method = RequestMethod.POST, headers = "Accept=application/json")
-    public WebResult login(String account, String password, @RequestBody User user) {
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public WebResult login(String account,String password) {
         WebResult webResult = new WebResult();
         try {
-        	if (StringUtils.isBlank(account) && StringUtils.isBlank(password) && null != user) {
-        		account = user.getAccount();
-        		password = user.getPassword();
-        	}
-        	webResult.setData(loginService.login(account, password));
+        	webResult.setData(loginService.login(account,password));
         	webResult.setCode(ResultCode.SUCCESS.getCode());
         	
         } catch (BusinessException be) {

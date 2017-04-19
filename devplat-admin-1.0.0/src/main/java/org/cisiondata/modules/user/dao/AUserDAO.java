@@ -56,4 +56,20 @@ public interface AUserDAO {
 	 * @throws DataAccessException
 	 */
 	public AUser findIdAuser(Long id) throws DataAccessException;
+	
+	/**
+	 * 查询全部用户
+	 * @throws DataAccessException
+	 */
+	public List<AUser> findAllAuser(Long identity) throws DataAccessException;
+	
+	/**
+	 * 查询用户角色id
+	 * @param id
+	 * @param identity
+	 * @return
+	 * @throws DataAccessException
+	 */
+	public List<Long> findAuserRole(AUser aUser) throws DataAccessException;
+	
 }

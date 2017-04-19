@@ -109,7 +109,9 @@
 	<select id="findUserAttribute" resultType="string" parameterType="org.cisiondata.modules.auth.entity.UserAttribute">
 		SELECT `VALUE` FROM T_USER_ATTRIBUTE WHERE USER_ID=#{userId} AND `KEY` =#{key} 
 	</select>
-	
+	<select id="findUserIdByAccessId" resultType="long" parameterType="string">
+		SELECT USER_ID FROM T_USER_ATTRIBUTE WHERE `KEY`='accessId' AND `VALUE`=#{0}
+	</select>
 	
 	
 </mapper>

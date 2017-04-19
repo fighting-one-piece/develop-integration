@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
@@ -31,7 +32,7 @@ public class QQServiceImpl implements IQQService {
 	private IResourceService resourceService = null;
 	//根据QQ号码得到群详情和群昵称
 	@Override
-	public Map<String, Object> readQQDatas(String qq) throws BusinessException {
+	public Map<String, Object> readQQDatas(String qq ,HttpServletRequest request) throws BusinessException {
 		String  regex ="[1-9][0-9]{4,14}";
 		Pattern p = Pattern.compile(regex);  
 		Matcher m = p.matcher(qq); 
@@ -74,7 +75,7 @@ public class QQServiceImpl implements IQQService {
 				list.get(i).remove("type");
 				list.get(i).remove("clazz");
 			}
-			List<ResourceInterfaceField> lists = resourceService.findAttributeByIdentity("QQController_readQQqunData");
+			List<ResourceInterfaceField> lists = resourceService.findAttributeByIdentity(request,"QQController_readQQqunData");
 			if (null == lists || lists.size()==0) throw new BusinessException(ResultCode.DATABASE_READ_FAIL);
 			Map<String,String> fieldsMap = FieldsUtils.getFieldsMessageSource(lists);
 			qr.setResultList(list);
@@ -115,7 +116,7 @@ public class QQServiceImpl implements IQQService {
 
 	@Override
 	// 根据QQ群号得到对应的群信息
-	public Map<String, Object> readQQqunDatas(String qunNum) {
+	public Map<String, Object> readQQqunDatas(String qunNum,HttpServletRequest request) {
 		String  regex ="[1-9][0-9]{4,14}";
 		Pattern p = Pattern.compile(regex);  
 		Matcher m = p.matcher(qunNum);
@@ -133,7 +134,7 @@ public class QQServiceImpl implements IQQService {
 					list.get(i).put(entry.getKey(), entry.getValue());
 				}
 			}
-			List<ResourceInterfaceField> lists = resourceService.findAttributeByIdentity("QQController_readQQqunDatas");
+			List<ResourceInterfaceField> lists = resourceService.findAttributeByIdentity(request,"QQController_readQQqunDatas");
 			if (null == lists || lists.size()==0) throw new BusinessException(ResultCode.DATABASE_READ_FAIL);
 			Map<String,String> fieldsMap = FieldsUtils.getFieldsMessageSource(lists);
 			qr.setResultList(list);
@@ -151,7 +152,7 @@ public class QQServiceImpl implements IQQService {
 
 	@Override
 	// 根据QQ号得到基本信息
-	public Map<String, Object> readQQData(String qq) throws BusinessException {
+	public Map<String, Object> readQQData(String qq ,HttpServletRequest request) throws BusinessException {
 		String  regex ="[1-9][0-9]{4,14}";
 		Pattern p = Pattern.compile(regex);  
 		Matcher m = p.matcher(qq); 
@@ -165,7 +166,7 @@ public class QQServiceImpl implements IQQService {
 				list.get(i).remove("index");
 				list.get(i).remove("type");
 			}
-			List<ResourceInterfaceField> lists = resourceService.findAttributeByIdentity("QQController_readQQ");
+			List<ResourceInterfaceField> lists = resourceService.findAttributeByIdentity(request,"QQController_readQQ");
 			if (null == lists || lists.size()==0) throw new BusinessException(ResultCode.DATABASE_READ_FAIL);
 			Map<String,String> fieldsMap = FieldsUtils.getFieldsMessageSource(lists);
 			qr.setResultList(list);
@@ -184,7 +185,7 @@ public class QQServiceImpl implements IQQService {
 	//通过QQ昵称查询
 	@Override
 	@SuppressWarnings("unchecked")
-	public QueryResult<Map<String, Object>> readQQNickData(String nick, String scrollId, int rowNumPerPage) {
+	public QueryResult<Map<String, Object>> readQQNickData(String nick, String scrollId, int rowNumPerPage,HttpServletRequest request) {
 		if (! StringUtils.isNotBlank(nick)) {
 			throw new BusinessException(ResultCode.PARAM_NULL);
 		}

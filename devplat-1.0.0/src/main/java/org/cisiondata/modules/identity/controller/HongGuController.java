@@ -35,8 +35,8 @@ public class HongGuController {
 			result.setFailure(bu.getMessage());
 			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -54,8 +54,8 @@ public class HongGuController {
 			result.setFailure(bu.getMessage());
 			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -73,8 +73,8 @@ public class HongGuController {
 			result.setFailure(bu.getMessage());
 			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -92,8 +92,8 @@ public class HongGuController {
 			result.setFailure(bu.getMessage());
 			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -111,8 +111,8 @@ public class HongGuController {
 			result.setFailure(bu.getMessage());
 			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -130,8 +130,8 @@ public class HongGuController {
 			result.setFailure(bu.getMessage());
 			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -151,8 +151,8 @@ public class HongGuController {
 			result.setFailure(bu.getMessage());
 			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}

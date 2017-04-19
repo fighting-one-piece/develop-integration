@@ -18,28 +18,28 @@ public class AUserRole extends PKAutoEntity<Long> {
 	/**用户ID */
 	@ManyToOne(cascade=CascadeType.REFRESH, optional=true)
 	@JoinColumn(name="USER_ID")
-	private Long auser = null;
+	private Long auserId = null;
 	/**角色ID */
 	@ManyToOne(cascade=CascadeType.REFRESH, optional=true)
 	@JoinColumn(name="ROLE_ID")
-	private Long arole = null;
+	private Long aroleId = null;
 	/**优先权*/
 	@Column(name="PRIORITY")
 	private String priority = null;
 	
 	
 	 
-	public Long getAuser() {
-		return auser;
+	public Long getAuserId() {
+		return auserId;
 	}
-	public void setAuser(Long auser) {
-		this.auser = auser;
+	public void setAuserId(Long auserId) {
+		this.auserId = auserId;
 	}
-	public Long getArole() {
-		return arole;
+	public Long getAroleId() {
+		return aroleId;
 	}
-	public void setArole(Long arole) {
-		this.arole = arole;
+	public void setAroleId(Long aroleId) {
+		this.aroleId = aroleId;
 	}
 	public String getPriority() {
 		return priority;

@@ -6,36 +6,22 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
-import org.cisiondata.modules.auth.web.WebUtils;
+import org.cisiondata.modules.auth.service.IRequestService;
 import org.cisiondata.modules.auth.web.handler.UrlMappingStorage.Mapper;
-import org.cisiondata.modules.queue.entity.MQueue;
-import org.cisiondata.modules.queue.entity.RequestMessage;
-import org.cisiondata.modules.queue.service.IRedisMQService;
 import org.cisiondata.utils.clazz.ClassScanner;
 import org.cisiondata.utils.clazz.ClassScanner.ClassResourceHandler;
 import org.cisiondata.utils.clazz.ObjectMethodParams;
 import org.cisiondata.utils.clazz.ParameterBinder;
-import org.cisiondata.utils.date.DateFormatter;
-import org.cisiondata.utils.endecrypt.SHAUtils;
 import org.cisiondata.utils.exception.BusinessException;
-import org.cisiondata.utils.redis.RedisClusterUtils;
-import org.cisiondata.utils.web.IPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -66,7 +52,7 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	
 	private ApplicationContext ctx = null;
 	
-	private IRedisMQService redisMQService = null;
+	private List<IRequestService> requestServiceList = new ArrayList<IRequestService>();
 	
 	public void setApplicationContext(ApplicationContext ctx) throws BeansException {
 		this.ctx = ctx;
@@ -82,7 +68,10 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	
 	@Override
 	public void afterPropertiesSet() {
-		redisMQService = ctx.getBean("redisMQService", IRedisMQService.class);
+		Map<String, IRequestService> beans = ctx.getBeansOfType(IRequestService.class);
+		for (Map.Entry<String, IRequestService> entry : beans.entrySet()) {
+			requestServiceList.add(entry.getValue());
+		}
 		new ClassScanner(new String[]{"org.cisiondata.modules"}, new ClassResourceHandler() {
 			@SuppressWarnings("rawtypes")
 			public void handle(MetadataReader metadata) {
@@ -123,30 +112,33 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		}).scan();
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		try {
 			String path = request.getServletPath();
 			LOG.info("url handler adapter request path: {}", path);
-			judgeSensitiveWord(request.getParameterMap());
-			if (path.startsWith("/app")) {
-				path = path.replace("/app", "");
-				Object result = handleExternalRequest(path, request, response);
-				writeResponse(response, result);
-			} else if (path.startsWith("/ext")) {
-				path = path.replace("/ext", "");
-				Object result = handleExternalRequestWithUserAccessControl(path, request, response);
-				writeResponse(response, result);
-			} else if (path.startsWith("/api/v1")) {
-				path = path.replace("/api/v1", "");
-				Object result = handleNormalRequest(path, request, response);
-				writeResponse(response, result);
-				sendMessage(request, path, result);
-			} else {
-				Object result = handleNormalRequest(path, request, response);
-				writeResponse(response, result);
+			for (IRequestService requestService : requestServiceList) {
+				Object[] preResult = requestService.preHandle(request);
+				if (preResult.length == 0 || (Boolean) preResult[0]) continue;
+				Object exceptionObj = preResult[1];
+				if (exceptionObj instanceof BusinessException) {
+					throw (BusinessException) exceptionObj;
+				}
 			}
+			Object result = null;
+			if (path.startsWith("/app")) {
+				result = handleExternalRequest(path.replace("/app", ""), request, response);
+			} else if (path.startsWith("/ext")) {
+				result = handleExternalRequest(path.replace("/ext", ""), request, response);
+			} else if (path.startsWith("/api/v1")) {
+				result = handleNormalRequest(path.replace("/api/v1", ""), request, response);
+			} else {
+				result = handleNormalRequest(path, request, response);
+			}
+			for (IRequestService requestService : requestServiceList) {
+				requestService.postHandle(request, result);
+			}
+			writeResponse(response, result);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			writeResponse(response, wrapperFailureWebResult(ResultCode.FAILURE, e.getMessage()));
@@ -185,25 +177,6 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		}
 	}
 	
-	private Object handleExternalRequestWithUserAccessControl(String interfaceUrl, 
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		/**
-		String account = request.getParameter("accessId");
-		AccessUserControl accessUserControl = accessUserService.readAccessUserControlByAccount(account);
-		long remainingCount = accessUserControl.getRemainingCount();
-		if (remainingCount <= 0) {
-			writeResponse(response, wrapperFailureWebResult(ResultCode.FAILURE, "账户剩余查询条数不足"));
-		}
-		**/
-		Object result = handleExternalRequest(interfaceUrl, request, response);
-		long incOrDec = parseReturnResultCount(result);
-		LOG.info("incOrDec : {}", incOrDec);
-		/**
-		accessUserService.updateRemainingCount(account, remainingCount, -incOrDec);
-		**/
-		return result;
-	}
-	
 	private Object handleExternalRequest(String interfaceUrl, HttpServletRequest request, HttpServletResponse response)
 			throws UnsupportedEncodingException {
 		return handleExternalRequest(interfaceUrl, new HashMap<String, String>(), request, response);
@@ -221,14 +194,13 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR, 
 					"No mapping found for HTTP request with URI " + interfaceUrl);
 		}
+		
 		try {
 			ParameterBinder parameterBinder = new ParameterBinder();
 			paramMap.putAll(omp.getParams());
 			Object[] params = parameterBinder.bindParameters(omp, paramMap, request, response);
-			judgeSensitiveWord(params);
 			Object result = ReflectionUtils.invokeMethod(method, omp.getObject(), params);
 			return method.getReturnType() == void.class || response.isCommitted() ? "" : result;
-
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			if (e.getCause() != null) {
@@ -244,153 +216,6 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 		response.setCharacterEncoding("UTF-8");
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		response.getWriter().write(objectMapper.writeValueAsString(result));
-	}
-	
-	@SuppressWarnings("unused")
-	private boolean authenticationAppRequest(HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
-    	String token = request.getParameter("token");
-		if (StringUtils.isBlank(token) || !"cisiondata".equals(token)) {
-			writeResponse(response, wrapperFailureWebResult(ResultCode.FAILURE, "该请求被拒绝访问"));
-			return false;
-		}
-		return true;
-    }
-    
-    @SuppressWarnings({ "unchecked", "unused" })
-	private boolean authenticationExternalRequest(HttpServletRequest request, 
-			HttpServletResponse response) throws Exception {
-    	Map<String, String[]> requestParams = request.getParameterMap();
-    	Map<String, String> params = new HashMap<String, String>();
-    	for (Map.Entry<String, String[]> entry : requestParams.entrySet()) {
-			params.put(entry.getKey(), entry.getValue()[0]);
-    	}
-    	/**
-    	try {
-	    	String accessKey = accessUserService.readAccessKeyByAccessId(params.get("accessId"));
-	    	params.put("accessKey", accessKey);
-    	} catch (Exception e) {
-    		LOG.error(e.getMessage(), e);
-    		writeResponse(response, wrapperFailureWebResult(ResultCode.FAILURE, e.getMessage()));
-    		return false;
-    	}
-    	**/
-    	params.put("date", DateFormatter.DATE.get().format(Calendar.getInstance().getTime()).replace("-", ""));
-    	List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(params.entrySet());
-		Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
-			@Override
-			public int compare(Entry<String, String> o1, Entry<String, String> o2) {
-				return o1.getKey().compareTo(o2.getKey());
-			}
-		});
-		String token = null;
-		StringBuffer sb = new StringBuffer();
-		for (Map.Entry<String, String> entry : list) {
-			String paramName = entry.getKey();
-			if ("token".equalsIgnoreCase(paramName)) {
-				token = entry.getValue();
-				continue;
-			}
-			sb.append(paramName).append("=").append(entry.getValue()).append("&");
-		}
-		if (sb.length() > 0) sb.deleteCharAt(sb.length() - 1);
-		LOG.info("access token: {}", SHAUtils.SHA1(sb.toString()));
-		if (!SHAUtils.SHA1(sb.toString()).equals(token)) {
-			writeResponse(response, wrapperFailureWebResult(ResultCode.FAILURE, "该请求被拒绝访问"));
-			return false;
-		}
-		return true;
-    }
-    
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	private long parseReturnResultCount(Object result) {
-    	if (result instanceof WebResult) {
-    		WebResult webResult = (WebResult) result;
-    		Object data = webResult.getData();
-    		if (data instanceof List) {
-    			return ((List) data).size();
-    		} else if (data instanceof QueryResult) {
-    			QueryResult queryResult = (QueryResult) data;
-    			return queryResult.getResultList().size();
-    		} else if (data instanceof Map) {
-    			Map<String, Object> map = (Map<String, Object>) data;
-    			long count = 0;
-    			for (Map.Entry<String, Object> entry : map.entrySet()) {
-    				Object value = entry.getValue();
-    				if (value instanceof List) {
-    					count += ((List) value).size();
-    				}
-    			}
-    			return count;
-    		}
-    	}
-    	return 0;
-    }
-    
-    @SuppressWarnings("unchecked")
-	private void judgeSensitiveWord(Map<String, String[]> paramMap) throws BusinessException {
-    	for (Map.Entry<String, String[]> entry : paramMap.entrySet()) {
-    		Object arg = entry.getValue()[0];
-			if (arg instanceof Map) {
-				Map<String, Object> argMap = (Map<String, Object>) arg;
-				for (Map.Entry<String, Object> argEntry : argMap.entrySet()) {
-					judgeSensitiveWord(argEntry.getValue());
-				}
-			} else {
-				judgeSensitiveWord(arg);
-			}
-    	}
-	}
-    
-    @SuppressWarnings("unchecked")
-	private void judgeSensitiveWord(Object[] args) throws BusinessException {
-		if (null != args && args.length != 0) {
-			for (int i = 0, len = args.length; i < len; i++) {
-				Object arg = args[i];
-				if (arg instanceof Map) {
-					Map<String, Object> map = (Map<String, Object>) arg;
-					for (Map.Entry<String, Object> entry : map.entrySet()) {
-						judgeSensitiveWord(entry.getValue());
-					}
-				} else {
-					judgeSensitiveWord(arg);
-				}
-			}
-		}
-	}
-	
-	private void judgeSensitiveWord(Object arg) throws BusinessException {
-		if (arg instanceof String) {
-			String queryTxt = String.valueOf(arg);
-			String[] keywords = queryTxt.indexOf(" ") == -1 ? new String[]{queryTxt} : queryTxt.split(" ");
-			for (int i = 0, len = keywords.length; i < len; i++) {
-				if (RedisClusterUtils.getInstance().sismember("sensitive_word", keywords[i])) {
-					throw new BusinessException("抱歉!该查询涉及敏感信息");
-				}
-			}
-		}
-	}
-	
-	private void sendMessage(HttpServletRequest request, String requestUrl, Object result) {
-		redisMQService.sendMessage(MQueue.REQUEST_ACCESS_QUEUE.getRoutingKey(), 
-				wrapperRequestMessage(request, requestUrl, result));
-	}
-	
-	@SuppressWarnings({"unchecked"})
-	private RequestMessage wrapperRequestMessage(HttpServletRequest request, String requestUrl, Object result) {
-		RequestMessage requestMessage = new RequestMessage();
-		requestMessage.setUrl(requestUrl);
-		Map<String, String[]> requestParams = request.getParameterMap();
-		Map<String, String> params = new HashMap<String, String>();
-    	for (Map.Entry<String, String[]> entry : requestParams.entrySet()) {
-			params.put(entry.getKey(), entry.getValue()[0]);
-    	}
-		requestMessage.setParams(params);
-		requestMessage.setIpAddress(IPUtils.getIPAddress(request));
-		requestMessage.setAccount(WebUtils.getCurrentAccout());
-		requestMessage.setTime(new Date());
-		requestMessage.setReturnResult(result);
-		return requestMessage;
 	}
 	
 }

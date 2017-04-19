@@ -31,8 +31,8 @@ public class DatadaController {
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData(data);
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			LOG.error(e.getMessage(), e);
 		}
 		return result;
@@ -47,8 +47,8 @@ public class DatadaController {
 			result.setData(datadaService.readPhoneIsExists(phone));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -61,8 +61,8 @@ public class DatadaController {
 				result.setData(datadaService.readIdCardIsExists(idCard));
 				result.setCode(ResultCode.SUCCESS.getCode());
 			} catch (Exception e) {
-				result.setCode(ResultCode.FAILURE.getCode());
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			}
 			return result;
 		}

@@ -8,8 +8,12 @@ public class APermission extends PKAutoEntity<Long> {
 	/** 用户类型*/
 	public static final Integer PRINCIPAL_TYPE_USER = 0;
 	/** 角色类型*/
-	public static final Integer PRINCIPAL_TYPE_ROLE = 1;
+	public static final Integer PRINCIPAL_TYPE_ROLE = 3;
+	/**	API类型*/
+	public static final Integer PRINCIPAL_TYPE_API = 5;
 	
+	/**	警友通类型*/
+	public static final Integer PRINCIPAL_TYPE_JYT = 6;
 	
 	/** 授权状态 用后四位标识CRUD操作*/
 	private Integer authStatus;

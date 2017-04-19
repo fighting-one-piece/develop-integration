@@ -1,7 +1,7 @@
 package org.cisiondata.modules.user.service;
 
-import org.cisiondata.modules.abstr.entity.QueryResult;
-import org.cisiondata.modules.user.entity.AdminUser;
+import java.util.Map;
+
 import org.cisiondata.utils.exception.BusinessException;
 
 public interface IAdminUserService {
@@ -12,26 +12,26 @@ public interface IAdminUserService {
 	 * @param pageSize
 	 * @return
 	 */
-	public QueryResult<AdminUser> findAdminUsersByPage(Integer page,Integer pageSize) throws BusinessException;
+	public Map<String,Object> findAdminUsersByPage(Integer page,Integer pageSize) throws BusinessException;
 	/**
 	 * 新增用户
 	 * @param adminUser
 	 * @return
 	 * @throws BusinessException
 	 */
-	public boolean addAdminUser(AdminUser adminUser)throws BusinessException;
+	public String addAdminUser(String account,String password,String identity,String nickName,String mobilePhone)throws BusinessException;
 	/**
 	 * 根据id修改用户
 	 * @param adminUser
 	 * @return
 	 * @throws BusinessException
 	 */
-	public boolean updateAdminUser(AdminUser user)throws BusinessException;
+	public boolean updateAdminUser(String account, String password,String identity, String nickName,String mobilePhone, long id)throws BusinessException;
 	/**
 	 * 根据id删除用户
 	 * @throws BusinessException
 	 */
-	public boolean deleteAdminUser(long id)throws BusinessException;
+	public String deleteAdminUser(Long id)throws BusinessException;
 
 
 }

@@ -36,8 +36,8 @@ public class UserController {
 			result.setFailure(bu.getMessage());
 			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
-			result.setResultCode(ResultCode.FAILURE);
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			LOG.error(e.getMessage(), e);
 		}
 		return result;
@@ -56,8 +56,8 @@ public class UserController {
 			result.setFailure(bu.getMessage());
 			LOG.error(bu.getMessage(), bu);
 		}catch (Exception e) {
-			result.setResultCode(ResultCode.FAILURE);
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			LOG.error(e.getMessage(), e);
 		}
 		return result;
@@ -76,8 +76,8 @@ public class UserController {
 			result.setFailure(bu.getMessage());
 			LOG.error(bu.getMessage(), bu);
 		} catch (Exception e) {
-			result.setResultCode(ResultCode.FAILURE);
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 			LOG.error(e.getMessage(), e);
 		}
 		return result;
@@ -96,8 +96,8 @@ public class UserController {
 				result.setFailure(bu.getMessage());
 				LOG.error(bu.getMessage(), bu);
 			} catch (Exception e) {
-				result.setResultCode(ResultCode.FAILURE);
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 				LOG.error(e.getMessage(), e);
 			}
 			return result;
@@ -116,8 +116,8 @@ public class UserController {
 				result.setFailure(bu.getMessage());
 				LOG.error(bu.getMessage(), bu);
 			} catch (Exception e) {
-				result.setResultCode(ResultCode.FAILURE);
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 				LOG.error(e.getMessage(), e);
 			}
 			return result;
@@ -137,8 +137,8 @@ public class UserController {
 				result.setFailure(bu.getMessage());
 				LOG.error(bu.getMessage(), bu);
 			} catch (Exception e) {
-				result.setResultCode(ResultCode.FAILURE);
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 				LOG.error(e.getMessage(), e);
 			}
 			return result;
@@ -158,8 +158,8 @@ public class UserController {
 				result.setFailure(bu.getMessage());
 				LOG.error(bu.getMessage(), bu);
 			} catch (Exception e) {
-				result.setResultCode(ResultCode.FAILURE);
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 				LOG.error(e.getMessage(), e);
 			}
 			return result;
@@ -178,8 +178,8 @@ public class UserController {
 				result.setFailure(bu.getMessage());
 				LOG.error(bu.getMessage(), bu);
 			} catch (Exception e) {
-				result.setResultCode(ResultCode.FAILURE);
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 				LOG.error(e.getMessage(), e);
 			}
 			return result;
@@ -199,8 +199,8 @@ public class UserController {
 				result.setFailure(bu.getMessage());
 				LOG.error(bu.getMessage(), bu);
 			} catch (Exception e) {
-				result.setResultCode(ResultCode.FAILURE);
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 				LOG.error(e.getMessage(), e);
 			}
 			return result;
@@ -220,8 +220,8 @@ public class UserController {
 				result.setFailure(bu.getMessage());
 				LOG.error(bu.getMessage(), bu);
 			} catch (Exception e) {
-				result.setResultCode(ResultCode.FAILURE);
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 				LOG.error(e.getMessage(), e);
 			}
 			return result;
@@ -234,15 +234,14 @@ public class UserController {
 			WebResult result  = new WebResult();
 			try {
 				result.setResultCode(ResultCode.SUCCESS);
-				auserService.judgeValidationCode(phone, verificationCode);
-				result.setData("验证码正确");
+				result.setData(auserService.judgeValidationCode(phone, verificationCode));
 			}catch (BusinessException bu) {
 				result.setCode((bu.getCode()));
 				result.setFailure(bu.getMessage());
 				LOG.error(bu.getMessage(), bu);
 			} catch (Exception e) {
-				result.setResultCode(ResultCode.FAILURE);
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 				LOG.error(e.getMessage(), e);
 			}
 			return result;
@@ -262,8 +261,8 @@ public class UserController {
 				result.setFailure(bu.getMessage());
 				LOG.error(bu.getMessage(), bu);
 			} catch (Exception e) {
-				result.setResultCode(ResultCode.FAILURE);
-				result.setFailure(e.getMessage());
+				result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+				result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 				LOG.error(e.getMessage(), e);
 			}
 			return result;
@@ -282,8 +281,8 @@ public class UserController {
 						result.setFailure(bu.getMessage());
 						LOG.error(bu.getMessage(), bu);
 					} catch (Exception e) {
-						result.setResultCode(ResultCode.FAILURE);
-						result.setFailure(e.getMessage());
+						result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+						result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 						LOG.error(e.getMessage(), e);
 					}
 					return result;

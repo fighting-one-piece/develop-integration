@@ -5,6 +5,7 @@ public enum ResultCode {
 	SUCCESS(1, "操作成功"),
 	FAILURE(2, "操作失败"),
 	NOT_FOUNT_DATA(3, "未查询到数据"),
+	SYSTEM_IS_BUSY(5, "系统繁忙，请稍后再试"),
 	
 	PARAM_NULL(-101, "请求参数为空"),
 	PARAM_ERROR(-102, "请求参数错误或非法请求"),
@@ -37,7 +38,16 @@ public enum ResultCode {
 	
 	NOT_BINDING_QQ(601, "手机号未绑定QQ"),
 	VERIFICATION_CODE_FAILURE(602, "验证码校验失败"),
-	KEYWORD_NOT_NULL(603, "关键字不能为空");
+	KEYWORD_NOT_NULL(603, "关键字不能为空"),
+	MACADDRESS_ERROR(604, "macAddress不正确"),
+	MOBILEPHONE_FORMAT_ERROR(605, "电话号码格式不正确"),
+	MOBILEPHONE_EXIST(606, "电话号码已存在,请更换电话号码"),
+	SECURITY_NULL(607, "密保问题为空"),
+	SECURITY_ERROR(608, "密保问题答案不匹配"),
+	CANT_SEND_VERIFICATION(609, "不能连续发送验证码"),
+	MOBILEPHONE_ERROR(610, "电话号码不匹配"),
+	RESOURCE_NOT_EXIST(650, "资源不存在或已删除");
+	
 	
 	/** 代码值*/
 	private int code = 0;

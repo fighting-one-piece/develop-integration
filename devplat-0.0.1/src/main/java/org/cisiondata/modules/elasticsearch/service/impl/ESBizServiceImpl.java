@@ -22,10 +22,14 @@ import org.apache.shiro.SecurityUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.elasticsearch.service.IESBizService;
+import org.cisiondata.modules.elasticsearch.service.ILMDataService;
 import org.cisiondata.modules.identity.service.IMobileAttributionService;
+import org.cisiondata.modules.system.entity.AAccessUserControl;
+import org.cisiondata.modules.system.service.IAAccessUserControlService;
 import org.cisiondata.modules.system.service.IIdCardAddressService;
 import org.cisiondata.utils.endecrypt.MD5Utils;
 import org.cisiondata.utils.exception.BusinessException;
+import org.cisiondata.utils.json.GsonUtils;
 import org.cisiondata.utils.message.MessageUtils;
 import org.cisiondata.utils.redis.RedisClusterUtils;
 import org.elasticsearch.action.search.SearchType;
@@ -40,14 +44,17 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
-	@Resource(name = "esBizService")
-	private IESBizService esBizService = null;
-	
 	@Resource(name = "mobileAttributionService")
 	private IMobileAttributionService mobileAttributionService = null;
 	
 	@Resource(name = "idCardAddressService")
 	private IIdCardAddressService idCardAddressService = null;
+	
+	@Resource(name = "baccessUserControlService")
+	private IAAccessUserControlService baccessUserControlService = null;
+	
+	@Resource(name = "lmDataService")
+	private ILMDataService lmDataService;
 	
 	private static Map<String, String> mobileAttributionCache = new HashMap<String, String>(10000);
 
@@ -343,16 +350,16 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 	}
 	
 	@Override
-	public List<Map<String, Object>> readLogisticsFilterDataLists(String query) throws BusinessException {
+	public List<Map<String, Object>> seleLogisticsFilterDataLists(String query) throws BusinessException {
 		if (! StringUtils.isNotBlank(query)) {
 			throw new BusinessException(ResultCode.KEYWORD_NOT_NULL);
 		}
 		List<Map<String, Object>> logisticsFilterDataList = new ArrayList<Map<String, Object>>();
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 		List<Map<String, Object>> logisticsDataList = new ArrayList<Map<String,Object>>();;
-				boolQueryBuilder.should(QueryBuilders.termQuery("mobilePhone", query));
-				boolQueryBuilder.should(QueryBuilders.termQuery("telePhone", query));
-				logisticsDataList = esBizService.readDataListByCondition("financial", "logistics", boolQueryBuilder);
+		boolQueryBuilder.should(QueryBuilders.termQuery("mobilePhone", query));
+		boolQueryBuilder.should(QueryBuilders.termQuery("telePhone", query));
+		logisticsDataList = readDataListByCondition("financial", "logistics", boolQueryBuilder,50);
 		Map<String, Object> logisticsFilterData = null;
 		Map<String, Object> logisticsData = null;
 		Set<String> locations = new HashSet<String>();
@@ -378,9 +385,23 @@ public class ESBizServiceImpl extends ESServiceImpl implements IESBizService {
 //			logisticsFilterData.put("源文件", sourceFile);
 			logisticsFilterDataList.add(logisticsFilterData);
 		}
+		
+		//储存柠檬调用数据
+		String queryData = GsonUtils.fromListToJson(logisticsFilterDataList);
+		lmDataService.insetData(query, queryData);
 		if (logisticsFilterDataList.size() == 0) {
 			throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 		}
+		String account = "06006B5FC8146FBe";
+		Long remainingCount = baccessUserControlService.selectQueryTimes(account);
+		if (remainingCount < 1) {
+			throw new BusinessException(688,"剩余次数不足！");
+		}
+		AAccessUserControl accessUserControl = new AAccessUserControl();
+		accessUserControl.setAccount(account);
+		remainingCount = remainingCount - 1;
+		accessUserControl.setRemainingCount(remainingCount);
+		baccessUserControlService.updateQueryTimes(accessUserControl);
 		return logisticsFilterDataList;
 	}
 	

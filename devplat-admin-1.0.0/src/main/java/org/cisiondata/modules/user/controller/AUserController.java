@@ -16,20 +16,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/orgrole")
+@RequestMapping(value = "/orguser")
 public class AUserController {
-	private Logger LOG = LoggerFactory.getLogger(AdminUserController.class);
+	private Logger LOG = LoggerFactory.getLogger(AUserController.class);
 	
 	@Resource(name="aUserService")
 	private IAUserService aUserService = null;
+	
+	private static String identity = "3";
 
 	//新增用户
-	@RequestMapping(value="/addauser",method=RequestMethod.POST, headers = "Accept=application/json")
+	@RequestMapping(value="/addauser",method=RequestMethod.POST)
 	@ResponseBody
-	public WebResult addAUser(String account,String password,String identity,String nickname,String expireTime,String salt){
+	public WebResult addAUser(String account,String password,String pwd,String nickname,String expireTime){
 		WebResult result=new WebResult();
 		try {
-			aUserService.addAUser(account,password,identity,nickname,expireTime,salt);
+			aUserService.addAUser(account,password,pwd,nickname,identity,expireTime);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData("新增成功");
 		}catch (BusinessException bu){
@@ -50,7 +52,7 @@ public class AUserController {
 	public WebResult findAUser(Integer page,Integer pageSize){
 		WebResult result=new WebResult();
 		try {
-			result.setData(aUserService.findAuser(page,pageSize));
+			result.setData(aUserService.findAuser(page,pageSize,identity));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		}catch (BusinessException bu){
 			result.setCode(bu.getCode());
@@ -65,10 +67,9 @@ public class AUserController {
 	}
 	
 	//修改
-	@RequestMapping(value="/uodateauser",method = RequestMethod.POST, headers = "Accept=application/json")
+	@RequestMapping(value="/updateauser",method = RequestMethod.POST)
 	@ResponseBody
 	public WebResult updateAUser(AUser auser){
-		System.out.println("ID："+auser.getId());
 		WebResult result=new WebResult();
 		try {
 			aUserService.updateAUser(auser);
@@ -87,17 +88,14 @@ public class AUserController {
 	}
 	
 	//删除
-	@RequestMapping(value="/deleteauser",method = RequestMethod.POST, headers = "Accept=application/json")
+	@RequestMapping(value="/deleteauser",method = RequestMethod.POST)
 	@ResponseBody
 	public WebResult deleteAUser(Long id){
 		WebResult result=new WebResult();
-		AUser auser=new AUser();
-		auser.setId(id);
-		auser.setDeleteFlag(true);
 		try {
-			aUserService.updateAUser(auser);
+			aUserService.updateAUserqt(id);
 			result.setCode(ResultCode.SUCCESS.getCode());
-			result.setData("删除成功");
+			result.setData("启停用成功");
 		}catch (BusinessException bu){
 			result.setCode(bu.getCode());
 			result.setFailure(bu.getDefaultMessage());
@@ -132,4 +130,24 @@ public class AUserController {
 		}	
 		return result;
 	}
+		//查询全部用户
+		@RequestMapping(value="/findall",method = RequestMethod.GET)
+		@ResponseBody
+		public WebResult findAllUser(Long id, Long identity){
+			WebResult result = new WebResult();
+			try {
+				result.setData(aUserService.findAllUser(id,identity));
+				result.setCode(ResultCode.SUCCESS.getCode());
+			} catch (BusinessException bu) {
+				result.setCode(bu.getCode());
+				result.setFailure(bu.getDefaultMessage());
+				LOG.error(bu.getDefaultMessage(),bu);
+			} catch (Exception e) {
+				result.setCode(ResultCode.FAILURE.getCode());
+				result.setFailure(e.getMessage());
+				LOG.error(e.getMessage(), e);
+			}
+			return result;
+		}
+		
 }

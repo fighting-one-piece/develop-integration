@@ -87,6 +87,18 @@ public interface IESService {
 	 * @param index
 	 * @param type
 	 * @param query
+	 * @param size
+	 * @return
+	 * @throws BusinessException
+	 */
+	public List<Map<String, Object>> readDataListByCondition(String index, String type, 
+			QueryBuilder query, int size) throws BusinessException;
+	
+	/**
+	 * 根据条件指定索引读取数据
+	 * @param index
+	 * @param type
+	 * @param query
 	 * @param isHighLight 是否高亮
 	 * @return
 	 * @throws BusinessException

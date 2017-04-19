@@ -1,8 +1,8 @@
 package org.cisiondata.modules.identity.controller;
-import java.util.Arrays;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
@@ -37,19 +37,19 @@ public class QQController {
 	@ResponseBody
 	@RequestMapping(value = "/qqs/{qq}/base",method=RequestMethod.GET)
 	//根据QQ号码查询基础信息和对应的群信息
-	public WebResult readQQ(@RequestParam String qq){
+	public WebResult readQQ(@RequestParam String qq,HttpServletRequest request){
 		WebResult result = new WebResult();
 		try {
 			//得到基本信息
-			Map<String, Object> listBase = qqService.readQQData(qq);
+			Map<String, Object> listBase = qqService.readQQData(qq ,request);
 			result.setData(listBase);
 			result.setCode(ResultCode.SUCCESS.getCode());
 		}catch(BusinessException bu){
 			result.setCode(bu.getCode());
 			result.setFailure(bu.getDefaultMessage());
 		}  catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -58,17 +58,17 @@ public class QQController {
 	//根据QQ号码查询对应的群信息
 	@ResponseBody
 	@RequestMapping(value="/qqs/{qq}/quns",method=RequestMethod.GET)
-	public WebResult readQQqunData(@RequestParam String qq){
+	public WebResult readQQqunData(@RequestParam String qq,HttpServletRequest request){
 		WebResult result = new WebResult();
 		try {
-			result.setData(qqService.readQQDatas(qq));
+			result.setData(qqService.readQQDatas(qq ,request));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		}catch(BusinessException bu){
 			result.setCode(bu.getCode());
 			result.setFailure(bu.getDefaultMessage());
 		}  catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -77,18 +77,18 @@ public class QQController {
 	@ResponseBody
 	@RequestMapping(value="/qqs/nickname/{nickname}",method=RequestMethod.GET)
 	//通过QQ昵称得到群信息
-	public WebResult readQQNickData(String nickname,String scrollId, int rowNumPerPage){
+	public WebResult readQQNickData(String nickname,String scrollId, int rowNumPerPage,HttpServletRequest request){
 		LOG.info("qq nickname : {}", nickname);
 		WebResult result = new WebResult();
 		try {
-			result.setData(qqService.readQQNickData(nickname,scrollId,rowNumPerPage));
+			result.setData(qqService.readQQNickData(nickname,scrollId,rowNumPerPage, request));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		}catch(BusinessException bu){
 			result.setCode(bu.getCode());
 			result.setFailure(bu.getDefaultMessage());
 		}  catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
@@ -96,34 +96,19 @@ public class QQController {
 	@ResponseBody
 	@RequestMapping(value="/quns/{qun}/members",method=RequestMethod.GET)
 	//根据QQ群号得到群信息
-	public WebResult readQQqunDatas(@RequestParam String qun){
+	public WebResult readQQqunDatas(@RequestParam String qun,HttpServletRequest request){
 		WebResult result = new WebResult();
 		try {
-			result.setData(qqService.readQQqunDatas(qun));
+			result.setData(qqService.readQQqunDatas(qun ,request));
 			result.setCode(ResultCode.SUCCESS.getCode());
 		}catch(BusinessException bu){
 			result.setCode(bu.getCode());
 			result.setFailure(bu.getDefaultMessage());
 		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
+			result.setCode(ResultCode.SYSTEM_IS_BUSY.getCode());
+			result.setFailure(ResultCode.SYSTEM_IS_BUSY.getDesc());
 		}
 		return result;
 	}
 	
-	@ResponseBody
-	@RequestMapping(value="/quns/search")
-	//得到群信息
-	public WebResult readQQqunsDatas(String[] qunNumList){
-		WebResult result = new WebResult();
-		try {
-			result.setData(esService.readDataListByCondition("qq", "qqqunrelation", 
-					"qunNum", Arrays.asList(qunNumList), 200));
-			result.setCode(ResultCode.SUCCESS.getCode());
-		} catch (Exception e) {
-			result.setCode(ResultCode.FAILURE.getCode());
-			result.setFailure(e.getMessage());
-		}
-		return result;
-	}
 }

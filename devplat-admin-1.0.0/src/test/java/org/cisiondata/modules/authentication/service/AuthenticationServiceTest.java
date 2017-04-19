@@ -40,7 +40,7 @@ public class AuthenticationServiceTest {
 	
 	@Test
 	public void testAdminUserService() {
-		QueryResult<AdminUser>  list = adminUserService.findAdminUsersByPage(1, 3);
+		//QueryResult<AdminUser>  list = adminUserService.findAdminUsersByPage(1, 3);
 	}
 //	@Test
 //	public void testRoleServiceReadIdentitiesByUserId() {

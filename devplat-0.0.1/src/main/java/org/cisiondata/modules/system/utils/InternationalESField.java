@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.cisiondata.modules.system.entity.ESMetadata;
+import org.cisiondata.modules.system.entity.ESMetadatas;
 import org.cisiondata.utils.exception.BusinessException;
 
 public class InternationalESField {
@@ -42,7 +42,7 @@ public class InternationalESField {
 			e.printStackTrace();
 			throw new BusinessException("创建国际化文件失败");
 		}
-		List<ESMetadata> list = getAll();
+		List<ESMetadatas> list = getAll();
 		BufferedWriter bwCN=
 				new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileCN),"ISO-8859-1"));
 		BufferedWriter bwEN=
@@ -69,7 +69,7 @@ public class InternationalESField {
 			bwEN.newLine();
 		}
 		
-		for(ESMetadata data : list){
+		for(ESMetadatas data : list){
 			ENStringBuilder.delete( 0, ENStringBuilder.length());
 			CNStringBuilder.delete( 0, CNStringBuilder.length());
 			CNStringBuilder.append(data.getIndexs()).append(".").append(data.getType()).append(".").append(data.getAttribute_en())
@@ -161,16 +161,16 @@ public class InternationalESField {
 	    return conn;
 	}
 	
-	private static List<ESMetadata> getAll() {
+	private static List<ESMetadatas> getAll() {
 	    Connection conn = getConn();
 	    String sql = "select * from T_ES_METADATA order by type";
 	    PreparedStatement pstmt;
-	    List<ESMetadata> list = new ArrayList<ESMetadata>();
+	    List<ESMetadatas> list = new ArrayList<ESMetadatas>();
 	    try {
 	        pstmt = (PreparedStatement)conn.prepareStatement(sql);
 	        ResultSet rs = pstmt.executeQuery();
 	        while (rs.next()) {
-	        	ESMetadata esmetadata = new ESMetadata();
+	        	ESMetadatas esmetadata = new ESMetadatas();
 	        	esmetadata.setIndexs(rs.getString("indexs"));
 	        	esmetadata.setType(rs.getString("type"));
 //	        	esmetadata.setAttribute_ch(cnToUnicode(rs.getString("attribute_ch")));

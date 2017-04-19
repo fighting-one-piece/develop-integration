@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.cisiondata.modules.user.dao.UserResourceDAO">
+
+	<resultMap type="org.cisiondata.modules.auth.entity.UserResource" id="AUserResourceModelMap">
+		<id property="id" column="ID"/>
+		<result column="USER_ID" property="userId"/>
+		<result column="RESOURCE_ID" property="resourceId"/>
+		<result column="PRIORITY" property="priority"/>
+		<result column="DELETE_FLAG" property="deleteFlag"/>
+	</resultMap>
+	
+	<!-- 查询 -->
+	<select id="findByCondition" parameterType="map" resultMap="AUserResourceModelMap">
+		select * from T_USER_RESOURCE 
+		<where>
+    		<if test="id != null">ID=#{id}</if>
+    		<if test="userId != null">and USER_ID=#{userId}</if>
+    		<if test="resourceId != null">and RESOURCE_ID=#{resourceId}</if>
+    		<if test="priority != null">and PRIORITY=#{priority}</if>
+    		<if test="deleteFlag != null">and DELETE_FLAG=#{deleteFlag}</if>
+    	</where>
+    	<if test="orderBy != null and orderBy != ''">
+    		order by ${orderBy}
+    	</if>
+    	<if test="begin != null and pageSize != null">
+    		limit #{begin},#{pageSize}
+    	</if>
+	</select>
+	
+	<!-- 查询总条数 -->
+	<select id="findCountByCondition" parameterType="map">
+		select COUNT(ID) from T_USER_RESOURCE
+		<where>
+    		<if test="id != null">ID=#{id}</if>
+    		<if test="userId != null">and USER_ID=#{userId}</if>
+    		<if test="resourceId != null">and RESOURCE_ID=#{resourceId}</if>
+    		<if test="priority != null">and PRIORITY=#{priority}</if>
+    		<if test="deleteFlag != null">and DELETE_FLAG=#{deleteFlag}</if>
+    	</where>
+	</select>
+	
+	<!-- 根据id修改 -->
+	<update id="updateUserResourceById" parameterType="org.cisiondata.modules.auth.entity.UserResource">
+	   	update T_USER_RESOURCE 
+   		<set>
+    		<if test="id != null">ID=#{id},</if>
+    		<if test="userId != null">USER_ID=#{userId},</if>
+    		<if test="resourceId != null">RESOURCE_ID=#{resourceId},</if>
+    		<if test="priority != null">PRIORITY=#{priority},</if>
+    		<if test="deleteFlag != null">DELETE_FLAG=#{deleteFlag}</if>
+   		</set>
+	   	WHERE ID=#{id}
+	</update>
+	
+	<!-- 新增，新增成功后返回id值 -->
+	<insert id="addUserResource" parameterType="org.cisiondata.modules.auth.entity.UserResource" useGeneratedKeys="true" keyProperty="id">
+		insert into T_USER_RESOURCE
+		(USER_ID,RESOURCE_ID,PRIORITY,DELETE_FLAG)
+		values
+		(#{userId},#{resourceId},#{priority},#{deleteFlag})
+	</insert>
+	
+</mapper>

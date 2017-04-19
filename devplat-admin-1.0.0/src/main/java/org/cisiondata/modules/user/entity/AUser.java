@@ -8,6 +8,7 @@ import org.cisiondata.modules.abstr.entity.PKAutoEntity;
 public class AUser extends PKAutoEntity<Long> {
 
 	private static final long serialVersionUID = 1L;
+	
 	/** 用户账号 */
 	private String account = null;
 	/** 用户密码 */
@@ -36,6 +37,16 @@ public class AUser extends PKAutoEntity<Long> {
 	private Date expireTime = null;
 	/** 是否删除标志 */
 	private Boolean deleteFlag = false;
+	/** 是否拥有当前角色*/
+	private transient boolean check = false;
+
+	public boolean isCheck() {
+		return check;
+	}
+
+	public void setCheck(boolean check) {
+		this.check = check;
+	}
 
 	public String getAccount() {
 		return account;

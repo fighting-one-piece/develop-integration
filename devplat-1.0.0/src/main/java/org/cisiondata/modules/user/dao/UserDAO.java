@@ -28,4 +28,6 @@ public interface UserDAO {
 	public void addUserAttribute(UserAttribute userAttribute)  throws DataAccessException;
 	//查看用户各种单一属性
 	public String findUserAttribute(UserAttribute userAttribute)  throws DataAccessException;
+	//根据accessId获得用户Id
+	public Long findUserIdByAccessId(String accessId) throws DataAccessException;
 }

@@ -21,7 +21,7 @@ public class LoginServiceImpl implements ILoginService {
 	
 	private Logger LOG = LoggerFactory.getLogger(LoginServiceImpl.class);
 	
-	@Resource(name = "loginLogService")
+	@Resource(name = "userLoginLogService")
 	private IUserLoginLogService userLoginLogService;
 	
 	@Resource(name = "userService")

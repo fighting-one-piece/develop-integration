@@ -33,24 +33,24 @@ public class AResourceServiceImpl implements IAResourceService, InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Head head = new Head();
-		head.setField("userId");
-		head.setFieldName("用户ID");
-		heads.add(head);
+//		head.setField("userId");
+//		head.setFieldName("用户ID");
+//		heads.add(head);
 		head = new Head();
 		head.setField("account");
-		head.setFieldName("角色名");
+		head.setFieldName("用户名");
 		heads.add(head);
-		head = new Head();
-		head.setField("resourceId");
-		head.setFieldName("资源ID");
-		heads.add(head);
+//		head = new Head();
+//		head.setField("resourceId");
+//		head.setFieldName("资源ID");
+//		heads.add(head);
 		head = new Head();
 		head.setField("resourceName");
 		head.setFieldName("资源名称");
 		heads.add(head);
 		head = new Head();
 		head.setField("deleteFlag");
-		head.setFieldName("删除标识");
+		head.setFieldName("停用");
 		heads.add(head);
 	}
 

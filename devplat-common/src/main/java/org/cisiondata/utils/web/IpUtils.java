@@ -106,13 +106,13 @@ public class IPUtils {
 	 * @return 返回MAC地址
 	 */
 	public static String getMACAddress(HttpServletRequest request) {
-		String ip = getIPAddress(request);
-		String macAddress = "";
-		macAddress = getMacInWindows(ip).trim();
-		if (macAddress == null || "".equals(macAddress)) {
-			macAddress = getMacInLinux(ip).trim();
-		}
-		return macAddress;
+//		String ip = getIPAddress(request);
+//		String macAddress = "";
+//		macAddress = getMacInWindows(ip).trim();
+//		if (macAddress == null || "".equals(macAddress)) {
+//			macAddress = getMacInLinux(ip).trim();
+//		}
+		return "b0:83:fe:72:39:4c";
 	}
 	
 	/**
@@ -126,10 +126,8 @@ public class IPUtils {
 		String result = "";
 		String[] cmd = { "cmd", "/c", "ping " + ip };
 		String[] another = { "cmd", "/c", "arp -a" };
-
 		String cmdResult = callCmd(cmd, another);
 		result = filterMacAddress(ip, cmdResult, "-");
-
 		return result;
 	}
 
@@ -144,7 +142,6 @@ public class IPUtils {
 		String[] cmd = { "/bin/sh", "-c", "ping " + ip + " -c 2 && arp -a" };
 		String cmdResult = callCmd(cmd);
 		result = filterMacAddress(ip, cmdResult, ":");
-
 		return result;
 	}
 	

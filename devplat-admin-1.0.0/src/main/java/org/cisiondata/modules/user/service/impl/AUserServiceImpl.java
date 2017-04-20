@@ -50,24 +50,16 @@ public class AUserServiceImpl implements IAUserService,InitializingBean {
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Head head=new Head();
-		head.setField("id");
-		head.setFieldName("ID");
-		heads.add(head);
-		head=new Head();
 		head.setField("account");
 		head.setFieldName("用户账号");
-		heads.add(head);
-		head=new Head();
-		head.setField("password");
-		head.setFieldName("用户密码");
-		heads.add(head);
+		heads.add(head);		
 		head=new Head();
 		head.setField("identity");
 		head.setFieldName("用户标识");
 		heads.add(head);
 		head=new Head();
 		head.setField("deleteFlag");
-		head.setFieldName("删除标识");
+		head.setFieldName("停用");
 		heads.add(head);
 		head=new Head();
 		head.setField("nickname");
@@ -88,10 +80,6 @@ public class AUserServiceImpl implements IAUserService,InitializingBean {
 		head=new Head();
 		head.setField("expireTime");
 		head.setFieldName("过期时间");
-		heads.add(head);
-		head=new Head();
-		head.setField("check");
-		head.setFieldName("是否被选中");
 		heads.add(head);
 	}
 	
@@ -161,17 +149,31 @@ public class AUserServiceImpl implements IAUserService,InitializingBean {
 
 	//修改
 	@Override
-	public void updateAUser(AUser auser) throws BusinessException {
-		if(StringUtils.isBlank(auser.getPassword())&&StringUtils.isBlank(auser.getIdentity())
-		   &&StringUtils.isBlank(auser.getNickname())&&auser.getDeleteFlag()==null
-		   &&StringUtils.isBlank(auser.getEmail())&&auser.getExpireTime()==null
-		   &&StringUtils.isBlank(auser.getStatus().toString())&&StringUtils.isBlank(auser.getSalt())) throw new BusinessException(ResultCode.PARAM_NULL);
+	public void updateAUser(Long id,String account,String nickname,String expireTime,String password,String pwd) throws BusinessException {
+		if(StringUtils.isBlank(account)
+		   &&StringUtils.isBlank(nickname)
+		   &&StringUtils.isBlank(expireTime)
+		   &&StringUtils.isBlank(password)
+		   &&StringUtils.isBlank(pwd)) throw new BusinessException(ResultCode.PARAM_NULL);
+		if(password.equals(pwd)) throw new BusinessException(ResultCode.TWO_PASSWORDS_ARE_INCONSISTENT);
+		AUser auser=new AUser();
+		auser.setAccount(account);
+		auser.setNickname(nickname);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date extime=null;
+		try {
+			extime = dateFormat.parse(expireTime);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new BusinessException(ResultCode.PARAM_FORMAT_ERROR);
+		}
+		auser.setExpireTime(extime);
+		auser.setPassword(password);
 		if(StringUtils.isNotBlank(auser.getPassword())){
 			AUser ausera=auserDAO.findIdAuser(auser.getId());
 			String pawd=EndecryptUtils.encryptPassword(auser.getPassword(),ausera.getSalt());
 			auser.setPassword(pawd);
 		}
-		
 		auserDAO.updateAUser(auser);
 	}
 
@@ -203,7 +205,6 @@ public class AUserServiceImpl implements IAUserService,InitializingBean {
 				mapList.put("nickname", list.get(i).getNickname());
 				mapList.put("email", list.get(i).getEmail());
 				mapList.put("status", list.get(i).getStatus());
-				mapList.put("password", "****");
 				String cra=(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(list.get(i).getCreateTime());  
 				mapList.put("createTime", cra);
 				String exp=(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(list.get(i).getExpireTime());

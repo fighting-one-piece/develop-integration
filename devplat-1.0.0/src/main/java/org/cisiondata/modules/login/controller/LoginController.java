@@ -38,8 +38,8 @@ public class LoginController {
     @Resource(name = "verificationCodeService")
     private IVerificationCodeService verificationCodeService = null;
     
-    @Resource(name = "loginLogService")
-	private IUserLoginLogService loginLogService = null;
+    @Resource(name = "userLoginLogService")
+	private IUserLoginLogService userLoginLogService = null;
     
     @ResponseBody
     @RequestMapping(value = {"/{login:login;?.*}"}, method = RequestMethod.POST, headers = "Accept=application/json")
@@ -51,13 +51,13 @@ public class LoginController {
         		account = user.getAccount();
         		password = user.getPassword();
         	}
-        	boolean isSuccess = verificationCodeService.validateVerificationCode(uuid, verificationCode);
-        	LOG.info("verification code validate success: {}", isSuccess);
-        	if (isSuccess) {
+//        	boolean isSuccess = verificationCodeService.validateVerificationCode(uuid, verificationCode);
+//        	LOG.info("verification code validate success: {}", isSuccess);
+//        	if (isSuccess) {
 	        	webResult.setData(loginService.readUserLoginInfoByAccountAndPassowrd(account, password));
 	        	webResult.setResultCode(ResultCode.SUCCESS);
-	        	loginLogService.addUserLoginLog(account,request, 0);
-        	}
+	        	userLoginLogService.addUserLoginLog(account,request, 0);
+//        	}
         } catch (BusinessException be) {
         	LOG.error(be.getMessage(), be);
         	webResult.setCode(be.getCode());
@@ -75,7 +75,7 @@ public class LoginController {
     public WebResult logout(HttpServletRequest request) {
         WebResult webResult = new WebResult();
         try {
-        	loginLogService.addUserLoginLog("",request, 1);
+        	userLoginLogService.addUserLoginLog("",request, 1);
         	loginService.doUserLogout();
         	webResult.setResultCode(ResultCode.SUCCESS);
         } catch (BusinessException be) {

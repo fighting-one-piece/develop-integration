@@ -76,14 +76,11 @@
 	<update id="updateAUser" parameterType="org.cisiondata.modules.user.entity.AUser"> 
 		update T_USER 
 		<set>
-			<if test="account !=null and account != ''">ACCOUNT=#{account},</if>
 			<if test="password !=null and password != ''">PASSWORD=#{password},</if>
-			<if test="identity !=null and identity != ''">IDENTITY=#{identity},</if>
 			<if test="nickname !=null and nickname != ''">NICK_NAME=#{nickname},</if>
 			<if test="expireTime !=null ">EXPIRE_TIME=#{expireTime},</if>
 			<if test="email !=null and email != ''">EMAIL=#{email},</if>
 			<if test="deleteFlag !=null">DELETE_FLAG=#{deleteFlag},</if>
-			<if test="status !=null">STATUS=#{status},</if>
 		</set>
 		 WHERE ID=#{id}
 	</update>

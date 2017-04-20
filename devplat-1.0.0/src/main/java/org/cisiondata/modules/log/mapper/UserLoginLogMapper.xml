@@ -19,4 +19,12 @@
 	<select id="selLoginLog" resultMap="UserLoginLogMap">
 		SELECT ACCOUNT,IP,`CURRENT_TIME`,`STATUS` FROM T_USER_LOGIN_LOG WHERE ACCOUNT=#{account} AND STATUS=0 ORDER BY `CURRENT_TIME` DESC LIMIT 1;
 	</select>
+	<!-- 查询用户登录日志总条数 -->
+	<select id="selLoginLogCount" resultMap="UserLoginLogMap">
+		SELECT * FROM T_USER_LOGIN_LOG WHERE ACCOUNT= #{account}
+	</select>
+	<!-- 查询用户登录日志进行分页 -->
+	<select id="selLoginLogPage" resultMap="UserLoginLogMap">
+		SELECT * FROM T_USER_LOGIN_LOG WHERE ACCOUNT= #{0} LIMIT #{1},#{2}		
+	</select>
 </mapper>

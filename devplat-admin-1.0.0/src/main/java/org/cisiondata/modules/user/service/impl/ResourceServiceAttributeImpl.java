@@ -33,14 +33,6 @@ public class ResourceServiceAttributeImpl implements IResourceAttributeService,I
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Head head=new Head();
-		head.setField("id");
-		head.setFieldName("ID");
-		heads.add(head);
-		head=new Head();
-		head.setField("resourceId");
-		head.setFieldName("资源ID");
-		heads.add(head);
-		head=new Head();
 		head.setField("fieldEN");
 		head.setFieldName("接口域英文");
 		heads.add(head);

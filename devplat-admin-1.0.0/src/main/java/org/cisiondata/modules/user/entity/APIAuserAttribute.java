@@ -12,7 +12,7 @@ public class APIAuserAttribute {
 	/**充值金额*/
 	private	String  money =null;
 	/**剩余金额*/
-	private	String   remaining_money =null;
+	private	String   remainingMoney =null;
 	public String getAccessId() {
 		return accessId;
 	}
@@ -31,11 +31,12 @@ public class APIAuserAttribute {
 	public void setMoney(String money) {
 		this.money = money;
 	}
-	public String getRemaining_money() {
-		return remaining_money;
+	public String getRemainingMoney() {
+		return remainingMoney;
 	}
-	public void setRemaining_money(String remaining_money) {
-		this.remaining_money = remaining_money;
+	public void setRemainingMoney(String remainingMoney) {
+		this.remainingMoney = remainingMoney;
 	}
+	
 	
 }

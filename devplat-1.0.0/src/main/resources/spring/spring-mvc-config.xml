@@ -12,7 +12,8 @@
 			http://www.springframework.org/schema/tx 
 			http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
 			http://www.springframework.org/schema/mvc 
-			http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
+			http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd"
+	default-autowire="byName">
 
 	<!-- 注解配置 -->
 	<context:component-scan base-package="org.cisiondata.modules">

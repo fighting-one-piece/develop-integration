@@ -6,7 +6,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:/org/springframework/beans/factory/xml/spring-beans-4.2.xsd
 						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
 						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
-						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd" 
+	default-autowire="byName">
 	
 	<!-- 注解配置  -->
 	<context:component-scan base-package="org.cisiondata">

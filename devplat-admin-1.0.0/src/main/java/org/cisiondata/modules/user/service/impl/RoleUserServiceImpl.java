@@ -26,9 +26,9 @@ public class RoleUserServiceImpl implements IRoleUserService,InitializingBean{
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Head head = new Head();
-		head.setField("id");
-		head.setFieldName("ID");
-		heads.add(head);
+//		head.setField("id");
+//		head.setFieldName("ID");
+//		heads.add(head);
 		head = new Head();
 		head.setField("name");
 		head.setFieldName("角色名");
@@ -43,7 +43,7 @@ public class RoleUserServiceImpl implements IRoleUserService,InitializingBean{
 		heads.add(head);
 		head = new Head();
 		head.setField("deleteFlag");
-		head.setFieldName("删除标识");
+		head.setFieldName("停用");
 		heads.add(head);
 	}
 	public String addRole(String name, String identity, String desc) throws BusinessException{
@@ -141,6 +141,7 @@ public class RoleUserServiceImpl implements IRoleUserService,InitializingBean{
 	@Override
 	public String addUserRoles(long role_id, String userId ,String priority) {
 		String result="";
+		System.out.println("+++++++++++");
 		if(StringUtils.isBlank(userId)){
 			result="未添加用户";
 			return result;
@@ -155,19 +156,19 @@ public class RoleUserServiceImpl implements IRoleUserService,InitializingBean{
 			auserRole.setPriority(priority);
 			list.add(auserRole);
 		}
-		for (AUserRole aUserRole : list) {
-			System.out.println("roleId"+aUserRole.getAroleId());
-			System.out.println("userId"+aUserRole.getAuserId());
-			System.out.println("priorit:"+aUserRole.getPriority());
-			System.out.println("++++++++++++++++++++++++++++++++");
+		try {
+			int code= roledao.addUserRoles(list);
+			if(code > 0){
+				result = "添加成功";
+			}else{
+				result = "添加失败";
+				throw new BusinessException(ResultCode.FAILURE);
+			}
+		} catch (Exception e) {
+			result="用户已经被添加";
 		}
-		int code= roledao.addUserRoles(list);
-		if(code > 0){
-			result = "添加成功";
-		}else{
-			result = "添加失败";
-			throw new BusinessException(ResultCode.FAILURE);
-		}
+		
+		
 		return result;
 		
 		

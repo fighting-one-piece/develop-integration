@@ -27,7 +27,7 @@ public class AUserAttributeServiceImpl implements AUserAttributeService,Initiali
 	private UserAttributeDAO userAttributeDAO;
 	
 	private static String key1="money";
-	private static String key2="remaining_money";
+	private static String key2="remainingMoney";
 	
 	private List<Object> heads = new ArrayList<Object>();
 	private List<Object> heads1 = new ArrayList<Object>();
@@ -38,24 +38,23 @@ public class AUserAttributeServiceImpl implements AUserAttributeService,Initiali
 		head.setFieldName("用户ID");
 		heads.add(head);
 		head=new Head();
-		head.setField("remaining_money");
+		head.setField("remainingMoney");
 		head.setFieldName("用户余额");
 		heads.add(head);
-		
 		head=new Head();
-		head.setField("ACCESS_ID");
-		head.setFieldName("ACCESS_ID");
+		head.setField("accessId");
+		head.setFieldName("accessId");
 		heads1.add(head);
 		head=new Head();
-		head.setField("ACCESS_KEY");
-		head.setFieldName("ACCESS_KEY");
+		head.setField("accessKey");
+		head.setFieldName("accessKey");
 		heads1.add(head);
 		head=new Head();
 		head.setField("money");
 		head.setFieldName("充值总金额");
 		heads1.add(head);
 		head=new Head();
-		head.setField("remaining_money");
+		head.setField("remainingMsoney");
 		head.setFieldName("剩余金额");
 		heads1.add(head);
 	}
@@ -82,70 +81,73 @@ public class AUserAttributeServiceImpl implements AUserAttributeService,Initiali
 	//根据user_id修改
 	@Override
 	public void updateUserAttribte(Double changeCount, Long userId) throws BusinessException {
-		if(changeCount==null&&userId==null) throw new BusinessException(ResultCode.PARAM_NULL);
+		if(changeCount==null||userId==null) throw new BusinessException(ResultCode.PARAM_NULL);
 		UserAttribute attribute=new UserAttribute();
 		attribute.setUserId(userId);
 		//查询总金额
 		attribute.setKey(key1);
-		UserAttribute attribute1=new UserAttribute();
-		attribute1=userAttributeDAO.findAUserAttribte(attribute);
+		UserAttribute attribute1=userAttributeDAO.findAUserAttribte(attribute);
+		//没有总金额属性增加一个
+		if(attribute1==null){
+			attribute1=new UserAttribute();
+			attribute1.setUserId(userId);
+			attribute1.setKey(key1);
+			attribute1.setValue("0");
+			attribute1.setType("Double");
+			userAttributeDAO.addUserAttribte(attribute1);
+		}
 		//查询余额
 		attribute.setKey(key2);
-		UserAttribute attribute2=new UserAttribute();
-		attribute2=userAttributeDAO.findAUserAttribte(attribute);
-		//根据type判断是增加还是减少金额
+		UserAttribute attribute2=userAttributeDAO.findAUserAttribte(attribute);
+		if(attribute2==null){
+			attribute2=new UserAttribute();
+			attribute2.setUserId(userId);
+			attribute2.setKey(key2);
+			attribute2.setValue("0");
+			attribute2.setType("Double");
+			userAttributeDAO.addUserAttribte(attribute2);
+		}
+		UserAttribute attribute3=userAttributeDAO.findAUserAttribte(attribute);
+		UserAttribute attribute4=userAttributeDAO.findAUserAttribte(attribute);
+		//从数据库读出余额和总金额
+		String pd="0";
+		//总金额
+		double cha=0;
+		if(pd.equals(attribute3.getValue())){
+			cha=0;
+		}else{
+			cha=Double.valueOf(attribute3.getValue()).doubleValue();
+		}
+		//余额
+		double yu=0;
+		if(pd.equals(attribute4.getValue())){
+			yu=0;
+		}else{
+			yu=Double.valueOf(attribute4.getValue()).doubleValue();
+		}
+		//根据输入的金额是大于还是小于0来判断增加还是减少
 		if(changeCount>0){
-			//增加总金额
-			double cha=0;
-			if(attribute1.getValue().equals("0")){
-				cha=0;
-			}else{
-				cha=Double.valueOf(attribute1.getValue()).doubleValue();
-			}
 			cha=cha+changeCount;
 			String value=""+cha;
 			attribute.setKey(key1);
 			attribute.setValue(value);
 			userAttributeDAO.updateUserAttribte(attribute);
 			//增加余额
-			double yu=0;
-			if(attribute2.getValue().equals("0")){
-				cha=0;
-			}else{
-				cha=Double.valueOf(attribute2.getValue()).doubleValue();
-			}
-			yu=Double.valueOf(attribute2.getValue()).doubleValue();
 			yu=yu+changeCount;
 			String yue=""+yu;
 			attribute.setKey(key2);
 			attribute.setValue(yue);
 			userAttributeDAO.updateUserAttribte(attribute);
 		}else{
-			//总金额
-			double cha=0;
-			if(attribute1.getValue().equals("0")){
-				cha=0;
-			}else{
-				cha=Double.valueOf(attribute1.getValue()).doubleValue();
-			}
-			cha=Double.valueOf(attribute1.getValue()).doubleValue();
-			//余额
-			double yu=0;
-			if(attribute2.getValue().equals("0")){
-				cha=0;
-			}else{
-				cha=Double.valueOf(attribute2.getValue()).doubleValue();
-			}
-			yu=Double.valueOf(attribute2.getValue()).doubleValue();
-			if(yu-changeCount>0){
+			if(yu+changeCount>0){
 				//减少总金额
-				cha=cha-changeCount;
+				cha=cha+changeCount;
 				String value=""+cha;
 				attribute.setKey(key1);
 				attribute.setValue(value);
 				userAttributeDAO.updateUserAttribte(attribute);
 				//减少余额
-				yu=yu-changeCount;
+				yu=yu+changeCount;
 				String yue=""+yu;
 				attribute.setKey(key2);
 				attribute.setValue(yue);
@@ -188,7 +190,6 @@ public class AUserAttributeServiceImpl implements AUserAttributeService,Initiali
 		List<APIAuserAttribute>	list2=new ArrayList<APIAuserAttribute>();
 		for (AUser aUser : userlist1) {
 			APIAuserAttribute apiuser=new APIAuserAttribute();
-			
 			System.out.println(aUser.getId());
 			params.put("userId", aUser.getId());
 			List<UserAttribute>	list=userAttributeDAO.findByCondition(params);
@@ -196,10 +197,9 @@ public class AUserAttributeServiceImpl implements AUserAttributeService,Initiali
 				if(userAttribute.getKey().equals("accessId"))apiuser.setAccessId(userAttribute.getValue());
 				if(userAttribute.getKey().equals("accessKey"))apiuser.setAccessKey(userAttribute.getValue());
 				if(userAttribute.getKey().equals("money"))apiuser.setMoney(userAttribute.getValue());
-				if(userAttribute.getKey().equals("remainingMoney"))apiuser.setRemaining_money(userAttribute.getValue());
+				if(userAttribute.getKey().equals("remainingMoney"))apiuser.setRemainingMoney(userAttribute.getValue());
 			}
 			list2.add(apiuser);
-			
 		}
 		qr.setResultList(list2);
 		qr.setTotalRowNum(pageCount);
@@ -219,6 +219,7 @@ public class AUserAttributeServiceImpl implements AUserAttributeService,Initiali
 		String remainingMoney=list.get(0).getValue();
 		System.out.println(remainingMoney);
 		String money=String.valueOf((Double.parseDouble(remainingMoney)+Double.parseDouble(changMoney)));
+		System.out.println(money);
 		userAttributeDAO.updateRemainingMoney(userId, money);
 		
 		

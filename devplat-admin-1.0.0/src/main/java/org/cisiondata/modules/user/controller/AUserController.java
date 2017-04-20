@@ -69,10 +69,10 @@ public class AUserController {
 	//修改
 	@RequestMapping(value="/updateauser",method = RequestMethod.POST)
 	@ResponseBody
-	public WebResult updateAUser(AUser auser){
+	public WebResult updateAUser(Long id ,String account,String nickname,String expireTime,String password,String pwd){
 		WebResult result=new WebResult();
 		try {
-			aUserService.updateAUser(auser);
+			aUserService.updateAUser(id,account, nickname, expireTime, password, pwd);
 			result.setCode(ResultCode.SUCCESS.getCode());
 			result.setData("修改成功");
 		}catch (BusinessException bu){

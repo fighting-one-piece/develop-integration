@@ -20,6 +20,26 @@ public class HttpRequestTest {
 	}
 	
 	@Test
+	public void testLoginDev() {
+		String url = "http://localhost:8080/devplat/api/v1/login";
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("account", "dev3");
+		params.put("password", "123456");
+		params.put("verificationCode", "gd2e");
+		params.put("uuid", "2db55bb5-938d-499d-aa21-8d536792f1fa");
+		String response = HttpUtils.sendPost(url, params);
+		System.out.println(response);
+	}
+	
+	@Test
+	public void testSecurity() {
+		String url = "http://localhost:8080/devplat/api/v1/users/settings/security/verify?answer=1";
+		String[] headers = new String[]{"accessToken", "a395f83ea703c1def55acc3460117a8f"};
+		String response = HttpUtils.sendGet(url,headers);
+		System.out.println(response);
+	}
+	
+	@Test
 	public void testLogout() {
 		String url = "http://localhost:8080/devplat/api/v1/logout";
 		Map<String, String> params = new HashMap<String, String>();
@@ -39,6 +59,14 @@ public class HttpRequestTest {
 	public void testIndexTypeSearch() {
 		String url = "http://localhost:8080/devplat/api/v1/labels/indices/operator/types/telecom?query=13512345678&scrollId=1&rowNumPerPage=40";
 		String[] headers = new String[]{"accessToken", "4b6939eeb8b5962ea58048904889bc16"};
+		String response = HttpUtils.sendGet(url, headers);
+		System.out.println(response);
+	}
+	
+	@Test
+	public void testReadUserLoginLog() {
+		String url = "http://localhost:8080/devplat/api/v1/userLoginLogs?account=test&index=1&pageSize=5";
+		String[] headers = new String[]{"accessToken", "ea7505a5cd29739e6da5050b7f65d964"};
 		String response = HttpUtils.sendGet(url, headers);
 		System.out.println(response);
 	}

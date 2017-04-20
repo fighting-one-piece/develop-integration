@@ -157,7 +157,7 @@ public class UserResourceChargingServiceImpl implements IUserResourceChargingSer
 	
 	private List<ResourceCharging> formatChargings(String chargings){
 		chargings = chargings.trim();
-		String[] chargingsStr = chargings.split(":");
+		String[] chargingsStr = chargings.split(";");
 		List<ResourceCharging> list = new ArrayList<ResourceCharging>();
 		for (String s : chargingsStr) {
 			ResourceCharging re = new ResourceCharging();

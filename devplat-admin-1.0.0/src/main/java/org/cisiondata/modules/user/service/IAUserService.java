@@ -35,7 +35,7 @@ public interface IAUserService {
 	 * @param auser
 	 * @throws BusinessException
 	 */
-	public void updateAUser(AUser auser) throws BusinessException;
+	public void updateAUser(Long id,String account,String nickname,String expireTime,String password,String pwd) throws BusinessException;
 	
 	/**
 	 * 启停用

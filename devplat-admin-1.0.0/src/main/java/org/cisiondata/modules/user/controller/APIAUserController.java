@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import org.cisiondata.modules.abstr.web.ResultCode;
 import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.user.entity.AUser;
+import org.cisiondata.modules.user.service.APIAUserService;
 import org.cisiondata.modules.user.service.IAUserService;
 import org.cisiondata.utils.exception.BusinessException;
 import org.slf4j.Logger;
@@ -21,6 +22,9 @@ public class APIAUserController {
 	
 	@Resource(name="aUserService")
 	private IAUserService aUserService = null;
+	
+	@Resource(name="aPIAUserService")
+	private APIAUserService aPIAUserService = null;
 	
 	private static String identity = "5";
 	
@@ -51,7 +55,7 @@ public class APIAUserController {
 		public WebResult findAUser(Integer page,Integer pageSize){
 			WebResult result=new WebResult();
 			try {
-				result.setData(aUserService.findAuser(page,pageSize,identity));
+				result.setData(aPIAUserService.findAPIAuser(page, pageSize, identity));
 				result.setCode(ResultCode.SUCCESS.getCode());
 			}catch (BusinessException bu){
 				result.setCode(bu.getCode());
@@ -68,10 +72,10 @@ public class APIAUserController {
 		//修改
 		@RequestMapping(value="/apiupdateauser",method = RequestMethod.POST)
 		@ResponseBody
-		public WebResult updateAUser(AUser auser){
+		public WebResult updateAUser(Long id,String account,String nickname,String expireTime,String password,String pwd){
 			WebResult result=new WebResult();
 			try {
-				aUserService.updateAUser(auser);
+				aUserService.updateAUser(id,account, nickname, expireTime, password, pwd);
 				result.setCode(ResultCode.SUCCESS.getCode());
 				result.setData("修改成功");
 			}catch (BusinessException bu){

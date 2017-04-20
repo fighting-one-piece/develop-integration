@@ -1,5 +1,6 @@
 package org.cisiondata.modules.user.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,57 +15,73 @@ import org.cisiondata.modules.user.dao.AUserDAO;
 import org.cisiondata.modules.user.dao.RoleUserDAO;
 import org.cisiondata.modules.user.dao.UserAttributeDAO;
 import org.cisiondata.modules.user.entity.AUser;
-import org.cisiondata.modules.user.service.IAUserShowService;
+import org.cisiondata.modules.user.service.APIAUserService;
 import org.cisiondata.modules.user.utils.Head;
 import org.cisiondata.utils.exception.BusinessException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
+@Service("aPIAUserService")
+public class APIAUserServiceImpl implements APIAUserService,InitializingBean{
 
-@Service("iAUserShowServiceImpl")
-public class IAUserShowServiceImpl implements IAUserShowService,InitializingBean{
-	
 	@Resource(name="auserDAO")
 	private AUserDAO auserDAO;
-	
-	@Resource(name="roleUserDAO")
-	private RoleUserDAO roleUserDAO;
 	
 	@Resource(name="auserAttributeDAO")
 	private UserAttributeDAO userAttributeDAO;
 	
-	private static String key1="money";
-	private static String key2="remainingMoney";
+	@Resource(name="roleUserDAO")
+	private RoleUserDAO roleUserDao;
 	
+	private static String key1="accessId";
+	private static String key2="accessKey";
 	private List<Object> heads = new ArrayList<Object>();
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Head head=new Head();		
+		Head head=new Head();
 		head.setField("account");
 		head.setFieldName("用户账号");
 		heads.add(head);		
 		head=new Head();
-		head.setField("realname");
-		head.setFieldName("用户真名");
+		head.setField("identity");
+		head.setFieldName("用户标识");
 		heads.add(head);
 		head=new Head();
-		head.setField("role");
-		head.setFieldName("用户角色");
+		head.setField("deleteFlag");
+		head.setFieldName("停用");
 		heads.add(head);
 		head=new Head();
-		head.setField("money");
-		head.setFieldName("充值金额");
+		head.setField("nickname");
+		head.setFieldName("用户昵称");
 		heads.add(head);
 		head=new Head();
-		head.setField("remainingMoney");
-		head.setFieldName("剩余金额");
+		head.setField("email");
+		head.setFieldName("用户邮箱");
+		heads.add(head);
+		head=new Head();
+		head.setField("status");
+		head.setFieldName("用户状态");
+		heads.add(head);
+		head=new Head();
+		head.setField("createTime");
+		head.setFieldName("创建时间");
+		heads.add(head);
+		head=new Head();
+		head.setField("expireTime");
+		head.setFieldName("过期时间");
+		heads.add(head);
+		head=new Head();
+		head.setField("accessId");
+		head.setFieldName("ACCESS_ID");
+		heads.add(head);
+		head=new Head();
+		head.setField("accessKey");
+		head.setFieldName("ACCESS_KEY");
 		heads.add(head);
 	}
 	
-	//查询用户金额
 	@Override
-	public Map<String, Object> findAUsermoney(Integer page, Integer pageSize, String identity)
-			throws BusinessException {
+	public Map<String, Object> findAPIAuser(Integer page, Integer pageSize, String identity) throws BusinessException {
 		QueryResult<Map<String,Object>> result = new QueryResult<Map<String,Object>>();
 		Map<String,Object> mapResult = new HashMap<String,Object>();
 		if(page < 1 || pageSize < 1) throw new BusinessException(ResultCode.PARAM_ERROR);
@@ -83,50 +100,32 @@ public class IAUserShowServiceImpl implements IAUserShowService,InitializingBean
 			List<Map<String,Object>>  listMap = new ArrayList<Map<String,Object>>();
 			for(int i = 0,len = list.size(); i < len;i++){
 				Map<String,Object> mapList = new HashMap<String,Object>();
-				mapList.put("userId", list.get(i).getId());
+				mapList.put("id", list.get(i).getId());
 				mapList.put("account", list.get(i).getAccount());
-				mapList.put("realname", list.get(i).getRealname());
-				AUser aUser=new AUser();
-				aUser.setId(list.get(i).getId());
-				aUser.setIdentity(identity);
-				List<Long> roleid=auserDAO.findAuserRole(aUser);
-				StringBuffer pj = new StringBuffer();  
-				int acount=0;
-				for (int h=0;h<roleid.size();h++){
-					Map<String, Object> mmp=new HashMap<String,Object>();
-					mmp.put("id", roleid.get(h));
-					mmp.put("identity", identity);
-					String jj=roleUserDAO.findIdinentity(mmp);
-					acount++;
-					if(acount==1){
-						pj.append(jj);
-					}else{
-						pj.append(","+jj);
-					}
-				}
-				String js=pj.toString();
-				mapList.put("role", js);
+				mapList.put("identity", list.get(i).getIdentity());
+				mapList.put("deleteFlag", list.get(i).getDeleteFlag());
+				mapList.put("nickname", list.get(i).getNickname());
+				mapList.put("email", list.get(i).getEmail());
+				mapList.put("status", list.get(i).getStatus());
+				String cra=(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(list.get(i).getCreateTime());  
+				mapList.put("createTime", cra);
+				String exp=(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(list.get(i).getExpireTime());
+				mapList.put("expireTime", exp);
 				UserAttribute attribute=new UserAttribute();
 				attribute.setUserId(list.get(i).getId());
 				attribute.setKey(key1);
-				UserAttribute attribute1=new UserAttribute();
-				attribute1=userAttributeDAO.findAUserAttribte(attribute);
+				UserAttribute attribute1=userAttributeDAO.findAUserAttribte(attribute);
 				if(attribute1==null){
-					String ye="null";
-					mapList.put("money", ye);
+					mapList.put("accessId", "null");
 				}else{
-					String ye=attribute1.getValue();
-					mapList.put("money", ye);
+					mapList.put("accessId", attribute1.getValue());
 				}
 				attribute.setKey(key2);
-				UserAttribute attribute2=new UserAttribute();
-				attribute2=userAttributeDAO.findAUserAttribte(attribute);
+				UserAttribute attribute2=userAttributeDAO.findAUserAttribte(attribute);
 				if(attribute2==null){
-					String ye="null";
-					mapList.put("remainingMoney", ye);
+					mapList.put("accessKey", "null");
 				}else{
-					String ye=attribute2.getValue();
-					mapList.put("remainingMoney", ye);
+					mapList.put("accessKey", attribute2.getValue());
 				}
 				listMap.add(mapList);
 			}
@@ -137,7 +136,6 @@ public class IAUserShowServiceImpl implements IAUserShowService,InitializingBean
 		}else{
 			throw new BusinessException(ResultCode.NOT_FOUNT_DATA);
 		}
-		
 		return mapResult;
 	}
 

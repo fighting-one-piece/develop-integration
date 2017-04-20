@@ -132,7 +132,20 @@ public class ResourceServiceImpl implements IResourceService {
 			userResourceAttributeMap.put("userResourceId", userResourceId);
 			userResourceAttributeMap.put("key", "fields");
 			List<UserResourceAttribute> userResourceAttributeList = userResourceAttributeDAO.findByCondition(userResourceAttributeMap);
-			if (userResourceAttributeList.size() != 1) return new ArrayList<ResourceInterfaceField>();
+			if (userResourceAttributeList.size() != 1) {
+				//返回默认
+				Map<String,Object> resourceAttributeMap = new HashMap<String,Object>();
+				resourceAttributeMap.put("resourceId", resourceId);
+				resourceAttributeMap.put("key", "fields");
+				List<ResourceAttribute> resourceAttributeList = resourceAttributeDAO.findByCondition(resourceAttributeMap);
+				if (resourceAttributeList.size() == 0) return new ArrayList<ResourceInterfaceField>();
+				ResourceAttribute resourceAttribute = resourceAttributeList.get(0);
+				try {
+					return GsonUtils.fromJsonToList(resourceAttribute.getValue(), ResourceInterfaceField.class);
+				} catch (Exception e) {
+					return new ArrayList<ResourceInterfaceField>();
+				}
+			}
 			UserResourceAttribute userResourceAttribute = userResourceAttributeList.get(0);
 			try {
 				return GsonUtils.fromJsonToList(userResourceAttribute.getValue(), ResourceInterfaceField.class);

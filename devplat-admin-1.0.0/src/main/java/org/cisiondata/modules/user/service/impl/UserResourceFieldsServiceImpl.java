@@ -116,6 +116,10 @@ public class UserResourceFieldsServiceImpl implements IUserResourceFieldsService
 		//5.如果没有定制资源，直接返回公共模块中的字段
 		if (userResourceAttributeList.size() == 0 ){
 			result.put("data", commonFields);
+			for (ResourceInterfaceField fi : commonFields) {
+				fi.setId(userId);
+				fi.setResourceId(resourceId);
+			}
 			return result;
 		} else {
 			//6.如果有定制资源，则将定制资源和公共模块合并，以定制资源为主
@@ -139,6 +143,10 @@ public class UserResourceFieldsServiceImpl implements IUserResourceFieldsService
 					field.setEncryptType(fi.getEncryptType());
 					userResourceFields.add(field);
 				}
+			}
+			for (ResourceInterfaceField fi : userResourceFields) {
+				fi.setId(userId);
+				fi.setResourceId(resourceId);
 			}
 			result.put("data", userResourceFields);
 			return result;
@@ -189,7 +197,7 @@ public class UserResourceFieldsServiceImpl implements IUserResourceFieldsService
 
 	private List<ResourceInterfaceField> formatFields(String fields){
 		fields = fields.trim();
-		String[] fieldsStr = fields.split(":");
+		String[] fieldsStr = fields.split(";");
 		List<ResourceInterfaceField> list = new ArrayList<ResourceInterfaceField>();
 		for (String s : fieldsStr) {
 			ResourceInterfaceField re = new ResourceInterfaceField();

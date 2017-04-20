@@ -14,10 +14,10 @@ $(document).ready(function(){
 		if(reg.test(idCard)){
 			document.getElementById('background').style.display='block';
 			$.ajax({
-				url:"educations",
+				url:"idCardeducation",
 				type:"get",
 				dataType:"json",
-				data:{"name":name,"idCard":idCard},
+				data:{"name":name,"idcard":idCard},
 				success:function(result){
 					$("#results").empty();
 					if(result.data){

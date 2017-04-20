@@ -235,7 +235,7 @@ $(document).ready(function(){
 						if (result.data == "") {
 							$("#results .ss").append("未找到相关数据");
 						}else {
-							var adata = "<p>查询结果："+result.data+"</p>"
+							var adata = "<p>查询结果："+result.failure+"</p>"
 							$(".styleTbody").append(adata);
 						}
 					} else if(result.code == 601){

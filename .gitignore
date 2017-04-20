@@ -14,4 +14,14 @@ lib
 */org.eclipse.wst.common.component
 esclient
 esentity
+devplat
+devplat-0.0.1/src/main/java/org/cisiondata/modules
+devplat-0.0.1/src/main/java/org/cisiondata/utils
+devplat-1.0.0/src/main/java/org/cisiondata/modules
+devplat-1.0.0/src/main/java/org/cisiondata/utils
 devplat-admin
+devplat-admin-0.0.1/src/main/java/org/cisiondata/modules
+devplat-admin-0.0.1/src/main/java/org/cisiondata/utils
+devplat-admin-1.0.0/src/main/java/org/cisiondata/modules
+devplat-admin-1.0.0/src/main/java/org/cisiondata/utils
+*/org.cisiondata.modules

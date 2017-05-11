@@ -107,6 +107,6 @@ public interface IAuthService {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public String readResourceReadIdentityByUrl(String url) throws BusinessException;
+	public String readResourceReadIdentityByUrl(String url,Integer type) throws BusinessException;
 	
 }

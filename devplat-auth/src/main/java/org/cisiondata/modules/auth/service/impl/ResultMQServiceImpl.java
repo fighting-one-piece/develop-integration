@@ -1,7 +1,7 @@
 package org.cisiondata.modules.auth.service.impl;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Enumeration;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -37,11 +37,15 @@ public class ResultMQServiceImpl extends RequestServiceImpl {
 		RequestMessage requestMessage = new RequestMessage();
 		requestMessage.setUrl(requestUrl);
 		Map<String, String[]> requestParams = request.getParameterMap();
-		Map<String, String> params = new HashMap<String, String>();
     	for (Map.Entry<String, String[]> entry : requestParams.entrySet()) {
-			params.put(entry.getKey(), entry.getValue()[0]);
+			requestMessage.getParams().put(entry.getKey(), entry.getValue()[0]);
     	}
-		requestMessage.setParams(params);
+		Enumeration<String> attributeNames = request.getAttributeNames();
+		while (attributeNames.hasMoreElements()) {
+			String attributeName = attributeNames.nextElement();
+			if (!attributeName.startsWith("rda_")) continue;
+			requestMessage.getAttributes().put(attributeName, request.getAttribute(attributeName));
+		}
 		requestMessage.setIpAddress(IPUtils.getIPAddress(request));
 		requestMessage.setAccount(WebUtils.getCurrentAccout());
 		requestMessage.setTime(new Date());

@@ -20,6 +20,23 @@ public interface IResourceService extends IGenericService<Resource, Long> {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public String readIdentityByUrl(String url) throws BusinessException;
+	public String readIdentityByUrl(String url,Integer type) throws BusinessException;
 	
+	/**
+	 * 判断该url是否在resource表中
+	 * @param url
+	 * @param type
+	 * @return
+	 * @throws BusinessException
+	 */
+	public boolean isInResource(String url,Integer type) throws BusinessException;
+	
+	/**
+	 * 根据url和type获取内存中的resource
+	 * @param url
+	 * @param type
+	 * @return
+	 * @throws BusinessException
+	 */
+	public Resource readResourceFromCache(String url,Integer type) throws BusinessException;
 }

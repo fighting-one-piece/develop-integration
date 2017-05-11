@@ -44,6 +44,7 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -127,7 +128,7 @@ public class ESClientHelper {
 	public static void createIndexType(String index, String type, String fileName) {
 		Client client = ESClient.getInstance().getClient();
 		PutMappingRequest mapping = Requests.putMappingRequest(index)
-				.type(type).source(readSource(fileName));
+				.type(type).source(readSource(fileName), XContentType.JSON);
 		PutMappingResponse response = client.admin().indices().putMapping(mapping).actionGet();
 		System.out.println(response.isAcknowledged());
 	}
@@ -417,7 +418,6 @@ public class ESClientHelper {
 	 * @param avgField
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	public static double readIndexTypeFieldValueWithAvg(String index, String type, String avgField) {
 		Client client = ESClient.getInstance().getClient();
 		String avgName = avgField + "Avg";
@@ -436,7 +436,6 @@ public class ESClientHelper {
 	 * @param sumField
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	public static double readIndexTypeFieldValueWithSum(String index, String type, String sumField) {
 		Client client = ESClient.getInstance().getClient();
 		String sumName = sumField + "Sum";
@@ -563,7 +562,7 @@ public class ESClientHelper {
 		for (int i = 0, len = qqNumList1.size(); i < len; i++) {
 			SearchRequestBuilder searchRequestBuilder = client.prepareSearch("qq").setTypes("qqdata");
 			searchRequestBuilder.setQuery(QueryBuilders.termQuery("qqNum", qqNumList1.get(i)));
-			searchRequestBuilder.setSearchType(SearchType.QUERY_AND_FETCH);
+			searchRequestBuilder.setSearchType(SearchType.QUERY_THEN_FETCH);
 			searchRequestBuilder.setSize(100).setExplain(false);
 			msrb.add(searchRequestBuilder);
 		}
@@ -581,7 +580,7 @@ public class ESClientHelper {
 		for (int i = 0, len = qqNumList2.size(); i < len; i++) {
 			SearchRequestBuilder searchRequestBuilder = client.prepareSearch("qq").setTypes("qqdata");
 			searchRequestBuilder.setQuery(QueryBuilders.termQuery("qqNum", qqNumList2.get(i)));
-			searchRequestBuilder.setSearchType(SearchType.QUERY_AND_FETCH);
+			searchRequestBuilder.setSearchType(SearchType.QUERY_THEN_FETCH);
 			searchRequestBuilder.setSize(100).setExplain(false);
 			SearchResponse sr = searchRequestBuilder.execute().actionGet();
 			System.out.println("total hits: " + sr.getHits().getTotalHits());
@@ -595,7 +594,7 @@ public class ESClientHelper {
 			queryBuilder.should(QueryBuilders.termQuery("qqNum", qqNumList3.get(i)));
 		}
 		searchRequestBuilder.setQuery(queryBuilder);
-		searchRequestBuilder.setSearchType(SearchType.QUERY_AND_FETCH);
+		searchRequestBuilder.setSearchType(SearchType.QUERY_THEN_FETCH);
 		searchRequestBuilder.setSize(100).setExplain(false);
 		SearchResponse sr = searchRequestBuilder.execute().actionGet();
 		System.out.println("total hits: " + sr.getHits().getTotalHits());

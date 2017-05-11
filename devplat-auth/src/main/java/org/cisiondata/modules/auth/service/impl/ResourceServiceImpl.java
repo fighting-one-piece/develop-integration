@@ -41,15 +41,15 @@ public class ResourceServiceImpl extends GenericServiceImpl<Resource, Long> impl
 	}
 	
 	@Override
-	public String readIdentityByUrl(String url) throws BusinessException {
-		Resource resource = resourcesCache.get(url);
+	public String readIdentityByUrl(String url,Integer type) throws BusinessException {
+		Resource resource = resourcesCache.get(url+type);
 		if (null != resource) return resource.getIdentity();
 		Query query = new Query();
 		query.addCondition("url", url);
 		query.addCondition("deleteFlag", false);
 		resource = resourceIntegrationDAO.readDataByCondition(query);
 		if (null == resource) return null;
-		resourcesCache.put(resource.getUrl(), resource);
+		resourcesCache.put(resource.getUrl()+resource.getType(), resource);
 		return resource.getIdentity();
 	}
 	
@@ -59,8 +59,29 @@ public class ResourceServiceImpl extends GenericServiceImpl<Resource, Long> impl
 		List<Resource> resources = resourceIntegrationDAO.readDataListByCondition(query);
 		for (int i = 0, len = resources.size(); i < len; i++) {
 			Resource resource = resources.get(i);
-			resourcesCache.put(resource.getUrl(), resource);
+			resourcesCache.put(resource.getUrl()+resource.getType(), resource);
 		}
 	}
 
+	@Override
+	public boolean isInResource(String url, Integer type) throws BusinessException {
+		Resource resource = resourcesCache.get(url+type);
+		if (null != resource) return true;
+		Query query = new Query();
+		query.addCondition("url", url);
+		query.addCondition("type", type);
+		query.addCondition("deleteFlag", false);
+		resource = resourceIntegrationDAO.readDataByCondition(query);
+		if (null == resource) return false;
+		resourcesCache.put(resource.getUrl()+resource.getType(), resource);
+		return true;
+	}
+
+	@Override
+	public Resource readResourceFromCache(String url, Integer type) throws BusinessException {
+		return resourcesCache.get(url+type);
+	}
+
+	
+	
 }

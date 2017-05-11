@@ -1,6 +1,5 @@
 package org.cisiondata.modules.es.client;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;

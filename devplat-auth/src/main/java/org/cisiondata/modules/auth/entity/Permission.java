@@ -16,8 +16,12 @@ public class Permission extends PKAutoEntity<Long> {
 
 	private static final long serialVersionUID = 1L;
 
-	/** 用户类型*/
-	public static final Integer PRINCIPAL_TYPE_USER = 0;
+	/** 镜世界角色类型*/
+	public static final Integer PRINCIPAL_TYPE_USER = 3;
+	/** API角色类型*/
+	public static final Integer PRINCIPAL_TYPE_API_USER = 5;
+	/** APP角色类型*/
+	public static final Integer PRINCIPAL_TYPE_APP_USER = 6;
 	/** 组类型*/
 	public static final Integer PRINCIPAL_TYPE_GROUP = 1;
 	/** 角色类型*/

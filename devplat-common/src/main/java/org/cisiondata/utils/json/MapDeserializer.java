@@ -35,7 +35,7 @@ public class MapDeserializer implements JsonDeserializer<Map<String, Object>> {
 			} else if (JsonObject.class.isAssignableFrom(elementClass)) {
 				map.put(entry.getKey(), GsonUtils.builder().toJson(element));
 			} else {
-				map.put(entry.getKey(), isNumberic(element.getAsString()) ? element.getAsLong() : element);
+				map.put(entry.getKey(), isNumberic(element.getAsString()) ? element.getAsLong() : element.getAsString());
 			}
 		}
 		return map;

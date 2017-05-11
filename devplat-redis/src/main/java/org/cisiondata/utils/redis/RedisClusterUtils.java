@@ -130,7 +130,7 @@ public class RedisClusterUtils {
 		try {
 			return jedisCluster.del(SerializerUtils.write(key));
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage(), e);
 		}
 		return null;
 	}
@@ -144,7 +144,7 @@ public class RedisClusterUtils {
 		try {
 			return jedisCluster.del(SerializerUtils.write(key));
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage(), e);
 		}
 		return null;
 	}
@@ -155,8 +155,13 @@ public class RedisClusterUtils {
 	 * @param members
 	 * @return
 	 */
-	public Long sadd(String key, String... members) {
-		return jedisCluster.sadd(key, members);
+	public long sadd(String key, String... members) {
+		try {
+			return jedisCluster.sadd(key, members);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
 	}
 	
 	/**
@@ -165,8 +170,13 @@ public class RedisClusterUtils {
 	 * @param members
 	 * @return
 	 */
-	public Long srem(String key, String... members) {
-		return jedisCluster.srem(key, members);
+	public long srem(String key, String... members) {
+		try {
+			return jedisCluster.srem(key, members);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
 	}
 	
 	/**
@@ -176,7 +186,12 @@ public class RedisClusterUtils {
 	 * @return
 	 */
 	public boolean sismember(String key, String member) {
-		return jedisCluster.sismember(key, member);
+		try {
+			return jedisCluster.sismember(key, member);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return false;
 	}
 	
 	/**
@@ -185,7 +200,12 @@ public class RedisClusterUtils {
 	 * @return
 	 */
 	public long scard(String key) {
-		return jedisCluster.scard(key);
+		try {
+			return jedisCluster.scard(key);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
 	}
 	
 	/**

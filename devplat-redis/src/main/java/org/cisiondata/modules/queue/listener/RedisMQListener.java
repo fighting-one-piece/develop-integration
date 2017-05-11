@@ -22,9 +22,9 @@ public class RedisMQListener {
 		for (String routingKey : redisMQService.getRoutingKeys()) {
 			long mqLength = redisMQService.readMessageQueueLength(routingKey);
 			if (mqLength > 0){
-				Object message = redisMQService.receiveMessage(routingKey);
-				for (int i = 0, len = consumerServiceList.size(); i < len; i++) {
-					for (int j = 0; j < mqLength; j++) {
+				for (int m = 0; m < mqLength; m++) {
+					Object message = redisMQService.receiveMessage(routingKey);
+					for (int i = 0, len = consumerServiceList.size(); i < len; i++) {
 						consumerServiceList.get(i).handleMessage(routingKey, message);
 					}
 				}

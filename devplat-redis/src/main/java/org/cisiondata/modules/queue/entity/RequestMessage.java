@@ -2,6 +2,7 @@ package org.cisiondata.modules.queue.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RequestMessage implements Serializable {
@@ -12,6 +13,8 @@ public class RequestMessage implements Serializable {
 	private String url = null;
 	/** 请求参数*/
 	private Map<String, String> params = null;
+	/** 请求属性*/
+	private Map<String, Object> attributes = null;
 	/** 请求IP*/
 	private String ipAddress = null;
 	/** 请求账户*/
@@ -45,11 +48,21 @@ public class RequestMessage implements Serializable {
 	}
 
 	public Map<String, String> getParams() {
+		if (null == params) params = new HashMap<String, String>();
 		return params;
 	}
 
 	public void setParams(Map<String, String> params) {
 		this.params = params;
+	}
+
+	public Map<String, Object> getAttributes() {
+		if (null == attributes) attributes = new HashMap<String, Object>();
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, Object> attributes) {
+		this.attributes = attributes;
 	}
 
 	public String getIpAddress() {

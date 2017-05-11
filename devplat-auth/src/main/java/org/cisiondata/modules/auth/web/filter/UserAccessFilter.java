@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -28,6 +28,7 @@ import org.cisiondata.modules.abstr.web.WebResult;
 import org.cisiondata.modules.auth.Constants;
 import org.cisiondata.modules.auth.entity.User;
 import org.cisiondata.modules.auth.service.IAuthService;
+import org.cisiondata.modules.auth.service.IPermissionService;
 import org.cisiondata.modules.auth.web.WebUtils;
 import org.cisiondata.modules.auth.web.session.SessionManager;
 import org.cisiondata.utils.date.DateFormatter;
@@ -55,6 +56,8 @@ public class UserAccessFilter implements Filter {
 	
 	private SessionManager sessionManager = null;
 	
+	private IPermissionService permissionService = null;
+	
 	private Set<String> notAuthenticationUrls = null;
 	
 	private Set<String> mustAuthenticationUrls = null;
@@ -63,6 +66,7 @@ public class UserAccessFilter implements Filter {
 		WebApplicationContext wac = WebApplicationContextUtils.getWebApplicationContext(config.getServletContext());
 		authService = wac.getBean(IAuthService.class);
 		sessionManager = wac.getBean(SessionManager.class);
+		permissionService = wac.getBean(IPermissionService.class);
 		initializeFilteredRequestUrl();
 	}
 
@@ -82,8 +86,11 @@ public class UserAccessFilter implements Filter {
 			if (!authorizationRequest(requestUrl)) {
 				
 			}
+			if (!jugdeUserPermission(requestUrl, httpServletRequest, httpServletResponse)) {
+				writeResponse(httpServletResponse, wrapperFailureWebResult(999,"此路径没有权限"));
+				return;
+			}
 		}
-		
 		chain.doFilter(request, response);
 	}
 	
@@ -106,7 +113,15 @@ public class UserAccessFilter implements Filter {
 		mustAuthenticationUrls.add("/users/settings/security/verify");
 		mustAuthenticationUrls.add("/users/settings/security/question");
 	}
-	
+	private boolean jugdeUserPermission(String requestUrl, HttpServletRequest request, HttpServletResponse response){
+		if (requestUrl.startsWith("/app")) {
+			return true;
+		} else if (requestUrl.startsWith("/ext")) {
+			return true;
+		} else {
+			return permissionService.findPermissionCisionData(requestUrl, request, response);
+	}
+	}
 	private boolean authenticationRequest(String requestUrl, HttpServletRequest request, HttpServletResponse response) {
 		if (requestUrl.startsWith("/app")) {
 			return authenticationAppRequest(request, response);

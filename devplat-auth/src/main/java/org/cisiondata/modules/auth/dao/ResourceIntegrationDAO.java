@@ -73,6 +73,7 @@ public class ResourceIntegrationDAO extends GenericDAOImpl<Resource, Long> {
 	@Override
 	public Resource readDataByPK(Long pk) throws DataAccessException {
 		Resource resource = resourceDAO.readDataByPK(pk);
+		if(null == resource) return resource;
 		EntityAttributeUtils.fillEntity(resource.getAttributes(), resource);
 		return resource;
 	}
@@ -80,6 +81,7 @@ public class ResourceIntegrationDAO extends GenericDAOImpl<Resource, Long> {
 	@Override
 	public Resource readDataByCondition(Query query) throws DataAccessException {
 		Resource resource = resourceDAO.readDataByCondition(query);
+		if(null == resource) return resource;
 		EntityAttributeUtils.fillEntity(resource.getAttributes(), resource);
 		return resource;
 	}

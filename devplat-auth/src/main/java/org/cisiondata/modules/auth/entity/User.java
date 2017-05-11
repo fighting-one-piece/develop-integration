@@ -85,6 +85,8 @@ public class User extends PKAutoEntity<Long> {
 	private transient Boolean encryptedFlag = false;
 	/** 是否填写个人信息*/
 	private transient Boolean informationFlag = false;
+	/** 剩余金额*/
+	private transient Double remainingMoney = null;
 	/** 访问ID */
 	private transient String accessId = null;
 	/** 访问KEY */
@@ -94,6 +96,14 @@ public class User extends PKAutoEntity<Long> {
 	
 	public String getAccount() {
 		return account;
+	}
+
+	public Double getRemainingMoney() {
+		return remainingMoney;
+	}
+
+	public void setRemainingMoney(Double remainingMoney) {
+		this.remainingMoney = remainingMoney;
 	}
 
 	public void setAccount(String account) {

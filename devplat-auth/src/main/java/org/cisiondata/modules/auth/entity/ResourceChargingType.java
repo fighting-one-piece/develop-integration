@@ -3,7 +3,7 @@ package org.cisiondata.modules.auth.entity;
 /** 资源计费类型*/
 public enum ResourceChargingType {
 	
-	DAY(0), MONTH(1), QUARTER(2), YEAR(3);
+	QUERY_TIMES(0), RESULT_COUNT(1), DAY(2), MONTH(3), QUARTER(4), YEAR(5);
 	
 	private int value;
 	

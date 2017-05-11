@@ -179,13 +179,14 @@ public class AuthServiceImpl implements IAuthService {
 	@Override
 	public boolean judgeUserPermission(String account, String url) throws BusinessException {
 		Set<String> permissions = readPermissionIdentitiesByAccount(account);
-		String permission = readResourceReadIdentityByUrl(url);
+		Integer type = Integer.valueOf(userService.readUserByAccount(account).getIdentity());
+		String permission = readResourceReadIdentityByUrl(url, type);
 		return permissions.contains(permission);
 	}
 	
 	@Override
-	public String readResourceReadIdentityByUrl(String url) throws BusinessException {
-		String identity = resourceService.readIdentityByUrl(url);
+	public String readResourceReadIdentityByUrl(String url,Integer type) throws BusinessException {
+		String identity = resourceService.readIdentityByUrl(url,type);
 		return StringUtils.isBlank(identity) ? null : identity + ":" + Permission.READ;
 	}
 	

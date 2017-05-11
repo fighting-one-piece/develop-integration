@@ -29,7 +29,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		}
 		AAdminUser adminUser = readUserByAccount(account);
 		if (null == adminUser) {
-			throw new BusinessException(ResultCode.ACCOUNT_PASSWORD_NOT_MATCH);
+			throw new BusinessException(ResultCode.ACCOUNT_NOT_EXIST);
 		}
 		String encryptPassword = EndecryptUtils.encryptPassword(password, adminUser.getSalt());
 		if (!encryptPassword.equals(adminUser.getPassword())) {
@@ -50,7 +50,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 			Map<String,Object> params = new HashMap<String ,Object>();
 			params.put("account", account);
 			List<AAdminUser> list =  adminUserDAO.findByCondition(params);
-			if (list.size() < 0) return null;
+			if (list.size() < 1) return null;
 			adminUser = list.get(0);
 			if (null != adminUser && null != adminUser.getId()) {
 				RedisClusterUtils.getInstance().set(accountCacheKey, adminUser, 1800);

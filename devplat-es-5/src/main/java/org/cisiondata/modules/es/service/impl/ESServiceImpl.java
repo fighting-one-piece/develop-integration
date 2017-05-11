@@ -61,7 +61,7 @@ public class ESServiceImpl extends AbstrESServiceImpl implements IESService {
 		for (int i = 0, len = attributeValues.size(); i < len; i++) {
 			SearchRequestBuilder srb = client.prepareSearch(index).setTypes(type);
 			srb.setQuery(QueryBuilders.termQuery(attribute, attributeValues.get(i)));
-			srb.setSearchType(SearchType.QUERY_AND_FETCH);
+			srb.setSearchType(SearchType.QUERY_THEN_FETCH);
 			srb.setSize(size).setExplain(false);
 			msrb.add(srb);
 		}
@@ -130,7 +130,7 @@ public class ESServiceImpl extends AbstrESServiceImpl implements IESService {
 	@Override
 	public QueryResult<Map<String, Object>> readPaginationDataListByConditionWithScore(String index, 
 			String[] types, QueryBuilder query, String scrollId, int size){
-		return readPaginationDataList(index, types, query, SearchType.DFS_QUERY_AND_FETCH, 
+		return readPaginationDataList(index, types, query, SearchType.DFS_QUERY_THEN_FETCH, 
 				scrollId, size, false, true);
 	}
 	

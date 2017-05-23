@@ -51,6 +51,13 @@ public class RabbitMQTest {
     	Thread.sleep(1000);
 	}
 	
+	@Test
+	public void test04() throws InterruptedException {
+		mqService.sendTopicMessage(MQueue.DEFAULT_QUEUE.getRoutingKey(), 
+    			SerializerUtils.write("this is default topic message !!!!!!"));
+		Thread.sleep(2000);
+	}
+	
 	@Test    
     public void test1() throws InterruptedException{    
         String message = "currentTime:"+System.currentTimeMillis();  

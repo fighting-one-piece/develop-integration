@@ -32,6 +32,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spring.version>4.3.6.RELEASE</spring.version>
 		<rabbitmq.client.version>4.0.0</rabbitmq.client.version>
 		<spring.rabbitmq.version>1.7.0.RELEASE</spring.rabbitmq.version>
 	</properties>
@@ -125,7 +126,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<webappDirectory>src/main/webapp</webappDirectory>
-					<warSourceDirectory>target/devplat</warSourceDirectory>
+					<warSourceDirectory>target/devplat-rabbitmq</warSourceDirectory>
 				</configuration>
 			</plugin>
 			<plugin>

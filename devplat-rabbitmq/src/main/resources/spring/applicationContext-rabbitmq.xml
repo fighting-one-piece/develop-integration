@@ -10,6 +10,14 @@
 						http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.6.xsd" 
 						default-autowire="byName">
 	
+	<!-- 注解配置  -->
+	<context:component-scan base-package="org.cisiondata">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>  
+	</context:component-scan>
+	
 	<!-- 加载文件配置 -->
 	<context:property-placeholder location="classpath*:rabbitmq/rabbitmq.properties" ignore-unresolvable="true"/>
 	
@@ -48,6 +56,10 @@
     </rabbit:topic-exchange>
     
     <!--定义rabbit template用于数据的接收和发送-->
+    <rabbit:template id="amqpTemplate" connection-factory="connectionFactory" 
+    	exchange="topicExChange"
+        message-converter="jsonMessageConverter"/>
+    
     <rabbit:template id="rAmqpTemplate" connection-factory="connectionFactory" 
     	exchange="directExChange" 
     	message-converter="serializerMessageConverter"
@@ -68,6 +80,24 @@
     </rabbit:listener-container>
     -->
     
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">            
+        <!-- 核心线程数，默认为1 -->            
+        <property name="corePoolSize" value="10" />            
+        <!-- 最大线程数，默认为Integer.MAX_VALUE -->            
+        <property name="maxPoolSize" value="50" />            
+        <!-- 队列最大长度，一般需要设置值>=notifyScheduledMainExecutor.maxNum；默认为Integer.MAX_VALUE -->            
+        <property name="queueCapacity" value="1000" />            
+        <!-- 线程池维护线程所允许的空闲时间，默认为60s -->            
+        <property name="keepAliveSeconds" value="300" />            
+        <!-- 线程池对拒绝任务（无线程可用）的处理策略，目前只支持AbortPolicy、CallerRunsPolicy；默认为后者 -->            
+        <property name="rejectedExecutionHandler">            
+            <!-- AbortPolicy:直接抛出java.util.concurrent.RejectedExecutionException异常 -->            
+            <!-- CallerRunsPolicy:主线程直接执行该任务，执行完之后尝试添加下一个任务到线程池中，可以有效降低向线程池内添加任务的速度 -->            
+            <!-- DiscardOldestPolicy:抛弃旧的任务、暂不支持；会导致被丢弃的任务无法再次被执行 -->            
+            <!-- DiscardPolicy:抛弃当前任务、暂不支持；会导致被丢弃的任务无法再次被执行 -->            
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />            
+        </property>            
+    </bean>
     
     <rabbit:listener-container connection-factory="connectionFactory" acknowledge="manual" concurrency="10" max-concurrency="20">
         <!--  
@@ -76,10 +106,21 @@
         <rabbit:listener queues="defaultQueue,requestAccessQueue,responseResultQueue,defaultTopicQueue" ref="receiveConfirmListener"/>
     </rabbit:listener-container>
     
+    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="auto" task-executor="taskExecutor">  
+         <rabbit:listener queues="requestAccessQueue" ref="messageQueueListenerAdapter" />
+    </rabbit:listener-container> 
+
+	<!--  用于消息的监听的代理类MessageListenerAdapter -->
+    <bean id="messageQueueListenerAdapter" class="org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter">
+        <constructor-arg ref="messageHandler" />    
+        <property name="defaultListenerMethod" value="handleMessage"></property>    
+        <property name="messageConverter" ref="jsonMessageConverter"></property>    
+    </bean> 
+    
     <!-- 消息转换器SimpleMessageConverter -->    
     <bean id="serializerMessageConverter"  class="org.springframework.amqp.support.converter.SimpleMessageConverter"/>   
     
-    <!-- 消息对象json转换类 -->
+    <!-- 消息转换器Json转换类 -->
     <bean id="jsonMessageConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter" />  
 	  
 </beans>

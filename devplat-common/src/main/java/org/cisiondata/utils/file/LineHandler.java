@@ -1,19 +1,19 @@
 package org.cisiondata.utils.file;
 
-public interface LineHandler {
+public interface LineHandler<T> {
 
 	/**
 	 * 处理行数据
 	 * @param line
 	 * @return
 	 */
-	public <T> T handle(String line);
+	public T handle(String line);
 	
 	/**
 	 * 过滤行数据
 	 * @param line
 	 * @return
 	 */
-	public boolean filter(String line);
+	public boolean filter(T t);
 	
 }

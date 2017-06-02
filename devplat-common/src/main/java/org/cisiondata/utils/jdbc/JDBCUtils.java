@@ -104,7 +104,7 @@ public class JDBCUtils {
 	 * @param params 参数
 	 * @return
 	 */
-	public static Object execute(String sql, ResultSetHandler handler, Object... params) {
+	public static <T> T execute(String sql, ResultSetHandler<T> handler, Object... params) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet result = null;

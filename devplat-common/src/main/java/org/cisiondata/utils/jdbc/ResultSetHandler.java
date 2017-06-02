@@ -2,12 +2,12 @@ package org.cisiondata.utils.jdbc;
 
 import java.sql.ResultSet;
 
-public interface ResultSetHandler {
+public interface ResultSetHandler<T> {
 	
 	/**
 	 * 处理结果集
 	 * @param resultSet
 	 * @return
 	 */
-	public Object handle(ResultSet resultSet);
+	public T handle(ResultSet resultSet);
 }

@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cisiondata.utils.json.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,15 +21,15 @@ public class FileUtils {
 	
 	private static Logger LOG = LoggerFactory.getLogger(FileUtils.class);
 	
-	public static <T> List<T> readFromAbsolute(String src, LineHandler lineHandler) throws FileNotFoundException {
+	public static <T> List<T> readFromAbsolute(String src, LineHandler<T> lineHandler) throws FileNotFoundException {
 		return read(new FileInputStream(new File(src)), lineHandler);
 	}
 	
-	public static <T> List<T> readFromClasspath(String src, LineHandler lineHandler) {
+	public static <T> List<T> readFromClasspath(String src, LineHandler<T> lineHandler) {
 		return read(FileUtils.class.getClassLoader().getResourceAsStream(src), lineHandler);
 	}
 	
-	public static <T> List<T> read(InputStream in, LineHandler lineHandler) {
+	public static <T> List<T> read(InputStream in, LineHandler<T> lineHandler) {
 		List<T> result = new ArrayList<T>();
 		BufferedReader br = null;
 		try {
@@ -54,7 +55,9 @@ public class FileUtils {
 		OutputStream out = null;
 		BufferedWriter bw = null;
 		try {
-			out = new FileOutputStream(new File(dest));
+			File file = new File(dest);
+			if (!file.exists()) file.mkdirs();
+			out = new FileOutputStream(file);
 			bw = new BufferedWriter(new OutputStreamWriter(out));
 			for (int i = 0, len = lines.size(); i < len; i++) {
 				bw.write(lines.get(i));
@@ -73,7 +76,55 @@ public class FileUtils {
 		}
 	}
 	
-	public static void filter(String src, String dest, LineHandler lineHandler) {
+	public static void writeJSON(String dest, List<Object> objects) {
+		OutputStream out = null;
+		BufferedWriter bw = null;
+		try {
+			out = new FileOutputStream(new File(dest));
+			bw = new BufferedWriter(new OutputStreamWriter(out));
+			for (int i = 0, len = objects.size(); i < len; i++) {
+				bw.write(GsonUtils.builder().toJson(objects.get(i)));
+				bw.newLine();
+			}
+			bw.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (null != out) out.close();
+				if (null != bw) bw.close();
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
+		}
+	}
+	
+	public static <T> List<T> filter(String src, LineHandler<T> lineHandler) {
+		List<T> result = new ArrayList<T>();
+		InputStream in = null;
+		BufferedReader br = null;
+		try {
+			in = new FileInputStream(new File(src));
+			br = new BufferedReader(new InputStreamReader(in));
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				T t = lineHandler.handle(line);
+				if (!lineHandler.filter(t)) result.add(t);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (null != in) in.close();
+				if (null != br) br.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	
+	public static <T> void filter(String src, String dest, LineHandler<T> lineHandler) {
 		InputStream in = null;
 		BufferedReader br = null;
 		OutputStream out = null;
@@ -85,7 +136,7 @@ public class FileUtils {
 			bw = new BufferedWriter(new OutputStreamWriter(out));
 			String line = null;
 			while ((line = br.readLine()) != null) {
-				if (!lineHandler.filter(line)) {
+				if (!lineHandler.filter(lineHandler.handle(line))) {
 					bw.write(line);
 					bw.newLine();
 				}

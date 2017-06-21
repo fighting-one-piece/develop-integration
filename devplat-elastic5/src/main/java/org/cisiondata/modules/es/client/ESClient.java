@@ -36,11 +36,11 @@ public class ESClient {
 	}
 	
 	private void initClient() {
-        Settings settings = Settings.builder().put("cluster.name", "cisiondata")
+        Settings settings = Settings.builder().put("cluster.name", "cisiondata-cluster")
         		.put("client.transport.sniff", true).build();
         client = new PreBuiltTransportClient(settings);
         List<EsServerAddress> esServerAddress = new ArrayList<EsServerAddress>();
-		esServerAddress.add(new EsServerAddress("192.168.0.115", 9300));
+		esServerAddress.add(new EsServerAddress("192.168.0.124", 9030));
 		for (EsServerAddress address : esServerAddress) {
 			client.addTransportAddress(new InetSocketTransportAddress(
 					new InetSocketAddress(address.getHost(), address.getPort())));

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.cisiondata</groupId>
-	<artifactId>devplat-es-5</artifactId>
+	<artifactId>devplat-elastic5</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -113,7 +113,7 @@
 	</dependencies>
 	
 	<build>
-		<finalName>devplat-es-5</finalName>
+		<finalName>devplat-elastic5</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<defaultGoal>install</defaultGoal>
@@ -165,7 +165,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<webappDirectory>src/main/webapp</webappDirectory>
-					<warSourceDirectory>target/devplat</warSourceDirectory>
+					<warSourceDirectory>target/devplat-elastic5</warSourceDirectory>
 				</configuration>
 			</plugin>
 			<plugin>

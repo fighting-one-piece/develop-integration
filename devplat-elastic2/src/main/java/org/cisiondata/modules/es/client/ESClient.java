@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
@@ -77,7 +78,30 @@ public class ESClient {
 				LOG.error(e.getMessage(), e);
 			}
 		}
+		initProps();
 	}
+	
+	private static void initProps() {
+		Properties properties = new Properties();
+		InputStream in = null;
+		try {
+			in = ESClient.class.getClassLoader().getResourceAsStream("redis/env.local.properties");
+			properties.load(in);
+			for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+				System.out.println("k: " + entry.getKey() + " v: " + entry.getValue());
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		} finally {
+			try {
+				if (null != in) in.close();
+			} catch (IOException e) {
+				LOG.error(e.getMessage(), e);
+			}
+		}
+	}
+	
+	
 	
 }
 

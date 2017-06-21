@@ -604,7 +604,7 @@ public class ESClientHelper {
 	}
 	
 	public static void main(String[] args) {
-		createIndex("logistics", 10, 1);
+		createIndex("logistics-v1", 10, 1);
 	}
 
 }

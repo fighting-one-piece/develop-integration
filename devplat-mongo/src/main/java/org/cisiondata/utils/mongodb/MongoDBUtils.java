@@ -25,8 +25,8 @@ public class MongoDBUtils {
     
     private void initMongoClient() {  
     	List<ServerAddress> serverAddressList = new ArrayList<ServerAddress>();  
-        ServerAddress serverAddress01 = new ServerAddress("192.168.0.20", 27018);  
-        ServerAddress serverAddress02 = new ServerAddress("192.168.0.115", 27018);  
+        ServerAddress serverAddress01 = new ServerAddress("172.20.100.20", 27018);  
+        ServerAddress serverAddress02 = new ServerAddress("172.20.100.115", 27018);  
         serverAddressList.add(serverAddress01);  
         serverAddressList.add(serverAddress02);  
         List<MongoCredential> credentials = new ArrayList<MongoCredential>();  

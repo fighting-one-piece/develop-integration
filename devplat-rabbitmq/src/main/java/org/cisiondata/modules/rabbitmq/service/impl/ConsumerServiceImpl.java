@@ -12,8 +12,22 @@ public abstract class ConsumerServiceImpl implements IConsumerService {
 
 	public abstract void handleMessage(Object message);
 	
-	public void handleMessage(String routingKey, Object message) {
+	@Override
+	public void handleMessage(String exchange, String routingKey, Object message) {
+		if ("directExchange".equalsIgnoreCase(exchange)) {
+			handleDirectMessage(routingKey, message);
+		} else if ("topicExchange".equalsIgnoreCase(exchange)) {
+			handleTopicMessage(routingKey, message);
+		}
+	}
+	
+	private void handleDirectMessage(String routingKey, Object message) {
 		if (!routingKey.equalsIgnoreCase(getRoutingKey())) return;
+		handleMessage(message);
+	}
+	
+	private void handleTopicMessage(String routingKey, Object message) {
+		if (!routingKey.matches(getRoutingKey())) return;
 		handleMessage(message);
 	}
 

@@ -4,7 +4,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 
-public interface IMQService {
+public interface IRabbitmqService {
 	
 	/**
 	 * 定义声明Exchange
@@ -15,9 +15,8 @@ public interface IMQService {
 	/**
 	 * 定义声明Queue
 	 * @param queue
-	 * @return
 	 */
-	public String declareQueue(Queue queue);
+	public void declareQueue(Queue queue);
 	
 	/**
 	 * 定义声明Binding
@@ -58,6 +57,14 @@ public interface IMQService {
 	 * @param message
 	 */
 	public void sendMessage(String exchange, String routingKey, Object message);
+	
+	/**
+	 * 发送主题消息,指定exchange交换器,指定routingKey队列
+	 * @param exchange
+	 * @param routingKey
+	 * @param message
+	 */
+	public void sendTopicMessage(String exchange, String routingKey, Object message);
 	
 	/**
 	 * 接受指定队列消息

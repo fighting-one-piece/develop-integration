@@ -10,11 +10,41 @@
 	<name>DevPlat RabbitMQ Project</name>
 	<url>http://maven.apache.org</url>
 
+	<profiles>
+		<!-- 开发环境 -->
+		<profile>
+			<id>development</id>
+			<properties>
+				<target-env>development</target-env>
+				<repo-host>192.168.0.124:8081</repo-host>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<!-- 测试环境 -->
+		<profile>
+			<id>test</id>
+			<properties>
+				<target-env>test</target-env>
+				<repo-host>172.20.100.114:11111</repo-host>
+			</properties>
+		</profile>
+		<!-- 生产环境 -->
+		<profile>
+			<id>production</id>
+			<properties>
+				<target-env>production</target-env>
+				<repo-host>172.20.100.114:11111</repo-host>
+			</properties>
+		</profile>
+	</profiles>
+
 	<repositories>
 		<repository>
 			<id>public</id>
 			<name>public repository</name>
-			<url>http://192.168.0.115:8081/nexus/content/groups/public/</url>
+			<url>http://${repo-host}/nexus/content/groups/public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -38,13 +68,6 @@
 	</properties>
 
 	<dependencies>
-		<!--DevPlat Spring依赖包 -->
-		<dependency>
-			<groupId>org.cisiondata</groupId>
-			<artifactId>devplat-spring</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		
 		<dependency>
 			<groupId>jdk.tools</groupId>
 			<artifactId>jdk.tools</artifactId>
@@ -59,6 +82,51 @@
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>test</scope>
+		</dependency>
+		
+		<!--Commons Lang依赖包 -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		
+		<!-- Gson依赖包 -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+		
+		<!--Spring依赖包 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
 		</dependency>
 		
 		<!-- RabbitMQ依赖报 -->
@@ -154,13 +222,13 @@
 		<repository>  
             <id>user-release</id>  
             <name>User Project Release</name>  
-            <url>http://192.168.0.115:8081/nexus/content/repositories/releases/</url>  
+            <url>http://${repo-host}/nexus/content/repositories/releases/</url>  
         </repository>  
   
         <snapshotRepository>  
             <id>user-snapshots</id>  
             <name>User Project SNAPSHOTS</name>  
-            <url>http://192.168.0.115:8081/nexus/content/repositories/snapshots/</url>  
+            <url>http://${repo-host}/nexus/content/repositories/snapshots/</url>  
         </snapshotRepository>  
 	</distributionManagement>
 	

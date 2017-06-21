@@ -1,6 +1,6 @@
 package org.cisiondata.modules.rabbitmq.service.impl;
 
-import org.cisiondata.modules.rabbitmq.entity.MQueue;
+import org.cisiondata.modules.rabbitmq.entity.CQueue;
 import org.cisiondata.modules.rabbitmq.service.impl.ConsumerServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +9,7 @@ public class DefaultConsumerServiceImpl extends ConsumerServiceImpl {
 
 	@Override
 	protected String getRoutingKey() {
-		return MQueue.DEFAULT_QUEUE.getRoutingKey();
+		return CQueue.DEFAULT_QUEUE.getRoutingKey();
 	}
 
 	@Override

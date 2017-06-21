@@ -21,11 +21,11 @@ public class CustomMessageListener implements MessageListener {
 	public void onMessage(Message message) {
 		System.out.println(message);
 		MessageProperties properties = message.getMessageProperties();
+		String exchange = properties.getReceivedExchange();
 		String routingKey = properties.getReceivedRoutingKey();
-		System.out.println("routingKey: " + routingKey);
 		if (StringUtils.isBlank(routingKey)) return;
 		for (int i = 0, len = consumerServiceList.size(); i < len; i++) {
-			consumerServiceList.get(i).handleMessage(routingKey, 
+			consumerServiceList.get(i).handleMessage(exchange, routingKey, 
 					SerializerUtils.read(message.getBody()));
 		}
 	}

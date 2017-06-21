@@ -1,4 +1,4 @@
-package org.cisiondata.modules.rabbitmq.example;
+package org.cisiondata.modules.rabbitmq.service;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -10,7 +10,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 
 @SuppressWarnings("deprecation")
-public class FTopic {
+public class RabbitmqApiTest {
 	
 	private static final String EXCHANGE_NAME = "topic_logs";  
 

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public class DefaultMessage implements Serializable {
+public class CMessage implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -18,17 +18,17 @@ public class DefaultMessage implements Serializable {
 	// 参数
 	private Object[] params = null;
 
-	public DefaultMessage() {
+	public CMessage() {
 	}
 
-	public DefaultMessage(String exchange, String routeKey, Object... params) {
+	public CMessage(String exchange, String routeKey, Object... params) {
 		this.params = params;
 		this.exchange = exchange;
 		this.routeKey = routeKey;
 	}
 
 	@SuppressWarnings("rawtypes")
-	public DefaultMessage(String exchange, String routeKey, String methodName, Object... params) {
+	public CMessage(String exchange, String routeKey, String methodName, Object... params) {
 		this.exchange = exchange;
 		this.routeKey = routeKey;
 		this.params = params;

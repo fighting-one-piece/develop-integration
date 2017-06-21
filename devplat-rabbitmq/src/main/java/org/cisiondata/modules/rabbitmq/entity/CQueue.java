@@ -1,9 +1,9 @@
 package org.cisiondata.modules.rabbitmq.entity;
 
-public enum MQueue {
+public enum CQueue {
 	
 	DEFAULT_QUEUE("defaultQueue", "default"),
-	DEFAULT_TOPIC_QUEUE("defaultTopicQueue", "topic"),
+	DEFAULT_TOPIC_QUEUE("defaultTopicQueue", "topic.default"),
 	REQUEST_ACCESS_QUEUE("requestAccessQueue", "requestAccess"),
 	RESPONSE_RESULT_QUEUE("responseResultQueue", "responseResult");
 	
@@ -11,7 +11,7 @@ public enum MQueue {
 	
 	private String routingKey = null;
 	
-	private MQueue(String name, String routingKey) {
+	private CQueue(String name, String routingKey) {
 		this.name = name;
 		this.routingKey = routingKey;
 	}

@@ -19,15 +19,17 @@
 	</context:component-scan>
 	
 	<!-- 加载文件配置 -->
-	<context:property-placeholder location="classpath*:rabbitmq/rabbitmq.properties" ignore-unresolvable="true"/>
+	<context:property-placeholder location="classpath*:rabbitmq/env.local.properties" ignore-unresolvable="true"/>
 	
 	<!--配置connection-factory，指定连接rabbit server参数-->
     <rabbit:connection-factory id="connectionFactory" 
     						   username="${rabbitmq.manager.user}" 
     						   password="${rabbitmq.manager.password}"
                                host="${rabbitmq.ip}"
-                               port="${rabbitmq.post}"
+                               port="${rabbitmq.port}"
                                publisher-confirms="true"  
+                               publisher-returns="true"
+                               connection-timeout="60000"
                                virtual-host="/"/>
 
     <!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成-->
@@ -35,51 +37,37 @@
 
     <!--定义queue-->
     <rabbit:queue id="defaultQueue" name="defaultQueue" durable="true" auto-delete="false" exclusive="false"/>
-    <rabbit:queue id="requestAccessQueue" name="requestAccessQueue" durable="true" auto-delete="false" exclusive="false"/>
-    <rabbit:queue id="responseResultQueue" name="responseResultQueue" durable="true" auto-delete="false" exclusive="false"/>
 	
-	 <rabbit:queue id="defaultTopicQueue" name="defaultTopicQueue" durable="true" auto-delete="false" exclusive="false"/>
+	<rabbit:queue id="defaultTopicQueue" name="defaultTopicQueue" durable="true" auto-delete="false" exclusive="false"/>
 
-    <!-- 定义direct exchange，绑定queue -->
-    <rabbit:direct-exchange name="directExChange" durable="true" auto-delete="false">
+    <!-- 定义direct exchange and binding queue -->
+    <rabbit:direct-exchange name="directExchange" durable="true" auto-delete="false">
         <rabbit:bindings>
             <rabbit:binding queue="defaultQueue" key="default"></rabbit:binding>
-            <rabbit:binding queue="requestAccessQueue" key="requestAccess"></rabbit:binding>
-            <rabbit:binding queue="responseResultQueue" key="responseResult"></rabbit:binding>
         </rabbit:bindings>
     </rabbit:direct-exchange>
     
-    <rabbit:topic-exchange name="topicExChange" durable="true" auto-delete="false">
+    <rabbit:topic-exchange name="topicExchange" durable="true" auto-delete="false">
     	<rabbit:bindings>
-            <rabbit:binding queue="defaultTopicQueue" pattern="*topic*"></rabbit:binding>
+            <rabbit:binding queue="defaultTopicQueue" pattern="topic.*"></rabbit:binding>
         </rabbit:bindings>
     </rabbit:topic-exchange>
     
     <!--定义rabbit template用于数据的接收和发送-->
-    <rabbit:template id="amqpTemplate" connection-factory="connectionFactory" 
-    	exchange="topicExChange"
-        message-converter="jsonMessageConverter"/>
-    
-    <rabbit:template id="rAmqpTemplate" connection-factory="connectionFactory" 
-    	exchange="directExChange" 
+    <rabbit:template id="dAmqpTemplate" connection-factory="connectionFactory" 
+    	exchange="directExchange" 
     	message-converter="serializerMessageConverter"
     	confirm-callback="confirmCallBackListener"  
         return-callback="returnCallBackListener"   
         mandatory="true" />
    
     <rabbit:template id="tAmqpTemplate" connection-factory="connectionFactory" 
-    	exchange="topicExChange"
+    	exchange="topicExchange"
     	message-converter="serializerMessageConverter"
     	confirm-callback="confirmCallBackListener"  
         return-callback="returnCallBackListener"   
         mandatory="true" />
 
-   	<!--  
-    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="manual" concurrency="10" max-concurrency="20">
-        <rabbit:listener queues="defaultQueue,requestAccessQueue,responseResultQueue,defaultTopicQueue" ref="customMessageListener"/>
-    </rabbit:listener-container>
-    -->
-    
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">            
         <!-- 核心线程数，默认为1 -->            
         <property name="corePoolSize" value="10" />            
@@ -99,28 +87,56 @@
         </property>            
     </bean>
     
-    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="manual" concurrency="10" max-concurrency="20">
-        <!--  
-        <rabbit:listener queues="defaultQueue,requestAccessQueue,responseResultQueue,defaultTopicQueue" ref="customMessageListener"/>
-        -->
-        <rabbit:listener queues="defaultQueue,requestAccessQueue,responseResultQueue,defaultTopicQueue" ref="receiveConfirmListener"/>
+    <!-- Listener Container -->
+    <!--  
+    <rabbit:listener-container 
+    	connection-factory="connectionFactory" 
+    	task-executor="taskExecutor"
+    	acknowledge="manual" 
+    	concurrency="10" 
+    	max-concurrency="20">
+        <rabbit:listener queues="defaultQueue,defaultTopicQueue" ref="receiveConfirmListener"/>
     </rabbit:listener-container>
+    -->
     
-    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="auto" task-executor="taskExecutor">  
-         <rabbit:listener queues="requestAccessQueue" ref="messageQueueListenerAdapter" />
-    </rabbit:listener-container> 
-
-	<!--  用于消息的监听的代理类MessageListenerAdapter -->
-    <bean id="messageQueueListenerAdapter" class="org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter">
-        <constructor-arg ref="messageHandler" />    
-        <property name="defaultListenerMethod" value="handleMessage"></property>    
-        <property name="messageConverter" ref="jsonMessageConverter"></property>    
+    <bean id="simpleMessageListenerContainer" 
+    	class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
+    	<property name="connectionFactory" ref="connectionFactory" />
+    	<!--  
+    	<property name="taskExecutor" ref="taskExecutor" />
+    	-->
+    	<property name="acknowledgeMode" ref="manual" />
+    	<property name="concurrentConsumers" value="10" />
+    	<property name="maxConcurrentConsumers" value="20" />
+    	<property name="exposeListenerChannel" value="true" />
+    	<property name="messageListener" ref="receiveConfirmListener" />
+    	<property name="messageConverter" ref="serializerMessageConverter" />
+    	<property name="queueNames" value="defaultQueue,defaultTopicQueue" />
+    </bean>
+    
+    <bean id="manual" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">    
+        <property name="staticField" value="org.springframework.amqp.core.AcknowledgeMode.MANUAL" />    
     </bean> 
     
-    <!-- 消息转换器SimpleMessageConverter -->    
-    <bean id="serializerMessageConverter"  class="org.springframework.amqp.support.converter.SimpleMessageConverter"/>   
+    <!--  
+    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="auto" task-executor="taskExecutor">  
+         <rabbit:listener queues="defaultQueue" ref="messageQueueListenerAdapter" />
+    </rabbit:listener-container> 
+	-->
+	
+	<!--  用于消息的监听的代理类MessageListenerAdapter -->
+    <!--  
+    <bean id="messageQueueListenerAdapter" class="org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter">
+        <constructor-arg ref="delegateMessageListener" />    
+        <property name="defaultListenerMethod" value="onMessage"></property>    
+        <property name="messageConverter" ref="jsonMessageConverter"></property>    
+    </bean> 
+    -->
     
-    <!-- 消息转换器Json转换类 -->
+    <!-- 消息转换器SimpleMessageConverter -->    
+    <bean id="serializerMessageConverter" class="org.springframework.amqp.support.converter.SimpleMessageConverter"/>   
+    
+    <!-- 消息转换器JsonMessageConverter -->
     <bean id="jsonMessageConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter" />  
 	  
 </beans>

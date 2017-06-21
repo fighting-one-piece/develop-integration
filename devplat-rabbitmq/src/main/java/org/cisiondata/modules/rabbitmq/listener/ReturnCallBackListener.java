@@ -6,7 +6,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate.ReturnCallback;
 import org.springframework.stereotype.Component;  
 
 @Component("returnCallBackListener")  
-public class ReturnCallBackListener implements ReturnCallback{  
+public class ReturnCallBackListener implements ReturnCallback {  
 	
     @Override  
     public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {  

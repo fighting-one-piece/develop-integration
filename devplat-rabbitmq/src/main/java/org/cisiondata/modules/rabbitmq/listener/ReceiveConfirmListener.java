@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.rabbitmq.service.IConsumerService;
 import org.cisiondata.utils.serde.SerializerUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
@@ -16,21 +18,24 @@ import com.rabbitmq.client.Channel;
 @Component("receiveConfirmListener")
 public class ReceiveConfirmListener implements ChannelAwareMessageListener {
 	
+	private Logger LOG = LoggerFactory.getLogger(ReceiveConfirmListener.class);
+	
 	@Autowired(required=true)
 	private List<IConsumerService> consumerServiceList = null;
 	
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception {
 		try {
-			System.out.println("receive confirm--:" + message.getMessageProperties());
-			System.out.println("receive confirm--:" + SerializerUtils.read(message.getBody()));
+			channel.basicQos(100);
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 			MessageProperties properties = message.getMessageProperties();
+			LOG.info("receive confirm: {}", properties);
+			String exchange = properties.getReceivedExchange();
 			String routingKey = properties.getReceivedRoutingKey();
-			System.out.println("routingKey: " + routingKey);
-			if (StringUtils.isBlank(routingKey)) return;
+			LOG.info("receive exchange: {} routingKey: {} message: {} ", exchange, routingKey, SerializerUtils.read(message.getBody()));
+			if (StringUtils.isBlank(exchange) || StringUtils.isBlank(routingKey)) return;
 			for (int i = 0, len = consumerServiceList.size(); i < len; i++) {
-				consumerServiceList.get(i).handleMessage(routingKey, 
+				consumerServiceList.get(i).handleMessage(exchange, routingKey, 
 						SerializerUtils.read(message.getBody()));
 			}
 		} catch (Exception e) {

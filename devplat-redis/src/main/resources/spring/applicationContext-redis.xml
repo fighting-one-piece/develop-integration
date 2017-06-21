@@ -8,7 +8,10 @@
 						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
 						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd"
 	default-autowire="byName">
-
+	
+	<!-- 加载文件配置 -->
+	<context:property-placeholder location="classpath:spring/applicationContext-config.properties" ignore-unresolvable="true"/>
+	
 	<!-- Jedis Pool Config -->
 	<bean name="genericObjectPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig" >
 		<property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}" />
@@ -27,17 +30,18 @@
     	<constructor-arg name="poolConfig" ref="genericObjectPoolConfig" />
         <constructor-arg name="host" value="${redis.pool.host}" />
     	<!--  
-    	<constructor-arg name="host" value="${redis.pool.host}" />
     	<constructor-arg name="port" value="${redis.pool.port}" />
     	-->
     </bean>
     
     <!-- Jedis Cluster Configuration -->
     <bean id="jedisCluster" class="org.cisiondata.utils.redis.JedisClusterFactory">
+    	<!--  
 		<property name="addressConfig">
-			<value>classpath:filter-${target-env}.properties</value>
+			<value>classpath:redis/env.local.properties</value>
 		</property>
 		<property name="addressKeyPrefix" value="redis.cluster.address" /> 
+		-->
 		<property name="timeout" value="${redis.cluster.timeout}" />
 		<property name="maxRedirections" value="${redis.cluster.maxRedirections}" />
 		<property name="genericObjectPoolConfig" ref="genericObjectPoolConfig" />

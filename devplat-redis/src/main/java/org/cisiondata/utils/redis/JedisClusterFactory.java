@@ -1,5 +1,7 @@
 package org.cisiondata.utils.redis;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -19,10 +21,12 @@ public class JedisClusterFactory implements FactoryBean<JedisCluster>, Initializ
 
 	private final Logger LOG = LoggerFactory.getLogger(JedisClusterFactory.class);
 	
-	private Resource addressConfig = null;
-	private String addressKeyPrefix = null;
-
 	private JedisCluster jedisCluster = null;
+
+	@SuppressWarnings("unused")
+	private Resource addressConfig = null;
+	private String addressKeyPrefix = "redis.cluster.address";
+
 	private Integer timeout = null;
 	private Integer maxRedirections = null;
 	private GenericObjectPoolConfig genericObjectPoolConfig = null;
@@ -51,9 +55,14 @@ public class JedisClusterFactory implements FactoryBean<JedisCluster>, Initializ
 	}
 	
 	private Set<HostAndPort> parseHostAndPort() {
+		Properties properties = new Properties();
+		InputStream in = null;
 		try {
-			Properties properties = new Properties();
+			/**
 			properties.load(this.addressConfig.getInputStream());
+			*/
+			in = JedisClusterFactory.class.getClassLoader().getResourceAsStream("redis/env.local.properties");
+			properties.load(in);
 			Set<HostAndPort> hostAndPorts = new HashSet<HostAndPort>();
 			for (Object key : properties.keySet()) {
 				if (!((String) key).startsWith(addressKeyPrefix)) continue;
@@ -65,10 +74,17 @@ public class JedisClusterFactory implements FactoryBean<JedisCluster>, Initializ
 				String[] ipAndPort = value.split(":");
 				HostAndPort hostAndPort = new HostAndPort(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
 				hostAndPorts.add(hostAndPort);
+				System.out.println("redis cluster host: " + hostAndPort.getHost() + " : " + hostAndPort.getPort());
 			}
 			return hostAndPorts;
 		} catch (Exception e) {
 			LOG.error("解析redis配置文件失败", e);
+		} finally {
+			try {
+				if (null != in) in.close();
+			} catch (IOException e) {
+				LOG.error(e.getMessage(), e);
+			}
 		}
 		return null;
 	}

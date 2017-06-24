@@ -16,6 +16,7 @@
 			<id>development</id>
 			<properties>
 				<target-env>development</target-env>
+				<repo-host>192.168.0.124:8081</repo-host>
 			</properties>
 			<activation>
 				<activeByDefault>true</activeByDefault>
@@ -26,6 +27,7 @@
 			<id>test</id>
 			<properties>
 				<target-env>test</target-env>
+				<repo-host>172.20.100.124:8081</repo-host>
 			</properties>
 		</profile>
 		<!-- 生产环境 -->
@@ -33,6 +35,7 @@
 			<id>production</id>
 			<properties>
 				<target-env>production</target-env>
+				<repo-host>172.20.100.124:8081</repo-host>
 			</properties>
 		</profile>
 	</profiles>
@@ -41,7 +44,7 @@
 		<repository>
 			<id>public</id>
 			<name>public repository</name>
-			<url>http://192.168.0.115:8081/nexus/content/groups/public/</url>
+			<url>http://${repo-host}/nexus/content/groups/public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -55,7 +58,7 @@
 		<pluginRepository>
 			<id>public</id>
 			<name>public repository</name>
-			<url>http://192.168.0.115:8081/nexus/content/groups/public/</url>
+			<url>http://${repo-host}/nexus/content/groups/public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -243,13 +246,13 @@
 		<repository>  
             <id>user-release</id>  
             <name>User Project Release</name>  
-            <url>http://192.168.0.115:8081/nexus/content/repositories/releases/</url>  
+            <url>http://${repo-host}/nexus/content/repositories/releases/</url>  
         </repository>  
   
         <snapshotRepository>  
             <id>user-snapshots</id>  
             <name>User Project SNAPSHOTS</name>  
-            <url>http://192.168.0.115:8081/nexus/content/repositories/snapshots/</url>  
+            <url>http://${repo-host}/nexus/content/repositories/snapshots/</url>  
         </snapshotRepository>  
 	</distributionManagement>
 </project>

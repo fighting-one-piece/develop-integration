@@ -18,7 +18,9 @@
 	</context:component-scan>
 	
 	<!-- 加载文件配置 -->
-	<context:property-placeholder location="classpath*:spring/applicationContext-config.properties" ignore-unresolvable="true"/>
+	<context:property-placeholder location="classpath:redis/env.local.properties" ignore-unresolvable="true"/>
+	<context:property-placeholder location="classpath:rabbitmq/env.local.properties" ignore-unresolvable="true"/>
+	<context:property-placeholder location="classpath:spring/applicationContext-config.properties" ignore-unresolvable="true"/>
 		
 	<!-- DBCP数据源配置 -->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -92,8 +94,6 @@
     <import resource="classpath:spring/applicationContext-task.xml"/>
     <import resource="classpath:spring/applicationContext-redis.xml"/>
     <import resource="classpath:spring/applicationContext-mybatis.xml"/>
-    <!--  
     <import resource="classpath:spring/applicationContext-rabbitmq.xml"/>
-    -->
     
 </beans>

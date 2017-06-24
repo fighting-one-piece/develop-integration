@@ -19,9 +19,11 @@
 	</context:component-scan>
 	
 	<!-- 加载文件配置 -->
-	<context:property-placeholder location="classpath*:rabbitmq/env.local.properties" ignore-unresolvable="true"/>
+	<!--  
+	<context:property-placeholder location="classpath:rabbitmq/env.local.properties" ignore-unresolvable="false"/>
+	-->
 	
-	<!--配置connection-factory，指定连接rabbit server参数-->
+	<!--配置connection-factory，指定连接rabbit server参数  cache-mode="CONNECTION" connection-cache-size="10"-->
     <rabbit:connection-factory id="connectionFactory" 
     						   username="${rabbitmq.manager.user}" 
     						   password="${rabbitmq.manager.password}"
@@ -29,25 +31,29 @@
                                port="${rabbitmq.port}"
                                publisher-confirms="true"  
                                publisher-returns="true"
+                               cache-mode="CHANNEL"
+                               channel-cache-size="30"
                                connection-timeout="60000"
                                virtual-host="/"/>
 
     <!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成-->
-    <rabbit:admin id="amqpAdmin" connection-factory="connectionFactory"/>
+    <rabbit:admin id="amqpAdmin" connection-factory="connectionFactory" auto-startup="true"/>
 
     <!--定义queue-->
-    <rabbit:queue id="defaultQueue" name="defaultQueue" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue id="defaultQueue" name="defaultQueue" durable="false" auto-delete="false" exclusive="false" 
+    	auto-declare="false" declared-by="amqpAdmin"/>
 	
-	<rabbit:queue id="defaultTopicQueue" name="defaultTopicQueue" durable="true" auto-delete="false" exclusive="false"/>
+	<rabbit:queue id="defaultTopicQueue" name="defaultTopicQueue" durable="false" auto-delete="false" exclusive="false" 
+		auto-declare="false" declared-by="amqpAdmin"/>
 
     <!-- 定义direct exchange and binding queue -->
-    <rabbit:direct-exchange name="directExchange" durable="true" auto-delete="false">
+    <rabbit:direct-exchange name="directExchange" durable="false" auto-delete="false" auto-declare="false" declared-by="amqpAdmin">
         <rabbit:bindings>
             <rabbit:binding queue="defaultQueue" key="default"></rabbit:binding>
         </rabbit:bindings>
     </rabbit:direct-exchange>
     
-    <rabbit:topic-exchange name="topicExchange" durable="true" auto-delete="false">
+    <rabbit:topic-exchange name="topicExchange" durable="false" auto-delete="false" auto-declare="false" declared-by="amqpAdmin">
     	<rabbit:bindings>
             <rabbit:binding queue="defaultTopicQueue" pattern="topic.*"></rabbit:binding>
         </rabbit:bindings>
@@ -55,64 +61,47 @@
     
     <!--定义rabbit template用于数据的接收和发送-->
     <rabbit:template id="dAmqpTemplate" connection-factory="connectionFactory" 
-    	exchange="directExchange" 
+    	exchange="directExchange" channel-transacted="false"
     	message-converter="serializerMessageConverter"
     	confirm-callback="confirmCallBackListener"  
         return-callback="returnCallBackListener"   
         mandatory="true" />
    
     <rabbit:template id="tAmqpTemplate" connection-factory="connectionFactory" 
-    	exchange="topicExchange"
+    	exchange="topicExchange" channel-transacted="false"
     	message-converter="serializerMessageConverter"
     	confirm-callback="confirmCallBackListener"  
         return-callback="returnCallBackListener"   
         mandatory="true" />
 
-    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">            
-        <!-- 核心线程数，默认为1 -->            
-        <property name="corePoolSize" value="10" />            
-        <!-- 最大线程数，默认为Integer.MAX_VALUE -->            
-        <property name="maxPoolSize" value="50" />            
-        <!-- 队列最大长度，一般需要设置值>=notifyScheduledMainExecutor.maxNum；默认为Integer.MAX_VALUE -->            
-        <property name="queueCapacity" value="1000" />            
-        <!-- 线程池维护线程所允许的空闲时间，默认为60s -->            
-        <property name="keepAliveSeconds" value="300" />            
-        <!-- 线程池对拒绝任务（无线程可用）的处理策略，目前只支持AbortPolicy、CallerRunsPolicy；默认为后者 -->            
-        <property name="rejectedExecutionHandler">            
-            <!-- AbortPolicy:直接抛出java.util.concurrent.RejectedExecutionException异常 -->            
-            <!-- CallerRunsPolicy:主线程直接执行该任务，执行完之后尝试添加下一个任务到线程池中，可以有效降低向线程池内添加任务的速度 -->            
-            <!-- DiscardOldestPolicy:抛弃旧的任务、暂不支持；会导致被丢弃的任务无法再次被执行 -->            
-            <!-- DiscardPolicy:抛弃当前任务、暂不支持；会导致被丢弃的任务无法再次被执行 -->            
-            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />            
-        </property>            
-    </bean>
-    
     <!-- Listener Container -->
-    <!--  
     <rabbit:listener-container 
     	connection-factory="connectionFactory" 
-    	task-executor="taskExecutor"
+	    task-executor="taskExecutor"
     	acknowledge="manual" 
     	concurrency="10" 
-    	max-concurrency="20">
+    	max-concurrency="20"
+    	prefetch="5"
+    	message-converter="serializerMessageConverter">
         <rabbit:listener queues="defaultQueue,defaultTopicQueue" ref="receiveConfirmListener"/>
     </rabbit:listener-container>
-    -->
     
-    <bean id="simpleMessageListenerContainer" 
-    	class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
+    <!-- 
+    <property name="exposeListenerChannel" value="true" />
+    <property name="taskExecutor" ref="taskExecutor" />
+    -->
+    <!--  
+    <bean id="messageListenerContainer" class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
     	<property name="connectionFactory" ref="connectionFactory" />
-    	<!--  
-    	<property name="taskExecutor" ref="taskExecutor" />
-    	-->
     	<property name="acknowledgeMode" ref="manual" />
+    	<property name="prefetchCount" value="5" />
     	<property name="concurrentConsumers" value="10" />
-    	<property name="maxConcurrentConsumers" value="20" />
-    	<property name="exposeListenerChannel" value="true" />
+    	<property name="maxConcurrentConsumers" value="100" />
     	<property name="messageListener" ref="receiveConfirmListener" />
     	<property name="messageConverter" ref="serializerMessageConverter" />
     	<property name="queueNames" value="defaultQueue,defaultTopicQueue" />
     </bean>
+    -->
     
     <bean id="manual" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">    
         <property name="staticField" value="org.springframework.amqp.core.AcknowledgeMode.MANUAL" />    
@@ -137,6 +126,12 @@
     <bean id="serializerMessageConverter" class="org.springframework.amqp.support.converter.SimpleMessageConverter"/>   
     
     <!-- 消息转换器JsonMessageConverter -->
-    <bean id="jsonMessageConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter" />  
+    <bean id="jsonMessageConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter"/>  
+    
+     <!--
+     Message Properties转换,用于spring-amqp 
+     Message对象中的Message Properties和RabbitMQ的Message Properties对象之间互相转换 
+     -->        
+    <bean id="messagePropertiesConverter" class="org.springframework.amqp.rabbit.support.DefaultMessagePropertiesConverter" />
 	  
 </beans>

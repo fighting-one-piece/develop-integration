@@ -10,6 +10,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("rabbitmqService")
@@ -24,7 +25,8 @@ public class RabbitmqServiceImpl implements IRabbitmqService {
 	@Resource(name="tAmqpTemplate")
     private AmqpTemplate tAmqpTemplate = null;
 	
-	@Resource(name="simpleMessageListenerContainer")
+//	@Resource(name="messageListenerContainer")
+	@Autowired
 	private SimpleMessageListenerContainer listenerContainer = null;
 	
     @Override

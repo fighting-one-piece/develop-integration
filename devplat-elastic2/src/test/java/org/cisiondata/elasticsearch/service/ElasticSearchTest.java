@@ -1,7 +1,7 @@
 package org.cisiondata.elasticsearch.service;
 
-import org.cisiondata.modules.es.plugins.stconverter.analysis.STConvertType;
-import org.cisiondata.modules.es.plugins.stconverter.analysis.STConverter;
+import org.cisiondata.modules.elastic.plugins.stconverter.analysis.STConvertType;
+import org.cisiondata.modules.elastic.plugins.stconverter.analysis.STConverter;
 
 public class ElasticSearchTest {
 

@@ -1,4 +1,4 @@
-package org.cisiondata.modules.es.plugins.stconverter.analysis;
+package org.cisiondata.modules.elastic.plugins.stconverter.analysis;
 
 import org.apache.lucene.analysis.Tokenizer;
 import org.elasticsearch.common.inject.Inject;

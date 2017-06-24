@@ -1,4 +1,4 @@
-package org.cisiondata.modules.es.service;
+package org.cisiondata.modules.elastic.service;
 
 import java.util.List;
 import java.util.Map;

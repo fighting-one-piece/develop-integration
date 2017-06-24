@@ -1,4 +1,4 @@
-package org.cisiondata.modules.es.plugins.stconverter.analysis;
+package org.cisiondata.modules.elastic.plugins.stconverter.analysis;
 ///*
 // * Licensed to Elasticsearch under one or more contributor
 // * license agreements. See the NOTICE file distributed with

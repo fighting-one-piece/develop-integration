@@ -1,13 +1,13 @@
-package org.cisiondata.modules.es.plugins.stconverter;
+package org.cisiondata.modules.elastic.plugins.stconverter;
 
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.cisiondata.modules.es.plugins.stconverter.analysis.STConvertAnalyzer;
-import org.cisiondata.modules.es.plugins.stconverter.analysis.STConvertCharFilter;
-import org.cisiondata.modules.es.plugins.stconverter.analysis.STConvertTokenFilter;
-import org.cisiondata.modules.es.plugins.stconverter.analysis.STConvertTokenizer;
-import org.cisiondata.modules.es.plugins.stconverter.analysis.STConvertType;
+import org.cisiondata.modules.elastic.plugins.stconverter.analysis.STConvertAnalyzer;
+import org.cisiondata.modules.elastic.plugins.stconverter.analysis.STConvertCharFilter;
+import org.cisiondata.modules.elastic.plugins.stconverter.analysis.STConvertTokenFilter;
+import org.cisiondata.modules.elastic.plugins.stconverter.analysis.STConvertTokenizer;
+import org.cisiondata.modules.elastic.plugins.stconverter.analysis.STConvertType;
 import org.elasticsearch.common.component.AbstractComponent;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;

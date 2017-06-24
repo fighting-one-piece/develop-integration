@@ -1,4 +1,4 @@
-package org.cisiondata.modules.es.client;
+package org.cisiondata.modules.elastic.client;
 
 import java.io.Serializable;
 

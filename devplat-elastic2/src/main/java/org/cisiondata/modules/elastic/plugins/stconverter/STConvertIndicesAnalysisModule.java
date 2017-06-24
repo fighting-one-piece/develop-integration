@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.cisiondata.modules.es.plugins.stconverter;
+package org.cisiondata.modules.elastic.plugins.stconverter;
 
 import org.elasticsearch.common.inject.AbstractModule;
 

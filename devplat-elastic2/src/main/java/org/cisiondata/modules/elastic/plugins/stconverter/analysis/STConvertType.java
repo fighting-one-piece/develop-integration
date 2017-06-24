@@ -1,4 +1,4 @@
-package org.cisiondata.modules.es.plugins.stconverter.analysis;
+package org.cisiondata.modules.elastic.plugins.stconverter.analysis;
 
 public enum STConvertType {
     SIMPLE_2_TRADITIONAL,

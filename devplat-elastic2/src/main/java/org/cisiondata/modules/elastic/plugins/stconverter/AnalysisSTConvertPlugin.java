@@ -1,9 +1,9 @@
-package org.cisiondata.modules.es.plugins.stconverter;
+package org.cisiondata.modules.elastic.plugins.stconverter;
 
 import java.util.Collection;
 import java.util.Collections;
 
-import org.cisiondata.modules.es.plugins.stconverter.analysis.STConvertAnalysisBinderProcessor;
+import org.cisiondata.modules.elastic.plugins.stconverter.analysis.STConvertAnalysisBinderProcessor;
 import org.elasticsearch.common.inject.Module;
 import org.elasticsearch.index.analysis.AnalysisModule;
 import org.elasticsearch.plugins.Plugin;

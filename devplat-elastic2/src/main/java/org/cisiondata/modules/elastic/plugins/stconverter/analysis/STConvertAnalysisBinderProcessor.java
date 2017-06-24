@@ -32,7 +32,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.cisiondata.modules.es.plugins.stconverter.analysis;
+package org.cisiondata.modules.elastic.plugins.stconverter.analysis;
 
 import org.elasticsearch.index.analysis.AnalysisModule;
 

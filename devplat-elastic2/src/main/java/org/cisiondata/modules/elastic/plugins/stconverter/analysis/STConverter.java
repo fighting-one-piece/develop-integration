@@ -1,4 +1,4 @@
-package org.cisiondata.modules.es.plugins.stconverter.analysis;
+package org.cisiondata.modules.elastic.plugins.stconverter.analysis;
 
 import java.io.*;
 import java.util.*;

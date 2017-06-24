@@ -1,4 +1,4 @@
-package org.cisiondata.modules.es.service.impl;
+package org.cisiondata.modules.elastic.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,8 +8,8 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.modules.abstr.entity.QueryResult;
-import org.cisiondata.modules.es.client.ESClient;
-import org.cisiondata.modules.es.service.IESService;
+import org.cisiondata.modules.elastic.client.ESClient;
+import org.cisiondata.modules.elastic.service.IESService;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.search.MultiSearchRequestBuilder;

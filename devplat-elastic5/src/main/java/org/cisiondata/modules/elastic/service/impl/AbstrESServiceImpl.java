@@ -1,4 +1,4 @@
-package org.cisiondata.modules.es.service.impl;
+package org.cisiondata.modules.elastic.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.cisiondata.modules.es.client.ESClient;
+import org.cisiondata.modules.elastic.client.ESClient;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.client.IndicesAdminClient;

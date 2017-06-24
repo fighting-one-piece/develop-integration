@@ -1,6 +1,6 @@
 package org.cisiondata.elasticsearch.service;
 
-import org.cisiondata.modules.es.client.ESClientHelper;
+import org.cisiondata.modules.elastic.client.ESClientHelper;
 
 public class ElasticTest {
 

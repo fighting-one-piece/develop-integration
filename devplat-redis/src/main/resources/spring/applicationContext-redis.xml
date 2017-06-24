@@ -10,7 +10,9 @@
 	default-autowire="byName">
 	
 	<!-- 加载文件配置 -->
-	<context:property-placeholder location="classpath:spring/applicationContext-config.properties" ignore-unresolvable="true"/>
+	<!--  
+	<context:property-placeholder location="classpath*:redis/env.local.properties" ignore-unresolvable="false"/>
+	-->
 	
 	<!-- Jedis Pool Config -->
 	<bean name="genericObjectPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig" >

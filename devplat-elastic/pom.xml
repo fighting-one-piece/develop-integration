@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.cisiondata</groupId>
-	<artifactId>devplat-elasticsearch</artifactId>
+	<artifactId>devplat-elastic</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -60,7 +60,7 @@
 	</dependencies>
 	
 	<build>
-		<finalName>devplat-elasticsearch</finalName>
+		<finalName>devplat-elastic</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<defaultGoal>install</defaultGoal>
@@ -112,7 +112,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<webappDirectory>src/main/webapp</webappDirectory>
-					<warSourceDirectory>target/devplat</warSourceDirectory>
+					<warSourceDirectory>target/devplat-elastic</warSourceDirectory>
 				</configuration>
 			</plugin>
 			<plugin>

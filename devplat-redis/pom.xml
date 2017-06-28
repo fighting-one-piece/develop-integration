@@ -138,7 +138,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<webappDirectory>src/main/webapp</webappDirectory>
-					<warSourceDirectory>target/devplat</warSourceDirectory>
+					<warSourceDirectory>target/devplat-redis</warSourceDirectory>
 				</configuration>
 			</plugin>
 			<plugin>

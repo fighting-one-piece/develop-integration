@@ -88,11 +88,11 @@
     
     <!-- 
     <property name="exposeListenerChannel" value="true" />
-    <property name="taskExecutor" ref="taskExecutor" />
     -->
     <!--  
     <bean id="messageListenerContainer" class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
     	<property name="connectionFactory" ref="connectionFactory" />
+	    <property name="taskExecutor" ref="taskExecutor" />
     	<property name="acknowledgeMode" ref="manual" />
     	<property name="prefetchCount" value="5" />
     	<property name="concurrentConsumers" value="10" />

@@ -51,7 +51,7 @@ public class ESClient {
 			String clusterName = properties.getProperty("cluster.name");
 			if (StringUtils.isBlank(clusterName)) throw new RuntimeException("cluster name is not null");
 			String clusterNodesTxt = properties.getProperty("cluster.nodes");
-			System.out.println("clusterNodes:" + clusterNodesTxt);
+			LOG.info("Elastic Search Cluster Nodes: " + clusterNodesTxt);
 			String[] clusterNodes = clusterNodesTxt.indexOf(",") == -1 ? 
 				new String[]{clusterNodesTxt} : clusterNodesTxt.split(",");
 			List<EsServerAddress> esServerAddress = new ArrayList<EsServerAddress>();

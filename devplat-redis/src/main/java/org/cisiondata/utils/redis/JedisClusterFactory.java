@@ -74,7 +74,7 @@ public class JedisClusterFactory implements FactoryBean<JedisCluster>, Initializ
 				String[] ipAndPort = value.split(":");
 				HostAndPort hostAndPort = new HostAndPort(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
 				hostAndPorts.add(hostAndPort);
-				System.out.println("redis cluster host: " + hostAndPort.getHost() + " : " + hostAndPort.getPort());
+				LOG.info("Redis Cluster Host: {} : {}", hostAndPort.getHost(), hostAndPort.getPort());
 			}
 			return hostAndPorts;
 		} catch (Exception e) {

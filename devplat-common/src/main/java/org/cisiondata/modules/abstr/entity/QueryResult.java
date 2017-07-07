@@ -8,7 +8,7 @@ public class QueryResult<Entity> implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	/** 数据集合*/
+	/** 数据结果集合*/
 	private List<Entity> resultList = null;
 	/** 总行数*/
 	private long totalRowNum = 0;

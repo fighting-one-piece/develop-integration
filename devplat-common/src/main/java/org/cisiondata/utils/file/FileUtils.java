@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.cisiondata.utils.json.GsonUtils;
@@ -36,7 +37,8 @@ public class FileUtils {
 			br = new BufferedReader(new InputStreamReader(in));
 			String line = null;
 			while ((line = br.readLine()) != null) {
-				result.add(lineHandler.handle(line));
+				T t = lineHandler.handle(line);
+				if (!lineHandler.filter(t)) result.add(t);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -51,12 +53,16 @@ public class FileUtils {
 		return result;
 	}
 	
+	public static void write(String dest, String... lines) {
+		write(dest, Arrays.asList(lines));
+	}
+	
 	public static void write(String dest, List<String> lines) {
 		OutputStream out = null;
 		BufferedWriter bw = null;
 		try {
 			File file = new File(dest);
-			if (!file.exists()) file.mkdirs();
+			if (!file.getParentFile().exists()) file.mkdirs();
 			out = new FileOutputStream(file);
 			bw = new BufferedWriter(new OutputStreamWriter(out));
 			for (int i = 0, len = lines.size(); i < len; i++) {
@@ -76,7 +82,7 @@ public class FileUtils {
 		}
 	}
 	
-	public static void writeJSON(String dest, List<Object> objects) {
+	public static <T> void writeJSON(String dest, List<T> objects) {
 		OutputStream out = null;
 		BufferedWriter bw = null;
 		try {
@@ -99,32 +105,7 @@ public class FileUtils {
 		}
 	}
 	
-	public static <T> List<T> filter(String src, LineHandler<T> lineHandler) {
-		List<T> result = new ArrayList<T>();
-		InputStream in = null;
-		BufferedReader br = null;
-		try {
-			in = new FileInputStream(new File(src));
-			br = new BufferedReader(new InputStreamReader(in));
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				T t = lineHandler.handle(line);
-				if (!lineHandler.filter(t)) result.add(t);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (null != in) in.close();
-				if (null != br) br.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return result;
-	}
-	
-	public static <T> void filter(String src, String dest, LineHandler<T> lineHandler) {
+	public static <T> void readAndWrite(String src, String dest, LineHandler<T> lineHandler) {
 		InputStream in = null;
 		BufferedReader br = null;
 		OutputStream out = null;

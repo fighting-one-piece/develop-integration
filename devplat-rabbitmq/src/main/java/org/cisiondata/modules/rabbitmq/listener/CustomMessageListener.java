@@ -3,7 +3,7 @@ package org.cisiondata.modules.rabbitmq.listener;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.cisiondata.modules.rabbitmq.service.IConsumerService;
+import org.cisiondata.modules.rabbitmq.service.IConsumeService;
 import org.cisiondata.utils.serde.SerializerUtils;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class CustomMessageListener implements MessageListener {
 	
 	@Autowired(required=true)
-	private List<IConsumerService> consumerServiceList = null;
+	private List<IConsumeService> consumerServiceList = null;
 	
 	@Override
 	public void onMessage(Message message) {

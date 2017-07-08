@@ -26,9 +26,6 @@ public class RabbitmqServiceTest {
 		rabbitmqService.sendMessage(CQueue.DEFAULT_QUEUE.getRoutingKey(), 
     			SerializerUtils.write("this is default message !!!!!!"));
 		Thread.sleep(2000);
-    	rabbitmqService.sendMessage(CQueue.REQUEST_ACCESS_QUEUE.getRoutingKey(), 
-    			SerializerUtils.write("this is request access message !!!!!!"));
-    	Thread.sleep(2000);
 //    	rabbitmqService.sendMessage(MQueue.RESPONSE_RESULT_QUEUE.getRoutingKey(), 
 //    			SerializerUtils.write("this is response result message !!!!!!"));
 //    	Thread.sleep(2000);
@@ -49,9 +46,6 @@ public class RabbitmqServiceTest {
 	public void test03() throws InterruptedException {
 		rabbitmqService.sendMessage(exChange, CQueue.DEFAULT_QUEUE.getRoutingKey(), "aaa"); 
 		Thread.sleep(1000);
-		rabbitmqService.sendMessage(exChange, CQueue.REQUEST_ACCESS_QUEUE.getRoutingKey(), "bbb"); 
-//		mqService.sendMessage(exChange, MQueue.RESPONSE_RESULT_QUEUE.getRoutingKey(), "ccc"); 
-    	Thread.sleep(1000);
 	}
 	
 	@Test
@@ -76,7 +70,7 @@ public class RabbitmqServiceTest {
         String message = "currentTime:"+System.currentTimeMillis();  
         System.out.println("test1---message:"+message);  
         //exchange,queue 都正确, confirm被回调, ack=true  
-        rabbitmqService.sendMessage(exChange, CQueue.REQUEST_ACCESS_QUEUE.getRoutingKey(), message);    
+        rabbitmqService.sendMessage(exChange, CQueue.PUSH_QUEUE.getRoutingKey(), message);    
         Thread.sleep(1000);  
     }    
       
@@ -85,7 +79,7 @@ public class RabbitmqServiceTest {
         String message = "currentTime:"+System.currentTimeMillis();  
         System.out.println("test2---message:"+message);  
         //exchange 错误,queue 正确, confirm被回调, ack=false  
-        rabbitmqService.sendMessage(exChange+"NO", CQueue.REQUEST_ACCESS_QUEUE.getRoutingKey(), message);    
+        rabbitmqService.sendMessage(exChange+"NO", CQueue.PUSH_QUEUE.getRoutingKey(), message);    
         Thread.sleep(1000);  
     }    
       
@@ -103,7 +97,7 @@ public class RabbitmqServiceTest {
         String message = "currentTime:"+System.currentTimeMillis();  
         System.out.println("test4---message:"+message);  
         //exchange 错误,queue 错误, confirm被回调, ack=false  
-        rabbitmqService.sendMessage(exChange+"NO", CQueue.REQUEST_ACCESS_QUEUE.getRoutingKey() + "NO", message);    
+        rabbitmqService.sendMessage(exChange+"NO", CQueue.PUSH_QUEUE.getRoutingKey() + "NO", message);    
         Thread.sleep(1000);  
     }    
 	

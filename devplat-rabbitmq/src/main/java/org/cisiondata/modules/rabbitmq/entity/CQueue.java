@@ -4,8 +4,7 @@ public enum CQueue {
 	
 	DEFAULT_QUEUE("defaultQueue", "default"),
 	DEFAULT_TOPIC_QUEUE("defaultTopicQueue", "topic.default"),
-	REQUEST_ACCESS_QUEUE("requestAccessQueue", "requestAccess"),
-	RESPONSE_RESULT_QUEUE("responseResultQueue", "responseResult");
+	PUSH_QUEUE("pushQueue", "push");
 	
 	private String name = null;
 	

@@ -41,19 +41,23 @@
 
     <!--定义queue-->
     <rabbit:queue id="defaultQueue" name="defaultQueue" durable="false" auto-delete="false" exclusive="false" 
-    	auto-declare="false" declared-by="amqpAdmin"/>
+    	auto-declare="true" declared-by="amqpAdmin"/>
+    	
+   	<rabbit:queue id="pushQueue" name="pushQueue" durable="false" auto-delete="false" exclusive="false" 
+    	auto-declare="true" declared-by="amqpAdmin"/>
 	
 	<rabbit:queue id="defaultTopicQueue" name="defaultTopicQueue" durable="false" auto-delete="false" exclusive="false" 
-		auto-declare="false" declared-by="amqpAdmin"/>
+		auto-declare="true" declared-by="amqpAdmin"/>
 
     <!-- 定义direct exchange and binding queue -->
-    <rabbit:direct-exchange name="directExchange" durable="false" auto-delete="false" auto-declare="false" declared-by="amqpAdmin">
+    <rabbit:direct-exchange name="directExchange" durable="false" auto-delete="false" auto-declare="true" declared-by="amqpAdmin">
         <rabbit:bindings>
             <rabbit:binding queue="defaultQueue" key="default"></rabbit:binding>
+            <rabbit:binding queue="pushQueue" key="push"></rabbit:binding>
         </rabbit:bindings>
     </rabbit:direct-exchange>
     
-    <rabbit:topic-exchange name="topicExchange" durable="false" auto-delete="false" auto-declare="false" declared-by="amqpAdmin">
+    <rabbit:topic-exchange name="topicExchange" durable="false" auto-delete="false" auto-declare="true" declared-by="amqpAdmin">
     	<rabbit:bindings>
             <rabbit:binding queue="defaultTopicQueue" pattern="topic.*"></rabbit:binding>
         </rabbit:bindings>

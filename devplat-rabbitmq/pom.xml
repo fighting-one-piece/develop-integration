@@ -129,7 +129,7 @@
 			<version>${spring.version}</version>
 		</dependency>
 		
-		<!-- RabbitMQ依赖报 -->
+		<!-- RabbitMQ依赖包 -->
        	<dependency>
 			<groupId>com.rabbitmq</groupId>
 			<artifactId>amqp-client</artifactId>

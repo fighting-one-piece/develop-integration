@@ -1,11 +1,11 @@
 package org.cisiondata.modules.rabbitmq.service.impl;
 
 import org.cisiondata.modules.rabbitmq.entity.CQueue;
-import org.cisiondata.modules.rabbitmq.service.impl.ConsumerServiceImpl;
+import org.cisiondata.modules.rabbitmq.service.impl.ConsumeServiceImpl;
 import org.springframework.stereotype.Service;
 
-@Service("defaultConsumerService")
-public class DefaultConsumerServiceImpl extends ConsumerServiceImpl {
+@Service("defaultConsumeService")
+public class DefaultConsumeServiceImpl extends ConsumeServiceImpl {
 
 	@Override
 	protected String getRoutingKey() {
@@ -14,8 +14,8 @@ public class DefaultConsumerServiceImpl extends ConsumerServiceImpl {
 
 	@Override
 	public void handleMessage(Object message) {
-		LOG.info("default consumer receive message: " + message);
-		System.out.println("default consumer receive message: " + message);
+		LOG.info("default consume receive message: " + message);
+		System.out.println("default consume receive message: " + message);
 	}
 
 }

@@ -3,7 +3,7 @@ package org.cisiondata.modules.rabbitmq.listener;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.cisiondata.modules.rabbitmq.service.IConsumerService;
+import org.cisiondata.modules.rabbitmq.service.IConsumeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -17,7 +17,7 @@ public class DelegateMessageListener {
 	private Logger LOG = LoggerFactory.getLogger(DelegateMessageListener.class);
 
 	@Autowired(required=true)
-	private List<IConsumerService> consumerServiceList = null;
+	private List<IConsumeService> consumerServiceList = null;
 
 	public void onMessage(Message message) {  
 		try{

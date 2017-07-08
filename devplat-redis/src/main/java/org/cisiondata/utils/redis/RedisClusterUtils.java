@@ -1,5 +1,6 @@
 package org.cisiondata.utils.redis;
 
+import org.apache.commons.lang.StringUtils;
 import org.cisiondata.utils.serde.SerializerUtils;
 import org.cisiondata.utils.spring.SpringBeanFactory;
 import org.slf4j.Logger;
@@ -93,6 +94,7 @@ public class RedisClusterUtils {
 	 * @return
 	 */
 	public Object get(String key) {
+		if (StringUtils.isBlank(key)) return null;
 		try {
 			byte[] value = jedisCluster.get(SerializerUtils.write(key));
 			if (null != value && value.length != 0) {
@@ -110,6 +112,7 @@ public class RedisClusterUtils {
 	 * @return
 	 */
 	public Object get(Object key) {
+		if (null == key) return null;
 		try {
 			byte[] value = jedisCluster.get(SerializerUtils.write(key));
 			if (null != value && value.length != 0) {
@@ -127,6 +130,7 @@ public class RedisClusterUtils {
 	 * @return
 	 */
 	public Long delete(String key) {
+		if (StringUtils.isBlank(key)) return null;
 		try {
 			return jedisCluster.del(SerializerUtils.write(key));
 		} catch (Exception e) {
@@ -141,6 +145,7 @@ public class RedisClusterUtils {
 	 * @return
 	 */
 	public Long delete(Object key) {
+		if (null == key) return null;
 		try {
 			return jedisCluster.del(SerializerUtils.write(key));
 		} catch (Exception e) {

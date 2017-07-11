@@ -31,6 +31,20 @@ public class RedisClusterUtils {
 	}
 	
 	/**
+	 * 是否存在key
+	 * @param key
+	 * @return
+	 */
+	public boolean exists(String key) {
+		try {
+			return jedisCluster.exists(SerializerUtils.write(key));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return false;
+	}
+	
+	/**
 	 * 缓存数据
 	 * @param key
 	 * @param value
@@ -89,6 +103,21 @@ public class RedisClusterUtils {
 	}
 	
 	/**
+	 * 
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public Long setnx(Object key, Object value) {
+		try {
+			return jedisCluster.setnx(SerializerUtils.write(key), SerializerUtils.write(value));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0L;
+	}
+	
+	/**
 	 * 读取数据
 	 * @param key
 	 * @return
@@ -117,6 +146,25 @@ public class RedisClusterUtils {
 			byte[] value = jedisCluster.get(SerializerUtils.write(key));
 			if (null != value && value.length != 0) {
 				return SerializerUtils.read(value);
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	/**
+	 * 读取数据
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public Object getSet(Object key, Object value) {
+		if (null == key || null == value) return null;
+		try {
+			byte[] ovalue = jedisCluster.getSet(SerializerUtils.write(key), SerializerUtils.write(value));
+			if (null != ovalue && ovalue.length != 0) {
+				return SerializerUtils.read(ovalue);
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -253,6 +301,88 @@ public class RedisClusterUtils {
 	public long listLength(String key) {
 		try {
 			return jedisCluster.llen(SerializerUtils.write(key));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	/**
+	 * Hash缓存数据
+	 * @param key
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public long hset(String key, String field, Object value) {
+		try {
+			return jedisCluster.hset(SerializerUtils.write(key), 
+					SerializerUtils.write(field), SerializerUtils.write(value));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	/**
+	 * Hash是否存在field
+	 * @param key
+	 * @param field
+	 * @return
+	 */
+	public boolean hexists(String key, String field) {
+		try {
+			return jedisCluster.hexists(SerializerUtils.write(key), SerializerUtils.write(field));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return false;
+	}
+	
+	/**
+	 * Hash字段自增数据
+	 * @param key
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public long hincrBy(String key, String field, long value) {
+		try {
+			return jedisCluster.hincrBy(SerializerUtils.write(key), 
+					SerializerUtils.write(field), value);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	/**
+	 * Hash读取数据
+	 * @param key
+	 * @param field
+	 * @return
+	 */
+	public Object hget(String key, String field) {
+		try {
+			byte[] returnObject = jedisCluster.hget(SerializerUtils.write(key), SerializerUtils.write(field));
+			if (null != returnObject && returnObject.length != 0) {
+				return SerializerUtils.read(returnObject);
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	/**
+	 * Hash刪除fields
+	 * @param key
+	 * @param fields
+	 * @return
+	 */
+	public long hdel(String key, String... fields) {
+		try {
+			return jedisCluster.hdel(SerializerUtils.write(key), SerializerUtils.write(fields));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}

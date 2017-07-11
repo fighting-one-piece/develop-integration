@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,19 +46,19 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAware, InitializingBean {
-	
+
 	private Logger LOG = LoggerFactory.getLogger(UrlHandlerAdapter.class);
 
 	private ObjectMapper objectMapper = new ObjectMapper();
-	
+
 	private ApplicationContext ctx = null;
-	
+
 	private List<IRequestService> requestServiceList = new ArrayList<IRequestService>();
-	
+
 	public void setApplicationContext(ApplicationContext ctx) throws BeansException {
 		this.ctx = ctx;
 	}
-	
+
 	public boolean supports(Object handler) {
 		return true;
 	}
@@ -65,21 +66,21 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	public long getLastModified(HttpServletRequest request, Object handler) {
 		return -1;
 	}
-	
+
 	@Override
 	public void afterPropertiesSet() {
 		Map<String, IRequestService> beans = ctx.getBeansOfType(IRequestService.class);
 		for (Map.Entry<String, IRequestService> entry : beans.entrySet()) {
 			requestServiceList.add(entry.getValue());
 		}
-		new ClassScanner(new String[]{"org.cisiondata.modules"}, new ClassResourceHandler() {
+		new ClassScanner(new String[] { "org.cisiondata.modules" }, new ClassResourceHandler() {
 			@SuppressWarnings("rawtypes")
 			public void handle(MetadataReader metadata) {
 				String className = metadata.getClassMetadata().getClassName();
 				String[] baseUrl = null;
 				AnnotationMetadata annotationMetadata = metadata.getAnnotationMetadata();
-				if (!annotationMetadata.hasAnnotation(Controller.class.getName()) &&
-						!annotationMetadata.hasAnnotation(RestController.class.getName())) 
+				if (!annotationMetadata.hasAnnotation(Controller.class.getName())
+						&& !annotationMetadata.hasAnnotation(RestController.class.getName()))
 					return;
 				Map<String, Object> attributes = metadata.getAnnotationMetadata()
 						.getAnnotationAttributes(RequestMapping.class.getName());
@@ -91,7 +92,8 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 					final Mapper mapper = new Mapper(baseUrl, clazz.newInstance());
 					ReflectionUtils.doWithMethods(clazz, new MethodCallback() {
 						public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-							if (Modifier.isPublic(method.getModifiers()) && method.isAnnotationPresent(RequestMapping.class)) {
+							if (Modifier.isPublic(method.getModifiers())
+									&& method.isAnnotationPresent(RequestMapping.class)) {
 								mapper.add(method);
 							}
 						}
@@ -99,9 +101,11 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 					UrlMappingStorage.addMapper(mapper);
 					ReflectionUtils.doWithFields(clazz, new FieldCallback() {
 						public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-							if (ctx.containsBean(field.getName()) && ctx.isTypeMatch(field.getName(), field.getType())) {
+							Resource resource = field.getAnnotation(Resource.class);
+							String beanName = null == resource ? field.getName() : resource.name();
+							if (ctx.containsBean(beanName) && ctx.isTypeMatch(beanName, field.getType())) {
 								ReflectionUtils.makeAccessible(field);
-								ReflectionUtils.setField(field, mapper.getController(), ctx.getBean(field.getName()));
+								ReflectionUtils.setField(field, mapper.getController(), ctx.getBean(beanName));
 							}
 						}
 					});
@@ -111,15 +115,17 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			}
 		}).scan();
 	}
-	
+
 	@Override
-	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 		try {
 			String path = request.getServletPath();
 			LOG.info("url handler adapter request path: {}", path);
 			for (IRequestService requestService : requestServiceList) {
 				Object[] preResult = requestService.preHandle(request);
-				if (preResult.length == 0 || (Boolean) preResult[0]) continue;
+				if (preResult.length == 0 || (Boolean) preResult[0])
+					continue;
 				Object exceptionObj = preResult[1];
 				if (exceptionObj instanceof BusinessException) {
 					throw (BusinessException) exceptionObj;
@@ -149,21 +155,23 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 	private WebResult wrapperFailureWebResult(int code, String failure) {
 		return new WebResult().buildFailure(code, failure);
 	}
-	
+
 	private WebResult wrapperFailureWebResult(ResultCode resultCode, String failure) {
 		return wrapperFailureWebResult(resultCode.getCode(), failure);
 	}
 
-	private Object handleNormalRequest(String path, HttpServletRequest request, HttpServletResponse response) 
+	private Object handleNormalRequest(String path, HttpServletRequest request, HttpServletResponse response)
 			throws UnsupportedEncodingException {
 		String interfaceUrl = path.replaceAll("/+", "/").replaceAll("^/app", "").replaceAll("^/ext", "");
 		ObjectMethodParams omp = UrlMappingStorage.getObjectMethod(interfaceUrl, request.getMethod());
 		if (omp == null) {
-			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR, "No mapping found for HTTP request with URI " + path);
+			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR,
+					"No mapping found for HTTP request with URI " + path);
 		}
 		Method method = omp.getMethod();
 		if (method == null) {
-			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR, "No mapping found for HTTP request with URI " + path);
+			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR,
+					"No mapping found for HTTP request with URI " + path);
 		}
 		try {
 			ParameterBinder parameterBinder = new ParameterBinder();
@@ -172,29 +180,30 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			return method.getReturnType() == void.class || response.isCommitted() ? "" : result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			if (e.getCause() != null) e = (Exception) e.getCause();
+			if (e.getCause() != null)
+				e = (Exception) e.getCause();
 			return wrapperFailureWebResult(ResultCode.FAILURE, e.getMessage());
 		}
 	}
-	
+
 	private Object handleExternalRequest(String interfaceUrl, HttpServletRequest request, HttpServletResponse response)
 			throws UnsupportedEncodingException {
 		return handleExternalRequest(interfaceUrl, new HashMap<String, String>(), request, response);
 	}
 
-	private Object handleExternalRequest(String interfaceUrl, Map<String, String> paramMap, HttpServletRequest request, 
+	private Object handleExternalRequest(String interfaceUrl, Map<String, String> paramMap, HttpServletRequest request,
 			HttpServletResponse response) throws UnsupportedEncodingException {
 		ObjectMethodParams omp = UrlMappingStorage.getObjectMethod(interfaceUrl);
 		if (omp == null) {
-			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR, 
+			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR,
 					"No mapping found for HTTP request with URI " + interfaceUrl);
 		}
 		Method method = omp.getMethod();
 		if (method == null) {
-			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR, 
+			return wrapperFailureWebResult(ResultCode.URL_MAPPING_ERROR,
 					"No mapping found for HTTP request with URI " + interfaceUrl);
 		}
-		
+
 		try {
 			ParameterBinder parameterBinder = new ParameterBinder();
 			paramMap.putAll(omp.getParams());
@@ -209,13 +218,13 @@ public class UrlHandlerAdapter implements HandlerAdapter, ApplicationContextAwar
 			return wrapperFailureWebResult(ResultCode.FAILURE, e.getMessage());
 		}
 	}
-	
-	private void writeResponse(HttpServletResponse response, Object result) 
+
+	private void writeResponse(HttpServletResponse response, Object result)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		response.getWriter().write(objectMapper.writeValueAsString(result));
 	}
-	
+
 }

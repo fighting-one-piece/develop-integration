@@ -80,9 +80,9 @@ public class XSSHttpServletRequestWrapper extends HttpServletRequestWrapper {
 			case '\"':
 				sb.append("＂");// 转义双引号
 				break;
-			// case '&':
-			// sb.append("＆");// 转义&
-			// break;
+			case '&':
+				sb.append("＆");// 转义&
+				break;
 			default:
 				sb.append(c);
 				break;

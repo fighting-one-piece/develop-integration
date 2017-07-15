@@ -140,6 +140,8 @@ public class AbstrESServiceImpl {
 			identity_attributes.add(attribute);
 		} else if (attributeLowerCase.indexOf("qq") != -1) {
 			identity_attributes.add(attribute);
+		} else if (attributeLowerCase.indexOf("qunnum") != -1) {
+			identity_attributes.add(attribute);
 		} else if (attributeLowerCase.indexOf("account") != -1) {
 			identity_attributes.add(attribute);
 		} else if (attributeLowerCase.indexOf("password") != -1) {
@@ -190,7 +192,7 @@ public class AbstrESServiceImpl {
 				ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>>
 				objectObjectCursor = mappingIterator.next();
 				String index = objectObjectCursor.key;
-				if (index.startsWith(".marvel-es")) continue;
+				if (index.startsWith(".marvel-es") || index.endsWith("-v1")) continue;
 				indices.add(index);
 				List<String> indexTypes = index_types_mapping.get(index);
 				if (null == indexTypes) {
@@ -204,6 +206,7 @@ public class AbstrESServiceImpl {
 					String type = keysIterator.next().value;
 					types.add(type);
 					indexTypes.add(type);
+					if("financial".equals(index) && "business".equals(type)) continue;
 					type_index_mapping.put(type, index);
 					String indexType = index + type;
 					Map<String, Set<String>> index_type_attributes = index_type_attributes_mapping.get(indexType);

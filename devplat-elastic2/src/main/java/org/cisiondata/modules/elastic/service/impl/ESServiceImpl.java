@@ -180,8 +180,9 @@ public class ESServiceImpl extends AbstrESServiceImpl implements IESService {
 	}
 	
 	private QueryResult<Map<String, Object>> readPaginationDataList(String index, String[] types,
-		QueryBuilder query, String scrollId, int size, boolean isHighLight, boolean isReturnScore){
-		return readPaginationDataList(index, types, query, SearchType.DFS_QUERY_THEN_FETCH, 
+		QueryBuilder queryBuilder, String scrollId, int size, boolean isHighLight, boolean isReturnScore){
+		return null == queryBuilder ? new QueryResult<Map<String, Object>>() : 
+			readPaginationDataList(index, types, queryBuilder, SearchType.DFS_QUERY_THEN_FETCH, 
 				scrollId, size, isHighLight, isReturnScore);
 	}
 	

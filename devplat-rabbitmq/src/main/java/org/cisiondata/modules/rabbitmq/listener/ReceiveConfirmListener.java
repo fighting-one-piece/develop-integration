@@ -29,17 +29,16 @@ public class ReceiveConfirmListener implements ChannelAwareMessageListener {
 			channel.basicQos(100);
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 			MessageProperties properties = message.getMessageProperties();
-			LOG.info("receive confirm: {}", properties);
 			String exchange = properties.getReceivedExchange();
 			String routingKey = properties.getReceivedRoutingKey();
-			LOG.info("receive exchange: {} routingKey: {} message: {} ", exchange, routingKey, SerializerUtils.read(message.getBody()));
+			LOG.info("--receive confirm-- exchange: {} routingKey: {} message: {} ", exchange, routingKey, SerializerUtils.read(message.getBody()));
 			if (StringUtils.isBlank(exchange) || StringUtils.isBlank(routingKey)) return;
 			for (int i = 0, len = consumerServiceList.size(); i < len; i++) {
 				consumerServiceList.get(i).handleMessage(exchange, routingKey, 
 						SerializerUtils.read(message.getBody()));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();// TODO 业务处理
+			LOG.error(e.getMessage(), e);
 			channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
 		}
 	}

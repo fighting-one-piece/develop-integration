@@ -305,7 +305,7 @@
 		<pluginRepository>
 			<id>public</id>
 			<name>public repository</name>
-			<url>http://192.168.0.124:8081/nexus/content/groups/public/</url>
+			<url>http://${repo-host}/nexus/content/groups/public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>

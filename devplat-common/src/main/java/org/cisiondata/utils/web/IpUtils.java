@@ -16,14 +16,14 @@ import org.slf4j.LoggerFactory;
 public class IPUtils {
 	
 	private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
+	
+	private static final String FILTER_IP = "106.15.34.120";
 
 	private IPUtils() {
 	}
 
 	public static String getIPAddress(HttpServletRequest request) {
-		if (request == null) {
-			return "unknown";
-		}
+		if (request == null) return "unknown";
 		String ip = request.getHeader("x-forwarded-for");
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("Proxy-Client-IP");
@@ -37,11 +37,10 @@ public class IPUtils {
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("X-Real-IP");
 		}
-
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getRemoteAddr();
 		}
-		return ip;
+		return ip.replace(" ", "").replace(FILTER_IP + ",", "").replace("," + FILTER_IP, "");
 	}
 
 	/**
@@ -210,6 +209,12 @@ public class IPUtils {
 			}
 		}
 		return result;
+	}
+	
+	public static void main(String[] args) {
+		System.out.println("192.168.0.1,106.15.34.120".replace(FILTER_IP + ",", "").replace("," + FILTER_IP, ""));
+		System.out.println("106.15.34.120,192.168.0.2".replace(FILTER_IP + ",", "").replace("," + FILTER_IP, ""));
+		System.out.println("192.168.0.1,106.15.34.120,192.168.0.2".replace(FILTER_IP + ",", "").replace("," + FILTER_IP, ""));
 	}
 	
 }

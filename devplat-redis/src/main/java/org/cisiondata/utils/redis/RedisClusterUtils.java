@@ -1,6 +1,10 @@
 package org.cisiondata.utils.redis;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
+import org.cisiondata.utils.reflect.ReflectUtils;
 import org.cisiondata.utils.serde.SerializerUtils;
 import org.cisiondata.utils.spring.SpringBeanFactory;
 import org.slf4j.Logger;
@@ -317,11 +321,57 @@ public class RedisClusterUtils {
 	public long hset(String key, String field, Object value) {
 		try {
 			return jedisCluster.hset(SerializerUtils.write(key), 
-					SerializerUtils.write(field), SerializerUtils.write(value));
+				SerializerUtils.write(field), SerializerUtils.write(value));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
 		return 0;
+	}
+	
+	/**
+	 * Hash缓存实体Bean
+	 * @param key
+	 * @param value
+	 * @param expireTime
+	 * @return
+	 */
+	public String hsetBean(Object key, Object value, int expireTime) {
+		try {
+			Map<byte[], byte[]> hash = new HashMap<byte[], byte[]>();
+			Map<String, Object> map = ReflectUtils.convertObjectToObjectMap(value);
+			for (Map.Entry<String, Object> entry : map.entrySet()) {
+				hash.put(SerializerUtils.write(entry.getKey()), 
+					SerializerUtils.write(entry.getValue()));
+			}
+			byte[] keyBytes = SerializerUtils.write(key);
+			String result = jedisCluster.hmset(keyBytes, hash);
+			jedisCluster.expire(keyBytes, expireTime);
+			return result;
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	/**
+	 * Hash缓存实体Bean
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public String hsetBean(Object key, Object value) {
+		try {
+			Map<byte[], byte[]> hash = new HashMap<byte[], byte[]>();
+			Map<String, Object> map = ReflectUtils.convertObjectToObjectMap(value);
+			for (Map.Entry<String, Object> entry : map.entrySet()) {
+				hash.put(SerializerUtils.write(entry.getKey()), 
+					SerializerUtils.write(entry.getValue()));
+			}
+			return jedisCluster.hmset(SerializerUtils.write(key), hash);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
 	}
 	
 	/**
@@ -349,7 +399,7 @@ public class RedisClusterUtils {
 	public long hincrBy(String key, String field, long value) {
 		try {
 			return jedisCluster.hincrBy(SerializerUtils.write(key), 
-					SerializerUtils.write(field), value);
+				SerializerUtils.write(field), value);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
@@ -367,6 +417,47 @@ public class RedisClusterUtils {
 			byte[] returnObject = jedisCluster.hget(SerializerUtils.write(key), SerializerUtils.write(field));
 			if (null != returnObject && returnObject.length != 0) {
 				return SerializerUtils.read(returnObject);
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	public Object hgetBean(String key, Class<?> entityClass) {
+		try {
+			Map<byte[], byte[]> hash = jedisCluster.hgetAll(SerializerUtils.write(key));
+			if (null != hash && !hash.isEmpty()) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				for (Map.Entry<byte[], byte[]> entry : hash.entrySet()) {
+					map.put((String) SerializerUtils.read(entry.getKey()), 
+						SerializerUtils.read(entry.getValue()));
+				}
+				Object returnObject = entityClass.newInstance();
+				ReflectUtils.convertObjectMapToObject(map, returnObject);
+				return returnObject;
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	/**
+	 * Hash读取数据
+	 * @param key
+	 * @return
+	 */
+	public Map<String, Object> hgetAll(String key) {
+		try {
+			Map<byte[], byte[]> returnObject = jedisCluster.hgetAll(SerializerUtils.write(key));
+			if (null != returnObject && !returnObject.isEmpty()) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				for (Map.Entry<byte[], byte[]> entry : returnObject.entrySet()) {
+					map.put((String) SerializerUtils.read(entry.getKey()), 
+						SerializerUtils.read(entry.getValue()));
+				}
+				return map;
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

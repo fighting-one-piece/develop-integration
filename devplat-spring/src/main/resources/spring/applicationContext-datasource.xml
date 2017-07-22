@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:/org/springframework/beans/factory/xml/spring-beans-4.2.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+	
+	<!-- 注解配置  -->
+	<context:component-scan base-package="org.cisiondata" />
+	
+	<!-- DBCP数据源配置 -->
+	<bean id="dataSource0" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${driverClassName}"></property> 
+		<property name="url" value="${datasource.master.url}"></property> 
+		<property name="username" value="${datasource.master.username}"></property> 
+		<property name="password" value="${datasource.master.password}"></property> 
+		<property name="initialSize" value="10"></property> 
+		<property name="maxActive" value="${dbcp.maxActive}"></property> 
+		<property name="maxIdle" value="${dbcp.maxIdle}"></property> 
+		<property name="minIdle" value="${dbcp.minIdle}"></property> 
+		<property name="maxWait" value="${dbcp.maxWait}"></property> 
+		<property name="removeAbandoned" value="${dbcp.removeAbandoned}"></property> 
+		<property name="defaultAutoCommit" value="${dbcp.defaultAutoCommit}"></property> 
+		<property name="removeAbandonedTimeout" value="${dbcp.removeAbandonedTimeout}"></property> 
+	</bean> 
+	
+	<bean id="dataSource1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${driverClassName}"></property> 
+		<property name="url" value="${datasource.slave1.url}"></property> 
+		<property name="username" value="${datasource.slave1.username}"></property> 
+		<property name="password" value="${datasource.slave1.password}"></property> 
+		<property name="initialSize" value="10"></property> 
+		<property name="maxActive" value="${dbcp.maxActive}"></property> 
+		<property name="maxIdle" value="${dbcp.maxIdle}"></property> 
+		<property name="minIdle" value="${dbcp.minIdle}"></property> 
+		<property name="maxWait" value="${dbcp.maxWait}"></property> 
+		<property name="removeAbandoned" value="${dbcp.removeAbandoned}"></property> 
+		<property name="defaultAutoCommit" value="${dbcp.defaultAutoCommit}"></property> 
+		<property name="removeAbandonedTimeout" value="${dbcp.removeAbandonedTimeout}"></property> 
+	</bean> 
+	
+	<!-- 配置多数据源映射关系 -->
+    <bean id="dataSource" class="org.cisiondata.utils.ds.DynamicRoutingDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+        		<entry key="dataSource1" value-ref="dataSource0"></entry>
+                <entry key="dataSource2" value-ref="dataSource1"></entry>
+            </map>
+        </property>
+    	<!-- 默认目标数据源为主库数据源 -->
+        <property name="defaultTargetDataSource" ref="dataSource0"/>
+    </bean>
+	    
+</beans>

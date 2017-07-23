@@ -1,7 +1,9 @@
 package org.cisiondata.utils.redis;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.cisiondata.utils.reflect.ReflectUtils;
@@ -10,7 +12,9 @@ import org.cisiondata.utils.spring.SpringBeanFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.JedisPool;
 
 public class RedisClusterUtils {
 	
@@ -32,6 +36,25 @@ public class RedisClusterUtils {
 	
 	public JedisCluster getJedisCluster() {
 		return jedisCluster;
+	}
+	
+	/**
+	 * 读取keys
+	 * @param pattern
+	 * @return
+	 */
+	public Set<String> keys(String pattern) {
+		Set<String> keys = new HashSet<String>();
+		Map<String, JedisPool> clusterNodes = jedisCluster.getClusterNodes();
+		for (Map.Entry<String, JedisPool> entry : clusterNodes.entrySet()) {
+			Jedis connection = entry.getValue().getResource();
+			try {
+				keys.addAll(connection.keysCustom(pattern));
+			} finally {
+				connection.close();
+			}
+		}
+		return keys;
 	}
 	
 	/**
@@ -107,7 +130,7 @@ public class RedisClusterUtils {
 	}
 	
 	/**
-	 * 
+	 * 缓存数据
 	 * @param key
 	 * @param value
 	 * @return

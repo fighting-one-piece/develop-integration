@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
+import redis.clients.util.SafeEncoder;
 
 public class RedisClusterUtils {
 	
@@ -44,6 +45,32 @@ public class RedisClusterUtils {
 	 * @return
 	 */
 	public Set<String> keys(String pattern) {
+		Set<String> keys = new HashSet<String>();
+		Map<String, JedisPool> clusterNodes = jedisCluster.getClusterNodes();
+		for (Map.Entry<String, JedisPool> entry : clusterNodes.entrySet()) {
+			Jedis connection = entry.getValue().getResource();
+			try {
+				Set<byte[]> keysByte = connection.keys(SafeEncoder.encode(pattern));
+				for (byte[] keyByte : keysByte) {
+					try {
+						keys.add((String) SerializerUtils.read(keyByte));
+					} catch (Exception e) {
+						keys.add(SafeEncoder.encode(keyByte));
+					}
+				}
+			} finally {
+				connection.close();
+			}
+		}
+		return keys;
+	}
+	
+	/**
+	 * 读取keys
+	 * @param pattern
+	 * @return
+	 */
+	public Set<String> keysCustom(String pattern) {
 		Set<String> keys = new HashSet<String>();
 		Map<String, JedisPool> clusterNodes = jedisCluster.getClusterNodes();
 		for (Map.Entry<String, JedisPool> entry : clusterNodes.entrySet()) {

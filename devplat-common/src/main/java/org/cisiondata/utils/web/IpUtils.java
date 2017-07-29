@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +19,13 @@ public class IPUtils {
 	
 	private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 	
-	private static final String FILTER_IP = "106.15.34.120";
+	private static final List<String> FILTER_IP_LIST = new ArrayList<String>();
+	
+	static {
+		FILTER_IP_LIST.add("106.14.52.33");
+		FILTER_IP_LIST.add("106.15.34.120");
+		FILTER_IP_LIST.add("106.15.156.227");
+	}
 
 	private IPUtils() {
 	}
@@ -40,7 +48,12 @@ public class IPUtils {
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getRemoteAddr();
 		}
-		return ip.replace(" ", "").replace(FILTER_IP + ",", "").replace("," + FILTER_IP, "");
+		ip = ip.replace(" ", "");
+		for (int i = 0, len = FILTER_IP_LIST.size(); i < len; i++) {
+			String filterIp = FILTER_IP_LIST.get(i);
+			ip = ip.replace(filterIp + ",", "").replace("," + filterIp, "");
+		}
+		return ip.contains(",") ? ip.split(",")[0] : ip;
 	}
 
 	/**
@@ -209,12 +222,6 @@ public class IPUtils {
 			}
 		}
 		return result;
-	}
-	
-	public static void main(String[] args) {
-		System.out.println("192.168.0.1,106.15.34.120".replace(FILTER_IP + ",", "").replace("," + FILTER_IP, ""));
-		System.out.println("106.15.34.120,192.168.0.2".replace(FILTER_IP + ",", "").replace("," + FILTER_IP, ""));
-		System.out.println("192.168.0.1,106.15.34.120,192.168.0.2".replace(FILTER_IP + ",", "").replace("," + FILTER_IP, ""));
 	}
 	
 }

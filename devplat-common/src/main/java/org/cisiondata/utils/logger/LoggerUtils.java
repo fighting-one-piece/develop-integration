@@ -29,12 +29,30 @@ public class LoggerUtils {
 	}
 	
 	/**
+	 * 
+	 * @param format
+	 * @param args
+	 */
+	public static void debug(String format, Object... args) {
+		LOG_DEBUG.debug(format, args);
+	}
+	
+	/**
 	 * INFO LOG
 	 * @param message
 	 * @param thrown
 	 */
 	public static void info(String message, Throwable throwable) {
 		LOG_INFO.info(message, throwable);
+	}
+	
+	/**
+	 * 
+	 * @param format
+	 * @param args
+	 */
+	public static void info(String format, Object... args) {
+		LOG_INFO.info(format, args);
 	}
 	
 	/**
@@ -46,4 +64,12 @@ public class LoggerUtils {
 		LOG_ERROR.error(message, throwable);
 	}
 	
+	/**
+	 * 
+	 * @param format
+	 * @param args
+	 */
+	public static void error(String format, Object... args) {
+		LOG_ERROR.error(format, args);
+	}
 }

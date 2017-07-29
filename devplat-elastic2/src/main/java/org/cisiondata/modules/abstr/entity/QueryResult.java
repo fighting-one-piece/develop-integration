@@ -56,6 +56,14 @@ public class QueryResult<Entity> implements Serializable {
 	public void setTotalRowNum(long totalRowNum) {
 		this.totalRowNum = totalRowNum;
 	}
+	
+	public String getScrollId() {
+		return scrollId;
+	}
+
+	public void setScrollId(String scrollId) {
+		this.scrollId = scrollId;
+	}
 
 	public int getTotalPageNum(int rowNumPerPage) {
 		if (rowNumPerPage == 0) {
@@ -74,12 +82,13 @@ public class QueryResult<Entity> implements Serializable {
 		return (currentPageNum -1) * rowNumPerPage;
 	}
 	
-	public String getScrollId() {
-		return scrollId;
+	public List<Entity> getPaginationResultList(int currentPageNum, int rowNumPerPage) {
+		if (getResultList().isEmpty()) return new ArrayList<Entity>();
+		if (currentPageNum <= 1) currentPageNum = 1;
+		int fromIndex = (currentPageNum - 1) * rowNumPerPage;
+		if (fromIndex > totalRowNum) return new ArrayList<Entity>();
+		int toIndex = (fromIndex + rowNumPerPage) > totalRowNum ? (int) totalRowNum : (fromIndex + rowNumPerPage);
+		return fromIndex <= toIndex ? resultList.subList(fromIndex, toIndex) : new ArrayList<Entity>();
 	}
-
-	public void setScrollId(String scrollId) {
-		this.scrollId = scrollId;
-	}
-
+	
 }

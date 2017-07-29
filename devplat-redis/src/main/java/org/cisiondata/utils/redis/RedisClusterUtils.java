@@ -379,6 +379,26 @@ public class RedisClusterUtils {
 	}
 	
 	/**
+	 * Hash缓存数据
+	 * @param key
+	 * @param map
+	 * @return
+	 */
+	public String hset(String key, Map<String, Object> value) {
+		try {
+			Map<byte[], byte[]> hash = new HashMap<byte[], byte[]>();
+			for (Map.Entry<String, Object> entry : value.entrySet()) {
+				hash.put(SerializerUtils.write(entry.getKey()), 
+					SerializerUtils.write(entry.getValue()));
+			}
+			return jedisCluster.hmset(SerializerUtils.write(key), hash);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	/**
 	 * Hash缓存实体Bean
 	 * @param key
 	 * @param value
@@ -387,6 +407,7 @@ public class RedisClusterUtils {
 	 */
 	public String hsetBean(Object key, Object value, int expireTime) {
 		try {
+			if (null == value) return null;
 			Map<byte[], byte[]> hash = new HashMap<byte[], byte[]>();
 			Map<String, Object> map = ReflectUtils.convertObjectToObjectMap(value);
 			for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -411,6 +432,7 @@ public class RedisClusterUtils {
 	 */
 	public String hsetBean(Object key, Object value) {
 		try {
+			if (null == value) return null;
 			Map<byte[], byte[]> hash = new HashMap<byte[], byte[]>();
 			Map<String, Object> map = ReflectUtils.convertObjectToObjectMap(value);
 			for (Map.Entry<String, Object> entry : map.entrySet()) {

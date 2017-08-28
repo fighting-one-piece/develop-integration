@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,17 +16,17 @@ public class PropertiesUtils {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(PropertiesUtils.class);
 	
-	public static Properties newInstance(String file) {
-		InputStream inStream = null;
+	public static Properties newInstance(String src) {
+		InputStream in = null;
 		try {
-			inStream = PropertiesUtils.class.getClassLoader().getResourceAsStream(file);
-			if (null == inStream) {
-				inStream = new FileInputStream(new File(file));
+			in = PropertiesUtils.class.getClassLoader().getResourceAsStream(src);
+			if (null == in) {
+				in = new FileInputStream(new File(src));
 			}
 		} catch (IOException e) {
 			LOG.error(e.getMessage(), e);
 		} 
-		return newInstance(inStream);
+		return newInstance(in);
 	}
 	
 	public static Properties newInstance(InputStream in) {
@@ -35,22 +37,36 @@ public class PropertiesUtils {
 			LOG.error(e.getMessage(), e);
 		} finally {
 			try {
-				if (null != in) {
-					in.close();
-				}
+				if (null != in) in.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOG.error(e.getMessage(), e);
 			}
 		}
 		return properties;
 	}
 	
-	public static Collection<Object> obtainValues(String file) {
-		return newInstance(file).values();
+	public static boolean containsKey(String src, Object key) {
+		return newInstance(src).containsKey(key);
+	}
+	
+	public static boolean containsValue(String src, Object value) {
+		return newInstance(src).containsValue(value);
+	}
+	
+	public static String getProperty(String src, String key) {
+		return newInstance(src).getProperty(key);
 	}
 
-	public static String obtainValue(String file, String key) {
-		return newInstance(file).getProperty(key);
+	public static String getProperty(String src, String key, String defaultValue) {
+		return newInstance(src).getProperty(key, defaultValue);
+	}
+	
+	public static Collection<Object> values(String src) {
+		return newInstance(src).values();
+	}
+	
+	public static Set<Entry<Object,Object>> entrySet(String src) {
+		return newInstance(src).entrySet();
 	}
 
 }

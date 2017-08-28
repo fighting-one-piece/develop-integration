@@ -443,6 +443,19 @@
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.4</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-dbcp2</artifactId>
+		    <version>2.1.1</version>
+		</dependency>
+		
+		<!--BONECP依赖包 -->
+		<dependency>
+		    <groupId>com.jolbox</groupId>
+		    <artifactId>bonecp</artifactId>
+		    <version>0.8.0.RELEASE</version>
+		</dependency>
 
 		<!-- CGLIB依赖包 -->
 		<dependency>
@@ -550,6 +563,13 @@
 			<artifactId>servlet-api</artifactId>
 			<version>2.4</version>
 			<scope>provided</scope>
+		</dependency>
+		
+		<!-- Joda Time依赖包 -->
+		<dependency>
+		    <groupId>joda-time</groupId>
+		    <artifactId>joda-time</artifactId>
+		    <version>2.9.9</version>
 		</dependency>
 		
 	</dependencies>

@@ -212,9 +212,16 @@ public class ReflectUtils {
 				if (null == value) continue;
 				Class<?> fieldType = field.getType();
 				if (fieldType.isAssignableFrom(Serializable.class)) {
-					Type type = object.getClass().getGenericSuperclass();
-					if (type instanceof ParameterizedType) {
-						fieldType = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+					for (Class<?> superClass = object.getClass(); 
+						superClass != Object.class; superClass = superClass.getSuperclass()) {
+						Type type = superClass.getGenericSuperclass();
+						if (type instanceof ParameterizedType) {
+							Type actualType = ((ParameterizedType) type).getActualTypeArguments()[0];
+							if (actualType instanceof Class) {
+								fieldType = (Class<?>) actualType;
+								break;
+							}
+						}
 					}
 					if (!fieldType.equals(value.getClass())) continue;
 				}

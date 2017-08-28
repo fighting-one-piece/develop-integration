@@ -31,8 +31,12 @@ public class Header implements Serializable {
 		this.fieldCH = fieldCH;
 	}
 	
-	public List<Header> getChildren() {
+	public void addChild(Header header) {
 		if (null == children) children = new ArrayList<Header>();
+		children.add(header);
+	}
+	
+	public List<Header> getChildren() {
 		return children;
 	}
 	

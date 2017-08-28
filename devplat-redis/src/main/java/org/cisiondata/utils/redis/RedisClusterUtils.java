@@ -85,6 +85,21 @@ public class RedisClusterUtils {
 	}
 	
 	/**
+	 * 返回key的类型
+	 * The type can be one of "none", string", "list", "set", "zset", "hash"
+	 * @param key
+	 * @return
+	 */
+	public String type(String key) {
+		try {
+			return jedisCluster.type(SerializerUtils.write(key));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return "none";
+	}
+	
+	/**
 	 * 是否存在key
 	 * @param key
 	 * @return
@@ -96,6 +111,21 @@ public class RedisClusterUtils {
 			LOG.error(e.getMessage(), e);
 		}
 		return false;
+	}
+	
+	/**
+	 * 设置过期时间
+	 * @param key
+	 * @param seconds
+	 * @return
+	 */
+	public Long expire(String key, int seconds) {
+		try {
+			return jedisCluster.expire(SerializerUtils.write(key), seconds);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return 0L;
 	}
 	
 	/**
@@ -384,10 +414,10 @@ public class RedisClusterUtils {
 	 * @param map
 	 * @return
 	 */
-	public String hset(String key, Map<String, Object> value) {
+	public String hset(String key, Map<String, ?> value) {
 		try {
 			Map<byte[], byte[]> hash = new HashMap<byte[], byte[]>();
-			for (Map.Entry<String, Object> entry : value.entrySet()) {
+			for (Map.Entry<String, ?> entry : value.entrySet()) {
 				hash.put(SerializerUtils.write(entry.getKey()), 
 					SerializerUtils.write(entry.getValue()));
 			}

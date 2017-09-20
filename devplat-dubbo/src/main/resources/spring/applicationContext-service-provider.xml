@@ -8,19 +8,22 @@
     	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 	
 	<!-- 注解配置  -->
+	<!--  
 	<context:component-scan base-package="org.cisiondata">
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>  
 	</context:component-scan>
+	-->
+	
+	<dubbo:annotation package="org.cisiondata.modules.dubbo" />
 	
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
         <property name="location" value="classpath:dubbo/dubbo.properties" />
     </bean>
 	
-	<bean id="registryService" class="org.cisiondata.modules.dubbo.service.impl.RegistryServiceImpl"></bean>
 	
 	<!-- 提供方应用名称信息，这个相当于起一个名字，我们dubbo管理页面比较清晰是哪个应用暴露出来的 -->  
    	<dubbo:application name="service_provider" owner="${dubbo.application.owner}"/>  
@@ -29,9 +32,12 @@
     <dubbo:protocol name="dubbo" port="20880" />  
    	
    	<!-- 使用zookeeper注册中心暴露服务地址 -->    
-   	<dubbo:registry address="zookeeper://192.168.0.114:2181" check="false" subscribe="false" register="true"></dubbo:registry>  
+   	<dubbo:registry address="zookeeper://192.168.0.124:2181" check="false" subscribe="false" register="true"></dubbo:registry>  
   	
   	<!-- 要暴露的服务接口 -->    
+  	<!--  
+	<bean id="registryService" class="org.cisiondata.modules.dubbo.service.impl.RegistryServiceImpl"></bean>
   	<dubbo:service interface="org.cisiondata.modules.dubbo.service.IRegistryService" ref="registryService" />  
+  	-->
   	
 </beans>

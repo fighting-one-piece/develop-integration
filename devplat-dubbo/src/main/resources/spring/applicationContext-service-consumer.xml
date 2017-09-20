@@ -8,17 +8,25 @@
     	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 	
 	<!-- 注解配置  -->
+	<!--  
 	<context:component-scan base-package="org.cisiondata">
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>  
 	</context:component-scan>
+	-->
 	
-  	<dubbo:application name="service_subscriber"></dubbo:application>  
+	<dubbo:annotation package="org.cisiondata.modules.dubbo" />
+	
+  	<dubbo:application name="service_consumer"></dubbo:application>
+  	  
     <!-- 使用zookeeper注册中心暴露服务地址 -->    
-    <dubbo:registry address="zookeeper://192.168.0.114:2181" check="false" subscribe="true" register="false"></dubbo:registry>   
+    <dubbo:registry address="zookeeper://192.168.0.124:2181" check="false" subscribe="true" register="false"></dubbo:registry>   
+    
     <!-- 要引用的服务 -->    
+    <!--  
     <dubbo:reference interface="org.cisiondata.modules.dubbo.service.IRegistryService" id="registryService"></dubbo:reference>     
+    -->
     
 </beans>

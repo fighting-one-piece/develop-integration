@@ -28,6 +28,8 @@
 	<!-- 提供方应用名称信息，这个相当于起一个名字，我们dubbo管理页面比较清晰是哪个应用暴露出来的 -->  
    	<dubbo:application name="service_provider" owner="${dubbo.application.owner}"/>  
    
+    <dubbo:monitor protocol="registry" />
+   
    	<!-- 用dubbo协议在20880端口暴露服务 -->  
     <dubbo:protocol name="dubbo" port="20880" />  
    	

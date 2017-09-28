@@ -550,6 +550,13 @@
 			<version>3.15</version>
 		</dependency>
 		
+		<!-- Xerces依赖包 -->
+		<dependency>
+		    <groupId>xerces</groupId>
+		    <artifactId>xerces</artifactId>
+		    <version>2.4.0</version>
+		</dependency>
+		
 		<!-- JSoup依赖包 -->
 		<dependency>
 		    <groupId>org.jsoup</groupId>
@@ -575,7 +582,10 @@
 	</dependencies>
 	
 	<build>
-		<finalName>devplat-common</finalName>
+		<finalName>${project.artifactId}-${project.version}</finalName>
+		<!-- 
+		<finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName>
+		 -->
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<defaultGoal>install</defaultGoal>

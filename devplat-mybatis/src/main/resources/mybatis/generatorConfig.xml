@@ -1,33 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
-<generatorConfiguration >
-  <classPathEntry location="F:\repositories\mysql\mysql.jar" />
-  <context id="mysql" >
-         <commentGenerator>
-          <property name="suppressDate" value="true"/>
-          <property name="suppressAllComments" value="true"/>
-      </commentGenerator>
-    <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhost:3306/test?characterEncoding=utf8" userId="root" password="123456" />
-    <javaTypeResolver>
-         <property name="forceBigDecimals" value="false"/>
-         </javaTypeResolver>
-         <!--生成Model类存放位置-->
-         <javaModelGenerator targetPackage="org.cisiondata.modules.abstr.entity" targetProject="integration">
-             <property name="enableSubPackages" value="true"/>
-             <property name="trimStrings" value="true"/>
-         </javaModelGenerator>
-         <!--生成映射文件存放位置-->
-         <sqlMapGenerator targetPackage="org.cisiondata.modules.abstr.mapper" targetProject="integration">
-             <property name="enableSubPackages" value="true"/>
-         </sqlMapGenerator>
-         <!--生成mapper类存放位置-->
-         <javaClientGenerator type="XMLMAPPER" targetPackage="org.cisiondata.modules.abstr.dao" targetProject="integration">
-             <property name="enableSubPackages" value="true"/>
-             <property name="basePackage" value="org.cisiondata.modules.dao" />
-         </javaClientGenerator>
-         <!--生成对应表及类名-->
-         <!--<table tableName="libotest" domainObjectName="libotestBean" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-         <table tableName="T_TEST" domainObjectName="Test" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
-        
-  </context>
+<generatorConfiguration>
+	<classPathEntry location="F:\repositories\mysql\mysql.jar" />
+	<context id="mysql">
+		<commentGenerator type="org.mybatis.plugins.generator.CustomCommentGenerator">
+			<property name="suppressDate" value="true" />
+			<property name="suppressAllComments" value="true" />
+		</commentGenerator>
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
+			connectionURL="jdbc:mysql://localhost:3306/test?characterEncoding=utf8"
+			userId="root" password="123456" />
+		<javaTypeResolver>
+			<property name="forceBigDecimals" value="false" />
+		</javaTypeResolver>
+		<!--生成Model类存放位置 -->
+		<javaModelGenerator targetPackage="org.cisiondata.modules.abstr.entity"
+			targetProject="integration">
+			<property name="enableSubPackages" value="true" />
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+		<!--生成映射文件存放位置 -->
+		<sqlMapGenerator targetPackage="org.cisiondata.modules.abstr.mapper"
+			targetProject="integration">
+			<property name="enableSubPackages" value="true" />
+		</sqlMapGenerator>
+		<!--生成mapper类存放位置 -->
+		<javaClientGenerator type="XMLMAPPER"
+			targetPackage="org.cisiondata.modules.abstr.dao" targetProject="integration">
+			<property name="enableSubPackages" value="true" />
+			<property name="basePackage" value="org.cisiondata.modules.dao" />
+		</javaClientGenerator>
+		<!--生成对应表及类名 -->
+		<!--<table tableName="libotest" domainObjectName="libotestBean" enableCountByExample="false" 
+			enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" 
+			selectByExampleQueryId="false"></table> -->
+		<table tableName="T_TEST" domainObjectName="Test"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>
+
+	</context>
 </generatorConfiguration>

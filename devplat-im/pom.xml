@@ -82,6 +82,14 @@
 			<scope>test</scope>
 		</dependency>
 		
+		<!--Servlet依赖包 -->
+		<dependency>
+		    <groupId>javax.servlet</groupId>
+		    <artifactId>javax.servlet-api</artifactId>
+		    <version>3.1.0</version>
+		    <scope>provided</scope>
+		</dependency>
+		
 		<!--Spring socket依赖包 -->
 		<dependency>
 			<groupId>org.springframework</groupId>

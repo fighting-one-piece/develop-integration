@@ -3,10 +3,13 @@ package org.cisiondata.modules.websocket.interceptor;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
@@ -28,6 +31,7 @@ public class MessagePushHandshakeInterceptor extends HttpSessionHandshakeInterce
         for (String value : values) {
         	System.out.println(value);
         }
+        attributes.put("query", request.getURI().getQuery());
         attributes.put("remoteIp", request.getRemoteAddress().getAddress().getHostAddress());
 		return super.beforeHandshake(request, response, wsHandler, attributes);
 	}
@@ -37,6 +41,14 @@ public class MessagePushHandshakeInterceptor extends HttpSessionHandshakeInterce
 			Exception ex) {
 		LOG.info("end message push handshake interceptor");
 		super.afterHandshake(request, response, wsHandler, ex);
+	}
+	
+	private HttpSession getSession(ServerHttpRequest request) {
+		if (request instanceof ServletServerHttpRequest) {
+			ServletServerHttpRequest serverRequest = (ServletServerHttpRequest) request;
+			return serverRequest.getServletRequest().getSession(isCreateSession());
+		}
+		return null;
 	}
 	
 }

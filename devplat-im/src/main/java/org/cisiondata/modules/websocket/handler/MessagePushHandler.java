@@ -1,9 +1,8 @@
 package org.cisiondata.modules.websocket.handler;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -31,7 +30,7 @@ public class MessagePushHandler implements WebSocketHandler {
 	@Resource(name = "connectionFactory")
 	private ConnectionFactory connectionFactory = null;
 
-	private static final List<WebSocketSession> users = new ArrayList<WebSocketSession>();
+	private static final Map<String, WebSocketSession> sessions = new HashMap<String, WebSocketSession>();
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -42,7 +41,10 @@ public class MessagePushHandler implements WebSocketHandler {
 			System.out.println(entry.getKey() + " : " + entry.getValue());
 		}
 		
-		users.add(session);
+		Object accountObj = attributes.get("account");
+		if (null != accountObj) {
+			sessions.put((String) accountObj, session);
+		}
 
 		session.sendMessage(new TextMessage("you connect server success"));
 		session.sendMessage(new TextMessage("you can receive message"));
@@ -70,14 +72,14 @@ public class MessagePushHandler implements WebSocketHandler {
 	@Override
 	public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
 		if (session.isOpen()) session.close();
-		users.remove(session);
+//		users.remove(session);
 
 		LOG.error("handle transport error, " + exception.getMessage(), exception);
 	}
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-		users.remove(session);
+		sessions.remove(session.getAttributes().get(""));
 		LOG.info("after connection closed {}", closeStatus.getReason());
 	}
 
@@ -91,10 +93,10 @@ public class MessagePushHandler implements WebSocketHandler {
 	 * @param message
 	 */
 	public void sendMessageToUsers(TextMessage message) {
-		for (WebSocketSession user : users) {
+		for (WebSocketSession session : sessions.values()) {
 			try {
-				if (user.isOpen()) {
-					user.sendMessage(message);
+				if (session.isOpen()) {
+					session.sendMessage(message);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.auth.dao.PermissionDAO">
+
+	<resultMap type="AuthPermission" id="permissionResultMap">
+		<id property="id" column="ID" />
+		<result property="principalType" column="PRINCIPAL_TYPE" />
+		<result property="principalId" column="PRINCIPAL_ID" />
+		<result property="resourceId" column="RESOURCE_ID" />
+		<result property="authStatus" column="AUTH_STATUS" />
+		<result property="extendStatus" column="EXTEND_STATUS" />
+	</resultMap>
+
+	<sql id="columnClause">ID, PRINCIPAL_TYPE, PRINCIPAL_ID, RESOURCE_ID, AUTH_STATUS,
+		EXTEND_STATUS</sql>
+
+	<sql id="whereClause">
+		<where>
+			<if test="condition.principalType != null">
+				AND PRINCIPAL_TYPE = #{condition.principalType}
+			</if>
+			<if test="condition.principalId != null">
+				AND PRINCIPAL_ID = #{condition.principalId}
+			</if>
+			<if test="condition.resourceId != null">
+				AND RESOURCE_ID = #{condition.resourceId}
+			</if>
+			<if test="condition.authStatus != null">
+				AND AUTH_STATUS = #{condition.authStatus}
+			</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="AuthPermission">
+		INSERT INTO T_PERMISSION(PRINCIPAL_TYPE, PRINCIPAL_ID, RESOURCE_ID,
+		AUTH_STATUS, EXTEND_STATUS)
+		VALUES(#{principalType},#{principalId},#{resourceId},#{authStatus},#{extendStatus})
+	</insert>
+
+	<select id="readDataByPK" resultMap="permissionResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_PERMISSION WHERE ID = #{id}
+	</select>
+
+	<select id="readDataByCondition" resultMap="permissionResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_PERMISSION
+		<include refid="whereClause" />
+	</select>
+
+	<select id="readDataListByCondition" resultMap="permissionResultMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_PERMISSION
+		<include refid="whereClause" />
+	</select>
+
+	<select id="readDataPaginationByCondition" resultMap="permissionResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_PERMISSION
+        ]]>
+
+
+	</select>
+</mapper>

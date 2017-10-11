@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.auth.dao.ResourceAttributeDAO">
+
+    <resultMap type="AuthResourceAttribute" id="resourceAttributeResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="resourceId" column="RESOURCE_ID"/>
+        <result property="key" column="KEY"/>
+        <result property="value" column="VALUE"/>  
+        <result property="type" column="TYPE"/>  
+    </resultMap>
+    
+    <sql id="columnClause">
+    	ID, RESOURCE_ID, `KEY`, VALUE, TYPE
+    </sql>
+    
+    <sql id="whereClause">
+    	<where>
+    		<if test="condition.resourceId != null and condition.resourceId != ''">
+    			AND RESOURCE_ID = #{condition.resourceId}
+    		</if>
+    		<if test="condition.key != null and condition.key != ''">
+    			AND `KEY` = #{condition.key}
+    		</if>
+    		<if test="condition.value != null and condition.value != ''">
+    			AND VALUE = #{condition.value}
+    		</if>
+    		<if test="condition.type != null and condition.type != ''">
+    			AND TYPE = #{condition.type}
+    		</if>
+    	</where>
+    </sql>
+    
+    
+    <insert id="insertBatch" parameterType="List">
+    	INSERT IGNORE INTO T_RESOURCE_ATTRIBUTE (RESOURCE_ID, `KEY`, VALUE, TYPE)
+    	VALUES
+    	<foreach collection="list" index="index" item="item" separator=",">
+    		(#{item.resourceId},#{item.key},#{item.value},#{item.type})
+    	</foreach>
+    </insert>
+    
+    <update id="update" parameterType="AuthResourceAttribute">
+    	UPDATE T_RESOURCE_ATTRIBUTE
+    	<set>
+    		<if test="value != null and value != ''">
+    			VALUE = #{value},
+    		</if>
+    		<if test="type != null and type != ''">
+    			TYPE = #{type}
+    		</if>
+    	</set>
+    	WHERE RESOURCE_ID = #{resourceId} AND `KEY` = #{key}
+    </update>
+    
+    
+    <select id="readDataListByCondition" parameterType="map" resultType="AuthResourceAttribute" resultMap="resourceAttributeResultMap">  
+        SELECT 
+        <include refid="columnClause"/>
+        FROM T_RESOURCE_ATTRIBUTE
+        <include refid="whereClause"/>
+    </select>
+    
+</mapper>

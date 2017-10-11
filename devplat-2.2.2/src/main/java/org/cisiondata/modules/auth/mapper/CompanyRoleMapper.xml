@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.auth.dao.CompanyRoleDAO">
+
+	<!-- 角色单位表 -->
+	<resultMap type="AuthCompanyRole" id="companyRoleMap">
+		<result property="id" column="ID" />
+		<result property="companyId" column="COMPANY_ID" />
+		<result property="roleId" column="ROLE_ID" />
+		<result property="priority" column="PRIORITY" />
+	</resultMap>
+
+
+	<sql id="columnClause">ID, COMPANY_ID, ROLE_ID, PRIORITY</sql>
+
+	<sql id="whereClause">
+		<where>
+			<if test="id != null">
+				AND ID = #{id}
+			</if>
+			<if test="companyId != null">
+				AND COMPANY_ID = #{companyId}
+			</if>
+			<if test="roleId != null">
+				AND ROLE_ID = #{roleId}
+			</if>
+			<if test="priority != null">
+				AND PRIORITY = #{priority}
+			</if>
+		</where>
+	</sql>
+
+	<!--条件查询 -->
+	<select id="readCompanyRole" parameterType="AuthCompanyRole"
+		resultMap="companyRoleMap">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_COMPANY_ROLE
+		<include refid="whereClause" />
+	</select>
+</mapper>

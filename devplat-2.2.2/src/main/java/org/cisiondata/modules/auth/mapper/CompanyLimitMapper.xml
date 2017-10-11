@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.auth.dao.CompanyLimitDAO">
+	<resultMap type="AuthCompanyLimit" id="companyLimitResultMap">
+		<result property="id" column="ID" />
+		<result property="companyId" column="COMPANY_ID" />
+		<result property="ctCount" column="CT_COUNT" />
+		<result property="type" column="TYPE" />
+		<result property="resourceId" column="RESOURCE_ID" />
+		<result property="expireTime" column="EXPIRE_TIME" />
+		<result property="deleteFlag" column="DELETE_FLAG" />
+	</resultMap>
+
+	<sql id="columnClause">ID,COMPANY_ID,CT_COUNT,TYPE,RESOURCE_ID,EXPIRE_TIME,DELETE_FLAG
+	</sql>
+
+	<sql id="whereClause">
+		<where>
+			<if test="id != null">
+				AND ID = #{id}
+			</if>
+			<if test="companyId != null ">
+				AND COMPANY_ID = #{companyId}
+			</if>
+			<if test="ctCount != null ">
+				AND CT_COUNT = #{ctCount}
+			</if>
+			<if test="type != null ">
+				AND TYPE = #{type}
+			</if>
+			<if test="resourceId != null">
+				AND RESOURCE_ID = #{resourceId}
+			</if>
+		</where>
+	</sql>
+
+	<select id="readConditions" resultMap="companyLimitResultMap"
+		parameterType="map">
+		SELECT
+		<include refid="columnClause" />
+		FROM T_COMPANY_LIMIT
+		<include refid="whereClause" />
+	</select>
+
+</mapper>

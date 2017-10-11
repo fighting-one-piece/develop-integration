@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.cisiondata.modules.auth.dao.CompanyDAO">
+	<resultMap id="BaseResultMap" type="AuthCompany">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="COMPANY_NAME" property="companyName" jdbcType="VARCHAR" />
+		<result column="COMPANY_CONTACT" property="companyContact"
+			jdbcType="VARCHAR" />
+		<result column="COMPANY_EMAIL" property="companyEmail"
+			jdbcType="VARCHAR" />
+		<result column="COMPANY_TELEPHONE" property="companyTelephone"
+			jdbcType="VARCHAR" />
+		<result column="COMPANY_ADDRESS" property="companyAddress"
+			jdbcType="VARCHAR" />
+		<result column="DELETE_FLAG" property="deleteFlag" jdbcType="INTEGER" />
+		<result column="COMPANY_PROVINCE" property="companyProvince"
+			jdbcType="INTEGER" />
+		<result column="EXPIRE_TIME" property="expireTime" />
+	</resultMap>
+
+
+
+	<!-- 查询 -->
+	<select id="readCompany" parameterType="map" resultMap="BaseResultMap">
+		select * from T_COMPANY
+		<where>
+			<if test="companyId!=null">
+			ID=#{companyId}
+			</if>
+			<if test="companyName != null and companyName != ''">
+			and	COMPANY_NAME = #{companyName,jdbcType=VARCHAR}
+			</if>
+			<if test="companyContact != null and companyContact != ''">
+				and COMPANY_CONTACT = #{companyContact,jdbcType=VARCHAR}
+			</if>
+			<if test="companyEmail != null and companyEmail != ''">
+				and COMPANY_EMAIL = #{companyEmail,jdbcType=VARCHAR}
+			</if>
+			<if test="companyTelephone != null and companyTelephone != ''">
+				and COMPANY_TELEPHONE =
+				#{companyTelephone,jdbcType=VARCHAR}
+			</if>
+			<if test="companyAddress != null and companyAddress != ''">
+				and COMPANY_ADDRESS = #{companyAddress,jdbcType=VARCHAR}
+			</if>
+			<if test="deleteFlag != null">
+				and DELETE_FLAG = #{deleteFlag,jdbcType=INTEGER}
+			</if>
+			<if test="companyProvince != null and companyProvince != ''">
+				and COMPANY_PROVINCE =
+				#{companyProvince,jdbcType=VARCHAR}
+			</if>
+		</where>
+		order by ID DESC
+		<if test="begin != null and pageSize != null">
+			limit #{begin},#{pageSize}
+		</if>
+	</select>
+
+
+
+</mapper>

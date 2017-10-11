@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cisiondata.modules.auth.dao.UserResourceDAO">
+
+	<resultMap type="AuthUserResource" id="userResourceResultMap">  
+        <id property="id" column="ID"/>  
+        <result property="userId" column="USER_ID"/>  
+        <result property="resourceId" column="RESOURCE_ID"/>
+        <result property="priority" column="PRIORITY"/> 
+        <result property="deleteFlag" column="DELETE_FLAG"/> 
+    </resultMap>
+    
+    <sql id="columnClause">ID, USER_ID, RESOURCE_ID, PRIORITY, DELETE_FLAG</sql>
+    
+    <sql id="whereClause">
+    	<where>
+    		<if test="condition.userId != null">
+    			AND USER_ID = #{condition.userId}
+    		</if>
+    		<if test="condition.resourceId != null">
+    			AND RESOURCE_ID = #{condition.resourceId}
+    		</if>
+    		<if test="condition.priority != null">
+    			AND PRIORITY = #{condition.priority}
+    		</if>
+    		<if test="condition.deleteFlag != null">
+    			AND DELETE_FLAG = #{condition.deleteFlag}
+    		</if>
+    	</where>
+    </sql>
+    
+     <insert id="insert" parameterType="AuthUserResource">
+            INSERT INTO T_USER_RESOURCE(USER_ID, RESOURCE_ID, PRIORITY, DELETE_FLAG) 
+            VALUES(#{USER_ID},#{RESOURCE_ID},#{PRIORITY},#{DELETE_FLAG})  
+    </insert>
+    
+    <select id="readDataByPK" resultMap="userResourceResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_USER_RESOURCE WHERE ID = #{id}
+    </select>
+    
+    <select id="readDataByCondition" resultMap="userResourceResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_USER_RESOURCE
+            <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataListByCondition" resultMap="userResourceResultMap">  
+            SELECT 
+            <include refid="columnClause"/>
+            FROM T_USER_RESOURCE
+            <include refid="whereClause"/>
+    </select>
+    
+    <select id="readDataPaginationByCondition" resultMap="userResourceResultMap">  
+        <![CDATA[ 
+            SELECT * FROM T_USER_RESOURCE
+        ]]>   
+    </select>
+    
+</mapper>

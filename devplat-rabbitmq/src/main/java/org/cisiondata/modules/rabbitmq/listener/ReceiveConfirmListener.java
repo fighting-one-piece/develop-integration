@@ -21,7 +21,7 @@ public class ReceiveConfirmListener implements ChannelAwareMessageListener {
 	private Logger LOG = LoggerFactory.getLogger(ReceiveConfirmListener.class);
 	
 	@Autowired(required=true)
-	private List<IConsumeService> consumerServiceList = null;
+	private List<IConsumeService> consumeServiceList = null;
 	
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception {
@@ -33,8 +33,8 @@ public class ReceiveConfirmListener implements ChannelAwareMessageListener {
 			String routingKey = properties.getReceivedRoutingKey();
 			LOG.info("--receive confirm-- exchange: {} routingKey: {} message: {} ", exchange, routingKey, SerializerUtils.read(message.getBody()));
 			if (StringUtils.isBlank(exchange) || StringUtils.isBlank(routingKey)) return;
-			for (int i = 0, len = consumerServiceList.size(); i < len; i++) {
-				consumerServiceList.get(i).handleMessage(exchange, routingKey, 
+			for (int i = 0, len = consumeServiceList.size(); i < len; i++) {
+				consumeServiceList.get(i).handleMessage(exchange, routingKey, 
 						SerializerUtils.read(message.getBody()));
 			}
 		} catch (Exception e) {

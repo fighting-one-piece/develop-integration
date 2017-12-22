@@ -1,0 +1,242 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.cisiondata</groupId>
+	<artifactId>devplat-kafka</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>DevPlat Kafka Project</name>
+	<url>http://maven.apache.org</url>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-parent</artifactId>
+	    <version>1.5.9.RELEASE</version>
+	    <relativePath/>
+	</parent>
+
+	<profiles>
+		<!-- 开发环境 -->
+		<profile>
+			<id>development</id>
+			<properties>
+				<target-env>development</target-env>
+				<repo-host>192.168.0.124:8081</repo-host>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<!-- 测试环境 -->
+		<profile>
+			<id>test</id>
+			<properties>
+				<target-env>test</target-env>
+				<repo-host>172.20.100.114:11111</repo-host>
+			</properties>
+		</profile>
+		<!-- 生产环境 -->
+		<profile>
+			<id>production</id>
+			<properties>
+				<target-env>production</target-env>
+				<repo-host>172.20.100.114:11111</repo-host>
+			</properties>
+		</profile>
+	</profiles>
+
+	<repositories>
+		<repository>
+			<id>public</id>
+			<name>public repository</name>
+			<url>http://${repo-host}/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+			
+		<repository> 
+            <id>maven-restlet</id> 
+            <name>Public Online Restlet Repository</name> 
+            <url>http://maven.restlet.org</url> 
+        </repository> 
+	</repositories>
+	
+	<pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestone</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spring.boot.version>1.5.9.RELEASE</spring.boot.version>
+		<spring.cloud.starter.config.version>1.4.0.RELEASE</spring.cloud.starter.config.version>
+		<spring.cloud.starter.eureka.version>1.4.0.RELEASE</spring.cloud.starter.eureka.version>
+		<spring.kafka.version>1.3.2.RELEASE</spring.kafka.version>
+		<kafka.clients.version>1.0.0</kafka.clients.version>
+		<kafka.streams.version>1.0.0</kafka.streams.version>
+		<commons.lang.version>2.6</commons.lang.version>
+		<logback.version>1.1.7</logback.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>jdk.tools</groupId>
+			<artifactId>jdk.tools</artifactId>
+			<version>1.8</version>
+			<scope>system</scope>
+            <systemPath>${JAVA_HOME}/lib/tools.jar</systemPath>
+  		</dependency>
+  		
+  		<!--JUnit依赖包 -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Spring Boot依赖包 -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter</artifactId>
+		    <exclusions>  
+		        <exclusion>  
+		            <groupId>org.springframework.boot</groupId>  
+		            <artifactId>spring-boot-starter-logging</artifactId>  
+		        </exclusion>  
+		    </exclusions>  
+		</dependency>
+		
+		<!-- Spring Kafka依赖包 -->
+		<dependency>
+		    <groupId>org.springframework.kafka</groupId>
+		    <artifactId>spring-kafka</artifactId>
+		    <version>${spring.kafka.version}</version>
+		</dependency>
+		
+		<!-- Kafka Clients依赖包 -->
+		<dependency>
+		    <groupId>org.apache.kafka</groupId>
+		    <artifactId>kafka-clients</artifactId>
+		    <version>${kafka.clients.version}</version>
+		</dependency>
+		
+		<!-- Kafka Streams依赖包 -->
+		<dependency>
+		    <groupId>org.apache.kafka</groupId>
+		    <artifactId>kafka-streams</artifactId>
+		    <version>${kafka.streams.version}</version>
+		</dependency>	
+		
+		<dependency>
+		    <groupId>org.projectlombok</groupId>
+		    <artifactId>lombok</artifactId>
+		    <version>1.16.18</version>
+		    <scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.bouncycastle</groupId>
+		    <artifactId>bcpkix-jdk15on</artifactId>
+		    <version>1.58</version>
+		</dependency>
+		
+	</dependencies>
+	
+	<build>
+		<finalName>devplat-kafka</finalName>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<defaultGoal>install</defaultGoal>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>maven</groupId>
+				<artifactId>maven-test-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+			<!-- War Maven Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<webappDirectory>src/main/webapp</webappDirectory>
+					<warSourceDirectory>target/devplat-rabbitmq</warSourceDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>tomcat-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.mybatis.generator</groupId>
+				<artifactId>mybatis-generator-maven-plugin</artifactId>
+				<version>1.3.2</version>
+				<configuration>
+					<verbose>true</verbose>
+					<overwrite>true</overwrite>
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
+	
+	<distributionManagement>
+		<repository>  
+            <id>user-release</id>  
+            <name>User Project Release</name>  
+            <url>http://${repo-host}/nexus/content/repositories/releases/</url>  
+        </repository>  
+  
+        <snapshotRepository>  
+            <id>user-snapshots</id>  
+            <name>User Project SNAPSHOTS</name>  
+            <url>http://${repo-host}/nexus/content/repositories/snapshots/</url>  
+        </snapshotRepository>  
+	</distributionManagement>
+	
+</project>

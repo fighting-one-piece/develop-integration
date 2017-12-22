@@ -10,6 +10,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,6 +20,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.Consts;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -35,7 +37,6 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -70,7 +71,10 @@ public class HttpClientUtils {
 	
 	static {
 		try {
+			/**
 			SSLContext sslContext = SSLContexts.custom().useTLS().build();
+			*/
+			SSLContext sslContext = SSLContext.getInstance("TLS");  
 			sslContext.init(null, new TrustManager[] { new X509TrustManager() {
 				public X509Certificate[] getAcceptedIssuers() {
 					return null;
@@ -86,7 +90,7 @@ public class HttpClientUtils {
 			Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
 					.<ConnectionSocketFactory> create()
 					.register("http", PlainConnectionSocketFactory.INSTANCE)
-					.register("https",new SSLConnectionSocketFactory(sslContext)).build();
+					.register("https", new SSLConnectionSocketFactory(sslContext)).build();
 			
 			connManager = new PoolingHttpClientConnectionManager(
 					socketFactoryRegistry);
@@ -117,32 +121,282 @@ public class HttpClientUtils {
 	}
 	
 	/**
-	  * HTTP请求，默认超时为5S
-	  * @param url
-	  * @return
+	 * HTTP GET请求
+	 * @param url
+	 * @param encode
+	 * @return
 	 */
-	public static String post(String url, String encode) {
-		return post(url, null, connectTimeout, encode);
+	public static String sendGet(String url, String encode) {
+		return sendGet(url, null, encode, connectTimeout, soTimeout);
 	}
 	
 	/**
-	  * HTTP请求，默认超时为5S
+	 * HTTP GET请求
+	 * @param url
+	 * @param encode
+	 * @param headers
+	 * @return
+	 */
+	public static String sendGet(String url, String encode, String... headers) {
+		return sendGet(url, null, encode, connectTimeout, soTimeout, headers);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param params
+	 * @param encode
+	 * @return
+	 */
+	public static String sendGet(String url, Map<String, String> params, String encode) {
+		return sendGet(url, params, encode, connectTimeout, soTimeout);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param params
+	 * @param headers
+	 * @return
+	 */
+	public static String sendGet(String url, Map<String, String> params, String... headers) {
+		return sendGet(url, params, ENCODE_UTF8, headers);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param params
+	 * @param encode
+	 * @param headers
+	 * @return
+	 */
+	public static String sendGet(String url, Map<String, String> params, String encode, String... headers) {
+		return sendGet(url, params, encode, connectTimeout, soTimeout, headers);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param params
+	 * @param encode
+	 * @param connectTimeout
+	 * @param soTimeout
+	 * @return
+	 */
+	public static String sendGet(String url, Map<String, String> params, String encode, 
+			int connectTimeout, int soTimeout, String... headers) {
+		String responseString = null;
+		RequestConfig requestConfig = RequestConfig.custom()
+				.setSocketTimeout(connectTimeout)
+				.setConnectTimeout(connectTimeout)
+				.setConnectionRequestTimeout(connectTimeout).build();
+		StringBuilder sb = new StringBuilder(url);
+		int i = 0;
+		if (null != params && params.size() > 0) {
+			for (Entry<String, String> entry : params.entrySet()) {
+				sb.append(i == 0 && !url.contains("?") ? "?" : "&");
+				sb.append(entry.getKey());
+				sb.append("=");
+				String value = entry.getValue();
+				try {
+					sb.append(URLEncoder.encode(value, "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					logger.warn("encode http get params error, value is " + value, e);
+					sb.append(URLEncoder.encode(value));
+				}
+				i++;
+			}
+		}
+		logger.info("[HttpClientUtils Get] begin invoke:" + sb.toString());
+		HttpGet httpGet = new HttpGet(sb.toString());
+		httpGet.setConfig(requestConfig);
+		if (null != headers) {
+			for (int j = 0, len = headers.length; j < len;) {
+        		httpGet.setHeader(headers[j], headers[j + 1]);
+        		j = j + 2;
+        	}
+		}
+		try {
+			CloseableHttpResponse response = httpclient.execute(httpGet);
+			try {
+				HttpEntity entity = response.getEntity();
+				try {
+					if (entity != null) {
+						responseString = EntityUtils.toString(entity, encode);
+					}
+				} finally {
+					if (entity != null) {
+						entity.getContent().close();
+					}
+				}
+			} catch (Exception e) {
+				logger.error(String.format("[HttpClientUtils Get]get response error, url:%s", sb.toString()), e);
+				return responseString;
+			} finally {
+				if (response != null) {
+					response.close();
+				}
+			}
+			logger.info(String.format("[HttpClientUtils Get]Debug url:%s , response string %s:", sb.toString(), responseString));
+		} catch (SocketTimeoutException e) {
+			logger.error(String.format("[HttpClientUtils Get]invoke get timout error, url:%s", sb.toString()), e);
+			return responseString;
+		} catch (Exception e) {
+			logger.error(String.format("[HttpClientUtils Get]invoke get error, url:%s", sb.toString()), e);
+		} finally {
+			httpGet.releaseConnection();
+		}
+		return responseString;
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @return
+	 */
+	public static Map<String, String> sendGetOnlyHeaders(String url) {
+		return sendGetOnlyHeaders(url, null);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param params
+	 * @return
+	 */
+	public static Map<String, String> sendGetOnlyHeaders(String url, Map<String, String> params) {
+		return sendGetOnlyHeaders(url, params, ENCODE_UTF8);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param params
+	 * @param encode
+	 * @return
+	 */
+	public static Map<String, String> sendGetOnlyHeaders(String url, Map<String, String> params, String encode) {
+		return sendGetOnlyHeaders(url, params, encode, connectTimeout, soTimeout);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param params
+	 * @param encode
+	 * @param connectTimeout
+	 * @param soTimeout
+	 * @return Response Header Infomations
+	 */
+	public static Map<String, String> sendGetOnlyHeaders(String url, Map<String, String> params, 
+			String encode, int connectTimeout, int soTimeout) {
+		Map<String, String> headers = new HashMap<String, String>();
+		RequestConfig requestConfig = RequestConfig.custom()
+				.setSocketTimeout(connectTimeout)
+				.setConnectTimeout(connectTimeout)
+				.setConnectionRequestTimeout(connectTimeout).build();
+		StringBuilder sb = new StringBuilder(url);
+		int i = 0;
+		if (null != params && params.size() > 0) {
+			for (Entry<String, String> entry : params.entrySet()) {
+				if (i == 0 && !url.contains("?")) {
+					sb.append("?");
+				} else {
+					sb.append("&");
+				}
+				sb.append(entry.getKey());
+				sb.append("=");
+				String value = entry.getValue();
+				try {
+					sb.append(URLEncoder.encode(value, "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					logger.warn("encode http get params error, value is " + value, e);
+					sb.append(URLEncoder.encode(value));
+				}
+				i++;
+			}
+		}
+		logger.info("[HttpClientUtils Get] begin invoke:" + sb.toString());
+		HttpGet httpGet = new HttpGet(sb.toString());
+		httpGet.setConfig(requestConfig);
+		Header[] reqHeaders = httpGet.getAllHeaders();
+		for (Header reqHeader : reqHeaders) {
+			System.err.println(reqHeader.getName() + " == " + reqHeader.getValue());
+		}
+		try {
+			CloseableHttpResponse response = httpclient.execute(httpGet);
+			try {
+				Header[] allHeaders = response.getAllHeaders();
+				for (int j = 0, len = allHeaders.length; j < len; j++) {
+					String headerName = allHeaders[j].getName();
+					String headerValue = allHeaders[j].getValue();
+					if (headers.containsKey(headerName)) {
+						headerValue = headers.get(headerName) + " ; " + headerValue;
+					}
+					headers.put(headerName, headerValue);
+				}
+			} catch (Exception e) {
+				logger.error(String.format("[HttpClientUtils Get]get response error, url:%s", sb.toString()), e);
+			} finally {
+				if (response != null) {
+					response.close();
+				}
+			}
+			logger.info(String.format("[HttpClientUtils Get]Debug url:%s , response string %s:", sb.toString(), response.toString()));
+		} catch (SocketTimeoutException e) {
+			logger.error(String.format("[HttpClientUtils Get]invoke get timout error, url:%s", sb.toString()), e);
+		} catch (Exception e) {
+			logger.error(String.format("[HttpClientUtils Get]invoke get error, url:%s", sb.toString()), e);
+		} finally {
+			httpGet.releaseConnection();
+		}
+		return headers;
+	}
+	
+	/**
+	  * HTTP POST请求，默认超时为5S
+	  * @param url
+	  * @param encode
+	  * @return
+	 */
+	public static String sendPost(String url, String encode) {
+		return sendPost(url, null, connectTimeout, encode);
+	}
+	
+	/**
+	  * HTTP POST请求，默认超时为5S
 	  * @param url
 	  * @param params
+	  * @param encode
 	  * @return
 	 */
-	public static String post(String url, Map<String, String> params, String encode) {
-		return post(url, params, connectTimeout, encode);
+	public static String sendPost(String url, Map<String, String> params, String encode) {
+		return sendPost(url, params, connectTimeout, encode);
 	}
 	
 	/**
-	  * HTTP请求
+	 * HTTP POST请求，默认超时为5S
+	 * @param url
+	 * @param params
+	 * @param encode
+	 * @param headers
+	 * @return
+	 */
+	public static String sendPost(String url, Map<String, String> params, String encode, String... headers) {
+		return sendPost(url, params, connectTimeout, encode, headers);
+	}
+	
+	/**
+	  * HTTP POST请求
 	  * @param url
 	  * @param params
 	  * @param connectTimeout
+	  * @param encode
+	  * @param headers
 	  * @return
 	 */
-	public static String post(String url, Map<String, String> params, int connectTimeout, String encode) {
+	public static String sendPost(String url, Map<String, String> params, int connectTimeout, String encode, String... headers) {
 		String responseContent = null;
 		HttpPost httpPost = new HttpPost(url);
 		try {
@@ -150,15 +404,21 @@ public class HttpClientUtils {
 					.setSocketTimeout(connectTimeout)
 					.setConnectTimeout(connectTimeout)
 					.setConnectionRequestTimeout(connectTimeout).build();
-			List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-			if (null == encode) encode = ENCODE_UTF8;
-			httpPost.setEntity(new UrlEncodedFormEntity(formParams, Charset.forName(encode)));
 			httpPost.setConfig(requestConfig);
-			// 绑定到请求 Entry
+			if (null == encode) encode = ENCODE_UTF8;
+			List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 			if (null != params && params.size() > 0) {
 				for (Map.Entry<String, String> entry : params.entrySet()) {
 					formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 				}
+			}
+			// 绑定到请求 Entry
+			httpPost.setEntity(new UrlEncodedFormEntity(formParams, Charset.forName(encode)));
+			if (null != headers) {
+				for (int i = 0, len = headers.length; i < len;) {
+            		httpPost.setHeader(headers[i], headers[i + 1]);
+            		i = i + 2;
+            	}
 			}
 			CloseableHttpResponse response = httpclient.execute(httpPost);
 			try {
@@ -187,78 +447,6 @@ public class HttpClientUtils {
 			httpPost.releaseConnection();
 		}
 		return responseContent;
-	}
-	
-	public static String get(String url, String encode) {
-		return get(url, null, encode, connectTimeout, soTimeout);
-	}
-	
-	public static String get(String url, Map<String, String> params, String encode) {
-		return get(url, params, encode, connectTimeout, soTimeout);
-	}
-	
-	public static String get(String url, Map<String, String> params,
-			String encode, int connectTimeout, int soTimeout) {
-		String responseString = null;
-		RequestConfig requestConfig = RequestConfig.custom()
-				.setSocketTimeout(connectTimeout)
-				.setConnectTimeout(connectTimeout)
-				.setConnectionRequestTimeout(connectTimeout).build();
-		StringBuilder sb = new StringBuilder(url);
-		int i = 0;
-		if (null != params && params.size() > 0) {
-			for (Entry<String, String> entry : params.entrySet()) {
-				if (i == 0 && !url.contains("?")) {
-					sb.append("?");
-				} else {
-					sb.append("&");
-				}
-				sb.append(entry.getKey());
-				sb.append("=");
-				String value = entry.getValue();
-				try {
-					sb.append(URLEncoder.encode(value, "UTF-8"));
-				} catch (UnsupportedEncodingException e) {
-					logger.warn("encode http get params error, value is " + value, e);
-					sb.append(URLEncoder.encode(value));
-				}
-				i++;
-			}
-		}
-		logger.info("[HttpClientUtils Get] begin invoke:" + sb.toString());
-		HttpGet get = new HttpGet(sb.toString());
-		get.setConfig(requestConfig);
-		try {
-			CloseableHttpResponse response = httpclient.execute(get);
-			try {
-				HttpEntity entity = response.getEntity();
-				try {
-					if (entity != null) {
-						responseString = EntityUtils.toString(entity, encode);
-					}
-				} finally {
-					if (entity != null) {
-						entity.getContent().close();
-					}
-				}
-			} catch (Exception e) {
-				logger.error(String.format("[HttpClientUtils Get]get response error, url:%s", sb.toString()), e);
-				return responseString;
-			} finally {
-				if (response != null) {
-					response.close();
-				}
-			}
-			logger.info(String.format("[HttpClientUtils Get]Debug url:%s , response string %s:", sb.toString(), responseString));
-		} catch (SocketTimeoutException e) {
-			logger.error(String.format("[HttpClientUtils Get]invoke get timout error, url:%s", sb.toString()), e);
-			return responseString;
-		} catch (Exception e) {
-			logger.error(String.format("[HttpClientUtils Get]invoke get error, url:%s", sb.toString()), e);
-		} finally {
-			get.releaseConnection();
-		}
-		return responseString;
 	}
 
 }

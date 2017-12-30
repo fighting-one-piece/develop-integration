@@ -1,6 +1,9 @@
 package org.cisiondata.utils.http;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
@@ -37,6 +40,7 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -68,6 +72,9 @@ public class HttpClientUtils {
 	public final static int connectTimeout = 5000;
 	
 	public final static int soTimeout = 5000;
+	
+	public static RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
+			.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
 	
 	static {
 		try {
@@ -128,6 +135,16 @@ public class HttpClientUtils {
 	 */
 	public static String sendGet(String url, String encode) {
 		return sendGet(url, null, encode, connectTimeout, soTimeout);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param headers
+	 * @return
+	 */
+	public static String sendGet(String url, String[] headers) {
+		return sendGet(url, null, ENCODE_UTF8, connectTimeout, soTimeout, headers);
 	}
 	
 	/**
@@ -196,8 +213,7 @@ public class HttpClientUtils {
 		if (null != params && params.size() > 0) {
 			for (Entry<String, String> entry : params.entrySet()) {
 				sb.append(i == 0 && !url.contains("?") ? "?" : "&");
-				sb.append(entry.getKey());
-				sb.append("=");
+				sb.append(entry.getKey()).append("=");
 				String value = entry.getValue();
 				try {
 					sb.append(URLEncoder.encode(value, "UTF-8"));
@@ -255,8 +271,18 @@ public class HttpClientUtils {
 	 * @param url
 	 * @return
 	 */
-	public static Map<String, String> sendGetOnlyHeaders(String url) {
-		return sendGetOnlyHeaders(url, null);
+	public static Map<String, Object> sendGetWithHeaders(String url) {
+		return sendGetWithHeaders(url, null, ENCODE_UTF8);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param headers
+	 * @return
+	 */
+	public static Map<String, Object> sendGetWithHeaders(String url, String[] headers) {
+		return sendGetWithHeaders(url, null, ENCODE_UTF8, headers);
 	}
 	
 	/**
@@ -265,8 +291,8 @@ public class HttpClientUtils {
 	 * @param params
 	 * @return
 	 */
-	public static Map<String, String> sendGetOnlyHeaders(String url, Map<String, String> params) {
-		return sendGetOnlyHeaders(url, params, ENCODE_UTF8);
+	public static Map<String, Object> sendGetWithHeaders(String url, Map<String, String> params) {
+		return sendGetWithHeaders(url, params, ENCODE_UTF8);
 	}
 	
 	/**
@@ -276,8 +302,21 @@ public class HttpClientUtils {
 	 * @param encode
 	 * @return
 	 */
-	public static Map<String, String> sendGetOnlyHeaders(String url, Map<String, String> params, String encode) {
-		return sendGetOnlyHeaders(url, params, encode, connectTimeout, soTimeout);
+	public static Map<String, Object> sendGetWithHeaders(String url, Map<String, String> params, String encode) {
+		return sendGetWithHeaders(url, params, encode, connectTimeout, soTimeout);
+	}
+	
+	/**
+	 * HTTP GET请求
+	 * @param url
+	 * @param params
+	 * @param encode
+	 * @param headers
+	 * @return
+	 */
+	public static Map<String, Object> sendGetWithHeaders(String url, Map<String, String> params, 
+			String encode, String... headers) {
+		return sendGetWithHeaders(url, params, encode, connectTimeout, soTimeout, headers);
 	}
 	
 	/**
@@ -289,9 +328,9 @@ public class HttpClientUtils {
 	 * @param soTimeout
 	 * @return Response Header Infomations
 	 */
-	public static Map<String, String> sendGetOnlyHeaders(String url, Map<String, String> params, 
-			String encode, int connectTimeout, int soTimeout) {
-		Map<String, String> headers = new HashMap<String, String>();
+	public static Map<String, Object> sendGetWithHeaders(String url, Map<String, String> params, 
+			String encode, int connectTimeout, int soTimeout, String... headers) {
+		Map<String, Object> result = new HashMap<String, Object>();
 		RequestConfig requestConfig = RequestConfig.custom()
 				.setSocketTimeout(connectTimeout)
 				.setConnectTimeout(connectTimeout)
@@ -300,13 +339,8 @@ public class HttpClientUtils {
 		int i = 0;
 		if (null != params && params.size() > 0) {
 			for (Entry<String, String> entry : params.entrySet()) {
-				if (i == 0 && !url.contains("?")) {
-					sb.append("?");
-				} else {
-					sb.append("&");
-				}
-				sb.append(entry.getKey());
-				sb.append("=");
+				sb.append(i == 0 && !url.contains("?") ? "?" : "&");
+				sb.append(entry.getKey()).append("=");
 				String value = entry.getValue();
 				try {
 					sb.append(URLEncoder.encode(value, "UTF-8"));
@@ -320,6 +354,12 @@ public class HttpClientUtils {
 		logger.info("[HttpClientUtils Get] begin invoke:" + sb.toString());
 		HttpGet httpGet = new HttpGet(sb.toString());
 		httpGet.setConfig(requestConfig);
+		if (null != headers) {
+			for (int j = 0, len = headers.length; j < len;) {
+        		httpGet.setHeader(headers[j], headers[j + 1]);
+        		j = j + 2;
+        	}
+		}
 		Header[] reqHeaders = httpGet.getAllHeaders();
 		for (Header reqHeader : reqHeaders) {
 			System.err.println(reqHeader.getName() + " == " + reqHeader.getValue());
@@ -327,14 +367,35 @@ public class HttpClientUtils {
 		try {
 			CloseableHttpResponse response = httpclient.execute(httpGet);
 			try {
+				Map<String, String> respheaders = new HashMap<String, String>();
 				Header[] allHeaders = response.getAllHeaders();
 				for (int j = 0, len = allHeaders.length; j < len; j++) {
 					String headerName = allHeaders[j].getName();
 					String headerValue = allHeaders[j].getValue();
-					if (headers.containsKey(headerName)) {
-						headerValue = headers.get(headerName) + " ; " + headerValue;
+					if (respheaders.containsKey(headerName)) {
+						headerValue = respheaders.get(headerName) + " ; " + headerValue;
 					}
-					headers.put(headerName, headerValue);
+					respheaders.put(headerName, headerValue);
+				}
+				result.put("headers", respheaders);
+				HttpEntity entity = response.getEntity();
+				ByteArrayOutputStream baos = null;
+				try {
+					if (entity != null) {
+						InputStream in = entity.getContent();
+						baos = new ByteArrayOutputStream();  
+				        byte[] buff = new byte[1024];  
+				        int rc = 0;  
+				        while ((rc = in.read(buff, 0, 1024)) > 0) {  
+				        	baos.write(buff, 0, rc);  
+				        }  
+						result.put("content", baos.toByteArray());
+					}
+				} finally {
+					if (entity != null) {
+						entity.getContent().close();
+						baos.close();
+					}
 				}
 			} catch (Exception e) {
 				logger.error(String.format("[HttpClientUtils Get]get response error, url:%s", sb.toString()), e);
@@ -351,7 +412,7 @@ public class HttpClientUtils {
 		} finally {
 			httpGet.releaseConnection();
 		}
-		return headers;
+		return result;
 	}
 	
 	/**
@@ -420,6 +481,124 @@ public class HttpClientUtils {
             		i = i + 2;
             	}
 			}
+			CloseableHttpResponse response = httpclient.execute(httpPost);
+			try {
+				// 执行POST请求
+				HttpEntity entity = response.getEntity(); // 获取响应实体
+				try {
+					if (null != entity) {
+						responseContent = EntityUtils.toString(entity, Charset.forName(encode));
+					}
+				} finally {
+					if (entity != null) {
+						entity.getContent().close();
+					}
+				}
+			} finally {
+				if (response != null) {
+					response.close();
+				}
+			}
+			logger.info("requestURI : " + httpPost.getURI() + ", responseContent: " + responseContent);
+		} catch (ClientProtocolException e) {
+			logger.error("ClientProtocolException", e);
+		} catch (IOException e) {
+			logger.error("IOException", e);
+		} finally {
+			httpPost.releaseConnection();
+		}
+		return responseContent;
+	}
+	
+	/**
+	  * HTTP POST请求
+	  * @param url
+	  * @param params
+	  * @param connectTimeout
+	  * @param encode
+	  * @param headers
+	  * @return
+	 */
+	public static Map<String, Object> sendPostWithHeaders(String url, Map<String, String> params, 
+			String encode, String... headers) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		HttpPost httpPost = new HttpPost(url);
+		try {
+			httpPost.setConfig(defaultRequestConfig);
+			if (null == encode) encode = ENCODE_UTF8;
+			List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+			if (null != params && params.size() > 0) {
+				for (Map.Entry<String, String> entry : params.entrySet()) {
+					formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+				}
+			}
+			// 绑定到请求 Entry
+			httpPost.setEntity(new UrlEncodedFormEntity(formParams, Charset.forName(encode)));
+			if (null != headers) {
+				for (int i = 0, len = headers.length; i < len;) {
+					httpPost.setHeader(headers[i], headers[i + 1]);
+					i = i + 2;
+				}
+			}
+			CloseableHttpResponse response = httpclient.execute(httpPost);
+			try {
+				Map<String, String> respheaders = new HashMap<String, String>();
+				Header[] allHeaders = response.getAllHeaders();
+				for (int j = 0, len = allHeaders.length; j < len; j++) {
+					String headerName = allHeaders[j].getName();
+					String headerValue = allHeaders[j].getValue();
+					if (respheaders.containsKey(headerName)) {
+						headerValue = respheaders.get(headerName) + " ; " + headerValue;
+					}
+					respheaders.put(headerName, headerValue);
+				}
+				result.put("headers", respheaders);
+				HttpEntity entity = response.getEntity(); // 获取响应实体
+				try {
+					if (null != entity) {
+						result.put("content", EntityUtils.toString(entity, Charset.forName(encode)));
+					}
+				} finally {
+					if (entity != null) {
+						entity.getContent().close();
+					}
+				}
+			} finally {
+				if (response != null) {
+					response.close();
+				}
+			}
+			logger.info("requestURI : " + httpPost.getURI() + ", responseContent: " + result.get("content"));
+		} catch (ClientProtocolException e) {
+			logger.error("ClientProtocolException", e);
+		} catch (IOException e) {
+			logger.error("IOException", e);
+		} finally {
+			httpPost.releaseConnection();
+		}
+		return result;
+	}
+	
+	public static String sendPostWithFile(String url, String path, String encode, String... headers) {
+		String responseContent = null;
+		HttpPost httpPost = new HttpPost(url);
+		try {
+			RequestConfig requestConfig = RequestConfig.custom()
+					.setSocketTimeout(connectTimeout)
+					.setConnectTimeout(connectTimeout)
+					.setConnectionRequestTimeout(connectTimeout).build();
+			httpPost.setConfig(requestConfig);
+			if (null == encode) encode = ENCODE_UTF8;
+			// 绑定到请求 Entry
+			if (null != headers) {
+				for (int i = 0, len = headers.length; i < len;) {
+            		httpPost.setHeader(headers[i], headers[i + 1]);
+            		i = i + 2;
+            	}
+			}
+			HttpEntity httpEntity = MultipartEntityBuilder.create()
+				.addBinaryBody("file", new File(path)).build();  
+			httpPost.setEntity(httpEntity);
 			CloseableHttpResponse response = httpclient.execute(httpPost);
 			try {
 				// 执行POST请求

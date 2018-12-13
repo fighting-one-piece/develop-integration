@@ -2,6 +2,7 @@ package org.cisiondata.modules.quartz.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -17,6 +18,7 @@ import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.ScheduleBuilder;
@@ -63,6 +65,37 @@ public class QuartzServiceImpl implements IQuartzService {
 			Class<? extends Job> jobClazz = (Class<? extends Job>) Class.forName(jobClass);
 			JobDetail jobDetail = JobBuilder.newJob().withIdentity(jobKey).ofType(jobClazz)
 					.storeDurably(true).requestRecovery(true).build();
+			scheduler.scheduleJob(jobDetail, cronTrigger);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		} 
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void insert(String jobGroup, String jobName, String jobClass, Map<?, ?> jobData, String triggerGroup,
+			String triggerName, String cron) throws BusinessException {
+		LOG.info("Insert Scheduler {} - {} - {} - {} - {} - {} - {}", jobGroup, jobName, jobClass, 
+				jobData, triggerGroup, triggerName, cron);
+		checkParamNotNull(jobGroup, "任务组名", jobName, "任务名称", jobClass, "任务实现类", cron, "任务Cron表达式");
+		try {
+			JobKey jobKey = new JobKey(jobName, jobGroup);
+			if (scheduler.checkExists(jobKey)) {
+				throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "该任务已经存在");
+			} 
+			if (StringUtils.isBlank(triggerGroup)) triggerGroup = jobGroup;
+			if (StringUtils.isBlank(triggerName)) triggerName = jobName;
+			TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
+			if (scheduler.checkExists(triggerKey)) {
+				throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "该任务Trigger已经存在");
+			}
+			CronExpression cronExpression = new CronExpression(cron);
+			ScheduleBuilder<CronTrigger> cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
+			CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey)
+					.withSchedule(cronScheduleBuilder).build();
+			Class<? extends Job> jobClazz = (Class<? extends Job>) Class.forName(jobClass);
+			JobDetail jobDetail = JobBuilder.newJob().withIdentity(jobKey).ofType(jobClazz)
+					.usingJobData(new JobDataMap(jobData)).storeDurably(true).requestRecovery(true).build();
 			scheduler.scheduleJob(jobDetail, cronTrigger);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

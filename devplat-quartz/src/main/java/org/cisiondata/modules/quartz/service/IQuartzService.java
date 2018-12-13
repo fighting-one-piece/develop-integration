@@ -1,6 +1,7 @@
 package org.cisiondata.modules.quartz.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.cisiondata.modules.quartz.entity.CJob;
 import org.cisiondata.utils.exception.BusinessException;
@@ -19,6 +20,20 @@ public interface IQuartzService {
 	 */
 	public void insert(String jobGroup, String jobName, String jobClass, String triggerGroup,
 			String triggerName, String cron) throws BusinessException;
+	
+	/**
+	 * 新增Job
+	 * @param jobGroup
+	 * @param jobName
+	 * @param jobClass
+	 * @param jobData
+	 * @param triggerGroup
+	 * @param triggerName
+	 * @param cron
+	 * @throws BusinessException
+	 */
+	public void insert(String jobGroup, String jobName, String jobClass, Map<?, ?> jobData,
+			String triggerGroup, String triggerName, String cron) throws BusinessException;
 	
 	/**
 	 * 更新Job的Cron表达式
